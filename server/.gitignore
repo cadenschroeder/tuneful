@@ -9,3 +9,5 @@ pom.xml.bak
 
 # Computer Config
 .DS_Store
+
+src/main/resources
