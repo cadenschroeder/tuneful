@@ -36,3 +36,12 @@
     transform: rotate(360deg);
   }
 }
+
+#music {
+  height: max-content;
+}
+
+#menu {
+  position: absolute;
+  bottom: 0;
+}
