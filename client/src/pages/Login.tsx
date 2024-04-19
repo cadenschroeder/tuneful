@@ -1,7 +1,7 @@
 import { AuthProps, Page, PageProps } from "../interfaces/interfaces";
 import { authLoginMock } from "../utils/auth";
 import { getAuth, GoogleAuthProvider, signInWithPopup } from "firebase/auth";
-import { addLoginCookie, removeLoginCookie } from "../utils/cookie";
+import { addLoginCookie } from "../utils/cookie";
 
 interface LoginProps {
   authProps: AuthProps;
@@ -12,10 +12,11 @@ const Login = ({ authProps, pageProps }: LoginProps) => {
   const { setIsAuthenticated } = authProps;
   const { setPage } = pageProps;
 
-  const handleLogin = () => {
+  const handleLoginIncognito = () => {
     if (authLoginMock()) {
       setIsAuthenticated(true);
       setPage(Page.MUSIC);
+      addLoginCookie("incognito");
     }
   };
 
@@ -26,26 +27,27 @@ const Login = ({ authProps, pageProps }: LoginProps) => {
       const response = await signInWithPopup(auth, new GoogleAuthProvider());
       const userEmail = response.user.email || "";
 
-      // Check if the email ends with the allowed domain
-      if (userEmail.endsWith("@brown.edu")) {
-        console.log(response.user.uid);
-        // add unique user id as a cookie to the browser.
+      if (!!userEmail) {
         addLoginCookie(response.user.uid);
         setIsAuthenticated(true);
+        setPage(Page.MUSIC);
       } else {
-        // User is not allowed, sign them out and show a message
         await auth.signOut();
-        console.log("User not allowed. Signed out.");
       }
     } catch (error) {
-      console.log(error);
+      alert("Error signing in with Google");
     }
   };
 
   return (
-    <div>
-      <h1>Tuneful!</h1>
-      <button onClick={handleLogin}>Continue with Google</button>
+    <div id="login">
+      <h1>tuneful</h1>
+      <p>
+        <button onClick={signInWithGoogle}>Continue with Google</button>
+      </p>
+      <p>
+        <button onClick={handleLoginIncognito}>Incognito 😎</button>
+      </p>
     </div>
   );
 };
