@@ -1,5 +1,6 @@
-package edu.brown.cs.student.main.server.handlers;
+package edu.brown.cs.student.main.server.handlers.maps;
 
+import edu.brown.cs.student.main.server.handlers.Utils;
 import edu.brown.cs.student.main.server.storage.StorageInterface;
 import java.util.HashMap;
 import java.util.Map;
@@ -7,11 +8,11 @@ import spark.Request;
 import spark.Response;
 import spark.Route;
 
-public class AddWordHandler implements Route {
+public class ClearUserHandler implements Route {
 
   public StorageInterface storageHandler;
 
-  public AddWordHandler(StorageInterface storageHandler) {
+  public ClearUserHandler(StorageInterface storageHandler) {
     this.storageHandler = storageHandler;
   }
 
@@ -26,24 +27,13 @@ public class AddWordHandler implements Route {
   public Object handle(Request request, Response response) {
     Map<String, Object> responseMap = new HashMap<>();
     try {
-      // collect parameters from the request
       String uid = request.queryParams("uid");
-      String word = request.queryParams("word");
 
-      Map<String, Object> data = new HashMap<>();
-      data.put("word", word);
-
-      System.out.println("adding word: " + word + " for user: " + uid);
-
-      // get the current word count to make a unique word_id by index.
-      int wordCount = this.storageHandler.getCollection(uid, "words").size();
-      String wordId = "word-" + wordCount;
-
-      // use the storage handler to add the document to the database
-      this.storageHandler.addDocument(uid, "words", wordId, data);
+      // Remove the user from the database
+      System.out.println("clearing words for user: " + uid);
+      this.storageHandler.clearUser(uid);
 
       responseMap.put("response_type", "success");
-      responseMap.put("word", word);
     } catch (Exception e) {
       // error likely occurred in the storage handler
       e.printStackTrace();
