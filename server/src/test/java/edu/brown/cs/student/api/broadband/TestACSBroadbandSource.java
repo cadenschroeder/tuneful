@@ -1,7 +1,7 @@
 package edu.brown.cs.student.api.broadband;
 
 import edu.brown.cs.student.main.exception.DatasourceException;
-import edu.brown.cs.student.main.server.broadband.ACSBroadbandSource;
+import edu.brown.cs.student.main.server.broadband.SpotifySource;
 import edu.brown.cs.student.main.server.broadband.BroadbandData;
 import org.junit.jupiter.api.Test;
 import org.testng.Assert;
@@ -10,7 +10,7 @@ public class TestACSBroadbandSource {
 
   @Test
   public void testACSBroadbandSourceSuccess() {
-    ACSBroadbandSource source = new ACSBroadbandSource();
+    SpotifySource source = new SpotifySource();
     try {
       BroadbandData data = source.getBroadBand("California", "Kings");
       Assert.assertNotNull(data);
@@ -24,7 +24,7 @@ public class TestACSBroadbandSource {
 
   @Test
   public void testACSBroadbandSourceNotFound() {
-    ACSBroadbandSource source = new ACSBroadbandSource();
+    SpotifySource source = new SpotifySource();
     Assert.expectThrows(DatasourceException.class, () -> source.getBroadBand("", ""));
   }
 }

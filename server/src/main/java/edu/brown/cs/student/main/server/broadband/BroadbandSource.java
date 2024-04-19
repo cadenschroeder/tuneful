@@ -14,4 +14,8 @@ public interface BroadbandSource {
    * @throws DatasourceException is any exception from getting the broadband data
    */
   BroadbandData getBroadBand(String state, String county) throws DatasourceException;
+
+  String getTrack();
+
+
 }

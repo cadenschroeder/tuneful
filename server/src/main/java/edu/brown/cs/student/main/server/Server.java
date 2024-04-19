@@ -4,7 +4,7 @@ import static spark.Spark.after;
 
 import com.google.common.cache.CacheBuilder;
 import edu.brown.cs.student.main.csv.ParserState;
-import edu.brown.cs.student.main.server.broadband.ACSBroadbandSource;
+import edu.brown.cs.student.main.server.broadband.SpotifySource;
 import edu.brown.cs.student.main.server.broadband.BroadbandHandler;
 import edu.brown.cs.student.main.server.cache.APICache;
 import edu.brown.cs.student.main.server.csv.LoadCSVHandler;
@@ -35,7 +35,7 @@ public class Server {
 
     // Setting up the handler for the GET /loadcsv, /viewcsv, /searchcsv, /broadband
     Spark.get(
-        "broadband", new APICache(new BroadbandHandler(new ACSBroadbandSource()), cacheBuilder));
+        "broadband", new APICache(new BroadbandHandler(new SpotifySource()), cacheBuilder));
     Spark.get("loadcsv", new LoadCSVHandler(parser));
     Spark.get("viewcsv", new ViewCSVHandler(parser));
     Spark.get("searchcsv", new SearchCSVHandler(parser));

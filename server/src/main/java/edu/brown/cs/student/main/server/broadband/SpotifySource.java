@@ -16,10 +16,13 @@ import java.util.Map;
 import okio.Buffer;
 
 /**
- * ACSBroadbandSource Uses the ACS API to get information about broadband coverage in given county,
+ * SpotifySource Uses the ACS API to get information about broadband coverage in given county,
  * state Takes in params: state, county
  */
-public class ACSBroadbandSource implements BroadbandSource {
+public class SpotifySource implements BroadbandSource {
+
+  private String clientID;
+  private String clientSecret;
 
   /** Map with keys = state names, values = state ids */
   private Map<String, String> states;
@@ -27,6 +30,15 @@ public class ACSBroadbandSource implements BroadbandSource {
   private final Moshi moshi = new Moshi.Builder().build();
   private final Type listType = Types.newParameterizedType(List.class, List.class, String.class);
   private final JsonAdapter<List<List<String>>> listJsonAdapter = this.moshi.adapter(this.listType);
+
+  public SpotifySource(){
+    this.clientID = "12f6f43b0e464dd0b0a5e1f6c4a18386";
+    this.clientSecret = "ac4ea3fd4d1146e19a9e13ec5a381037";
+  }
+
+  private String fetchSongSnippet(){
+
+  }
 
   /**
    * fetchStateId is a helper function fetch state id and define state name to id map if undefined
