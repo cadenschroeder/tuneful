@@ -1,6 +1,7 @@
 import Menu from "../components/Menu";
 import Music from "../components/Music";
-import { AuthProps, PageProps } from "../interfaces/interfaces";
+import Profile from "../components/Profile";
+import { AuthProps, Page, PageProps } from "../interfaces/interfaces";
 
 interface ApplicationProps {
   authProps: AuthProps;
@@ -8,10 +9,25 @@ interface ApplicationProps {
 }
 
 const Application = ({ authProps, pageProps }: ApplicationProps) => {
+  const { page } = pageProps;
+
+  const handleTunefulClick = () => {
+    window.location.reload();
+  };
+
+  const CurrentPage = (): JSX.Element => {
+    switch (page) {
+      case Page.PROFILE:
+        return <Profile props={null} />;
+      default:
+        return <Music props={null} />;
+    }
+  };
+
   return (
     <div id="application">
-      <h1>Tuneful!</h1>
-      <Music props={null} />
+      <button onClick={handleTunefulClick}>tuneful</button>
+      <CurrentPage />
       <Menu authProps={authProps} pageProps={pageProps} />
     </div>
   );

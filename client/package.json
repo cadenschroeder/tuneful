@@ -9,9 +9,10 @@
     "@types/jest": "^27.5.2",
     "@types/node": "^16.18.96",
     "@types/react": "^18.2.79",
-    "js-cookie": "^3.0.5",
     "@types/react-dom": "^18.2.25",
+    "dotenv": "^16.4.5",
     "firebase": "^10.11.0",
+    "js-cookie": "^3.0.5",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-scripts": "5.0.1",
@@ -19,7 +20,8 @@
     "web-vitals": "^2.1.4"
   },
   "devDependencies": {
-    "@babel/plugin-proposal-private-property-in-object": "^7.16.7"
+    "@babel/plugin-proposal-private-property-in-object": "^7.16.7",
+    "@types/js-cookie": "^3.0.6"
   },
   "scripts": {
     "start": "react-scripts start",

@@ -1,4 +1,5 @@
-import { AuthProps, PageProps } from "../interfaces/interfaces";
+import { AuthProps, Page, PageProps } from "../interfaces/interfaces";
+import { getLoginCookie, removeLoginCookie } from "../utils/cookie";
 
 interface MenuProps {
   authProps: AuthProps;
@@ -7,26 +8,45 @@ interface MenuProps {
 
 const Menu = ({ authProps, pageProps }: MenuProps) => {
   const { setIsAuthenticated } = authProps;
-  const { setPage } = pageProps;
+  const { page, setPage } = pageProps;
 
   const hanleProfileClick = () => {
-    setPage("profile");
+    setPage(Page.PROFILE);
   };
 
   const handleMusicClick = () => {
-    setPage("music");
+    setPage(Page.MUSIC);
   };
 
   const handleLogoutClick = () => {
+    removeLoginCookie();
     setIsAuthenticated(false);
-    setPage("login");
+    setPage(Page.LOGIN);
   };
+
+  const isIncognito = getLoginCookie() === "incognito";
 
   return (
     <div id="menu">
-      <button onClick={hanleProfileClick}>Profile</button>
-      <button onClick={handleMusicClick}>Music</button>
-      <button onClick={handleLogoutClick}>Logout</button>
+      {!isIncognito && (
+        <>
+          <button
+            className={page === Page.PROFILE ? "selected" : ""}
+            onClick={hanleProfileClick}
+          >
+            Profile 🤖
+          </button>
+          <button
+            className={page === Page.MUSIC ? "selected" : ""}
+            onClick={handleMusicClick}
+          >
+            Music 🎶
+          </button>
+        </>
+      )}
+      <button onClick={handleLogoutClick}>
+        {isIncognito ? "Leave Incognito 👋" : "Logout 👋"}
+      </button>
     </div>
   );
 };
