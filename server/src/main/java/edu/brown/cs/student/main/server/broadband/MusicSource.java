@@ -1,5 +1,6 @@
 package edu.brown.cs.student.main.server.broadband;
 
+import java.io.IOException;
 import java.net.MalformedURLException;
 import java.util.HashMap;
 import java.util.List;
@@ -14,7 +15,7 @@ public interface MusicSource {
    * @param songID
    * @return SongData for the song
    */
-  SongData getSongData(String songID) throws MalformedURLException;
+  SongData getSongData(String songID) throws IOException, DatasourceException;
 
   /**
    * Takes in max, min, and target values for all audio features and queries API 
@@ -22,7 +23,7 @@ public interface MusicSource {
    * @param inputs max, min, target, etc. (hashmap for now but we can change it)
    * @return a list of song IDs referring to the songs to be recommended
    */
-  List<String> getRecommendation(HashMap<String, String> inputs) throws MalformedURLException;
+  List<String> getRecommendation(HashMap<String, String> inputs) throws IOException, DatasourceException;
 
   /**
    * getBroadBand gets the broadband data of county, state

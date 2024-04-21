@@ -5,15 +5,18 @@ import com.squareup.moshi.Moshi;
 import com.squareup.moshi.Types;
 import edu.brown.cs.student.main.exception.DatasourceException;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStreamWriter;
 import java.lang.reflect.Type;
 import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Scanner;
+
 import okio.Buffer;
 
 /**
@@ -37,28 +40,96 @@ public class SpotifySource implements MusicSource {
     this.clientSecret = "ac4ea3fd4d1146e19a9e13ec5a381037";
   }
 
+  private String getAccessToken() throws IOException{
+    URL url = new URL("https://accounts.spotify.com/api/token");
+    HttpURLConnection httpConn = (HttpURLConnection) url.openConnection();
+    httpConn.setRequestMethod("POST");
+
+    httpConn.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
+
+    httpConn.setDoOutput(true);
+    OutputStreamWriter writer = new OutputStreamWriter(httpConn.getOutputStream());
+    writer.write("grant_type=client_credentials&client_id=" + this.clientID + "&client_secret=" + this.clientSecret);
+    writer.flush();
+    writer.close();
+    httpConn.getOutputStream().close();
+
+    InputStream responseStream = httpConn.getResponseCode() / 100 == 2 ? httpConn.getInputStream() : httpConn.getErrorStream();
+    Scanner s = new Scanner(responseStream).useDelimiter("\\A");
+    String response = s.hasNext() ? s.next() : "";
+    s.close();
+    String[] tokens = response.split(":");
+    return tokens[1].replace("\"", "");
+  }
+
   /**
    * calls the get track and get audio features Spotify endpoints to build a SongData record
-   * @throws MalformedURLException 
+   * @throws IOException 
+   * @throws DatasourceException 
    */
   @Override
-  public SongData getSongData(String songID) throws MalformedURLException {
-    URL requestURL =
-          new URL("https", "api.census.gov", "/data/2010/dec/sf1?get=NAME&for=state:*");
-    HttpURLConnection clientConnection = connect(requestURL);
-    List<List<String>> statesFromJson =
-          this.listJsonAdapter.fromJson(new Buffer().readFrom(clientConnection.getInputStream()));
-    return new SongData(songID, false, songID, songID, null);
+  public SongData getSongData(String songID) throws IOException, DatasourceException {
+    // List<List<String>> tokenMap = getAccessToken();
+    String accessToken = getAccessToken();
+
+    // get Track API call:
+    URL url = new URL("https://api.spotify.com/v1/tracks/" + songID + "?market=SE");
+    HttpURLConnection httpConn = (HttpURLConnection) url.openConnection();
+    httpConn.setRequestMethod("GET");
+    httpConn.setRequestProperty("Authorization", "Bearer " + accessToken);
+    InputStream responseStream = httpConn.getResponseCode() / 100 == 2 ? httpConn.getInputStream() : httpConn.getErrorStream();
+    Scanner s = new Scanner(responseStream).useDelimiter("\\A");
+    String response = s.hasNext() ? s.next() : "";
+    s.close();
+
+    Map<String, Object> track = deserializeTrack(response);
+    // TODO: Add null checks to values below:
+    String snippetURL = track.get("preview_url").toString();
+    String explicit = track.get("explicit").toString();
+    Map<String, Object> albumInfo = (Map<String, Object>) track.get("album");
+    String albumName = albumInfo.get("name").toString();
+    ArrayList<Map<String, Object>> images = (ArrayList<Map<String, Object>>) albumInfo.get("images");
+
+    ArrayList<Map<String, Object>> artists = (ArrayList<Map<String, Object>>) track.get("artists"); // check this cast
+    ArrayList<String> artistNames = new ArrayList<>();
+    for (Map<String, Object> artist : artists){
+      artistNames.add(artist.get("name").toString());
+    }
+
+    return new SongData(snippetURL, explicit, artistNames, albumName, images, null);
   }
 
   @Override
-  public List<String> getRecommendation(HashMap<String, String> inputs) throws MalformedURLException  {
+  public List<String> getRecommendation(HashMap<String, String> inputs) throws IOException, DatasourceException  {
     // TODO Auto-generated method stub
     URL requestURL = new URL("https", "api.census.gov", "/data/2010/dec/sf1?get=NAME&for=state:*");
     HttpURLConnection clientConnection = connect(requestURL);
     List<List<String>> statesFromJson = this.listJsonAdapter
         .fromJson(new Buffer().readFrom(clientConnection.getInputStream()));
     return new ArrayList<String>();
+  }
+
+  public static Map<String, Object> deserializeTrack(String jsonSong) throws IOException {
+    // Initializes Moshi
+    Moshi moshi = new Moshi.Builder().build();
+
+    // Initializes an adapter to a Broadband class then uses it to parse the JSON.
+    JsonAdapter<Map<String, Object>> adapter = moshi.adapter(Types.newParameterizedType(Map.class, String.class, Object.class));
+
+    Map<String, Object> track = adapter.fromJson(jsonSong);
+
+    return track;
+  }
+
+  public static List<List<String>> deserializeAccessToken(String jsonToken) throws IOException {
+    // Initializes Moshi
+    Moshi moshi = new Moshi.Builder().build();
+
+    // Initializes an adapter to a Broadband class then uses it to parse the JSON.
+    JsonAdapter<List> adapter = moshi.adapter(List.class);
+    List<List<String>> accessToken = adapter.fromJson(jsonToken);
+
+    return accessToken;
   }
 
 
