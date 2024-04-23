@@ -5,6 +5,7 @@ import Application from "./pages/Application";
 import { AuthProps, Page, PageProps } from "./interfaces/interfaces";
 import { initializeApp } from "firebase/app";
 import { getLoginCookie } from "./utils/cookie";
+import Footer from "./components/Footer";
 
 const firebaseConfig = {
   apiKey: process.env.REACT_APP_API_KEY,
@@ -42,12 +43,13 @@ function App() {
   }, []);
 
   return (
-    <div className="App">
+    <div className="App" id="App">
       {showLogin ? (
         <Login authProps={authProps} pageProps={pageProps} />
       ) : (
         <Application authProps={authProps} pageProps={pageProps} />
       )}
+      <Footer />
     </div>
   );
 }
