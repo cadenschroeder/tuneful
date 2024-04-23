@@ -108,6 +108,7 @@ interface Song {
   cover: string;
   artist: string;
   blob: string;
+  spotify: string;
 }
 
 interface CardProps {
@@ -189,6 +190,9 @@ const Card = ({ songs }: CardProps) => {
 
   return (
     <div id="card" className="card">
+      <a href={song.spotify}>
+        <img src="img/spotify.png" alt="spotify" />
+      </a>
       <h2>"{song.name}"</h2>
       <p>{song.artist}</p>
       {blob ? (

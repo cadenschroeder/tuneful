@@ -35,7 +35,7 @@ button:not(.card button) {
   color: #fff;
   border: none;
   box-shadow: 3px 3px 0 0 #00000080;
-  transition: all 0.2s;
+  transition: all 0.1s;
 }
 
 button:not(.card button):hover {
@@ -110,7 +110,7 @@ h1 {
   border: none;
   padding: 0 0 0.1em 0;
   background: none;
-  transition: all 0.2s;
+  transition: all 0.15s;
   text-shadow: 2px 2px 0 #00000080;
   cursor: pointer;
 }
@@ -160,4 +160,18 @@ h1 {
 
 #footer a:hover {
   color: #00000099;
+}
+
+.card a img {
+  right: 0;
+  border: none;
+  position: absolute;
+  width: 20px;
+  opacity: 0.2;
+  padding: 10px;
+  transition: all 0.1s;
+}
+
+.card a img:hover {
+  opacity: 0.5;
 }
