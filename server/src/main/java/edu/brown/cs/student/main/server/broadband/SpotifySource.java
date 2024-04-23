@@ -16,12 +16,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
-
 import okio.Buffer;
 
 /**
- * SpotifySource Uses the ACS API to get information about broadband coverage in given county,
- * state Takes in params: state, county
+ * SpotifySource Uses the ACS API to get information about broadband coverage in given county, state
+ * Takes in params: state, county
  */
 public class SpotifySource implements MusicSource {
 
@@ -35,12 +34,12 @@ public class SpotifySource implements MusicSource {
   private final Type listType = Types.newParameterizedType(List.class, List.class, String.class);
   private final JsonAdapter<List<List<String>>> listJsonAdapter = this.moshi.adapter(this.listType);
 
-  public SpotifySource(){
+  public SpotifySource() {
     this.clientID = "12f6f43b0e464dd0b0a5e1f6c4a18386";
     this.clientSecret = "ac4ea3fd4d1146e19a9e13ec5a381037";
   }
 
-  private String getAccessToken() throws IOException{
+  private String getAccessToken() throws IOException {
     URL url = new URL("https://accounts.spotify.com/api/token");
     HttpURLConnection httpConn = (HttpURLConnection) url.openConnection();
     httpConn.setRequestMethod("POST");
@@ -49,12 +48,19 @@ public class SpotifySource implements MusicSource {
 
     httpConn.setDoOutput(true);
     OutputStreamWriter writer = new OutputStreamWriter(httpConn.getOutputStream());
-    writer.write("grant_type=client_credentials&client_id=" + this.clientID + "&client_secret=" + this.clientSecret);
+    writer.write(
+        "grant_type=client_credentials&client_id="
+            + this.clientID
+            + "&client_secret="
+            + this.clientSecret);
     writer.flush();
     writer.close();
     httpConn.getOutputStream().close();
 
-    InputStream responseStream = httpConn.getResponseCode() / 100 == 2 ? httpConn.getInputStream() : httpConn.getErrorStream();
+    InputStream responseStream =
+        httpConn.getResponseCode() / 100 == 2
+            ? httpConn.getInputStream()
+            : httpConn.getErrorStream();
     Scanner s = new Scanner(responseStream).useDelimiter("\\A");
     String response = s.hasNext() ? s.next() : "";
     s.close();
@@ -64,8 +70,9 @@ public class SpotifySource implements MusicSource {
 
   /**
    * calls the get track and get audio features Spotify endpoints to build a SongData record
-   * @throws IOException 
-   * @throws DatasourceException 
+   *
+   * @throws IOException
+   * @throws DatasourceException
    */
   @Override
   public SongData getSongData(String songID) throws IOException, DatasourceException {
@@ -77,7 +84,10 @@ public class SpotifySource implements MusicSource {
     HttpURLConnection httpConn = (HttpURLConnection) url.openConnection();
     httpConn.setRequestMethod("GET");
     httpConn.setRequestProperty("Authorization", "Bearer " + accessToken);
-    InputStream responseStream = httpConn.getResponseCode() / 100 == 2 ? httpConn.getInputStream() : httpConn.getErrorStream();
+    InputStream responseStream =
+        httpConn.getResponseCode() / 100 == 2
+            ? httpConn.getInputStream()
+            : httpConn.getErrorStream();
     Scanner s = new Scanner(responseStream).useDelimiter("\\A");
     String response = s.hasNext() ? s.next() : "";
     s.close();
@@ -88,24 +98,43 @@ public class SpotifySource implements MusicSource {
     String explicit = track.get("explicit").toString();
     Map<String, Object> albumInfo = (Map<String, Object>) track.get("album");
     String albumName = albumInfo.get("name").toString();
-    ArrayList<Map<String, Object>> images = (ArrayList<Map<String, Object>>) albumInfo.get("images");
+    ArrayList<Map<String, Object>> images =
+        (ArrayList<Map<String, Object>>) albumInfo.get("images");
 
-    ArrayList<Map<String, Object>> artists = (ArrayList<Map<String, Object>>) track.get("artists"); // check this cast
+    ArrayList<Map<String, Object>> artists =
+        (ArrayList<Map<String, Object>>) track.get("artists"); // check this cast
     ArrayList<String> artistNames = new ArrayList<>();
-    for (Map<String, Object> artist : artists){
+    for (Map<String, Object> artist : artists) {
       artistNames.add(artist.get("name").toString());
     }
 
-    return new SongData(snippetURL, explicit, artistNames, albumName, images, null);
+    // get features API call
+    URL featuresURL = new URL("https://api.spotify.com/v1/audio-features/11dFghVXANMlKmJXsNCbNl");
+    HttpURLConnection featuresHttpConn = (HttpURLConnection) featuresURL.openConnection();
+    featuresHttpConn.setRequestMethod("GET");
+    featuresHttpConn.setRequestProperty("Authorization", "Bearer " + accessToken);
+    InputStream featuresResponseStream =
+        featuresHttpConn.getResponseCode() / 100 == 2
+            ? featuresHttpConn.getInputStream()
+            : featuresHttpConn.getErrorStream();
+    Scanner featuresS = new Scanner(featuresResponseStream).useDelimiter("\\A");
+    String featuresResponse = featuresS.hasNext() ? featuresS.next() : "";
+    featuresS.close();
+
+    Map<String, Object> features = deserializeTrack(featuresResponse);
+    // TODO: change features map into integers
+
+    return new SongData(snippetURL, explicit, artistNames, albumName, images, features);
   }
 
   @Override
-  public List<String> getRecommendation(HashMap<String, String> inputs) throws IOException, DatasourceException  {
+  public List<String> getRecommendation(HashMap<String, String> inputs)
+      throws IOException, DatasourceException {
     // TODO Auto-generated method stub
     URL requestURL = new URL("https", "api.census.gov", "/data/2010/dec/sf1?get=NAME&for=state:*");
     HttpURLConnection clientConnection = connect(requestURL);
-    List<List<String>> statesFromJson = this.listJsonAdapter
-        .fromJson(new Buffer().readFrom(clientConnection.getInputStream()));
+    List<List<String>> statesFromJson =
+        this.listJsonAdapter.fromJson(new Buffer().readFrom(clientConnection.getInputStream()));
     return new ArrayList<String>();
   }
 
@@ -114,7 +143,8 @@ public class SpotifySource implements MusicSource {
     Moshi moshi = new Moshi.Builder().build();
 
     // Initializes an adapter to a Broadband class then uses it to parse the JSON.
-    JsonAdapter<Map<String, Object>> adapter = moshi.adapter(Types.newParameterizedType(Map.class, String.class, Object.class));
+    JsonAdapter<Map<String, Object>> adapter =
+        moshi.adapter(Types.newParameterizedType(Map.class, String.class, Object.class));
 
     Map<String, Object> track = adapter.fromJson(jsonSong);
 
@@ -132,14 +162,14 @@ public class SpotifySource implements MusicSource {
     return accessToken;
   }
 
-
-
   // /**
-  //  * fetchStateId is a helper function fetch state id and define state name to id map if undefined
+  //  * fetchStateId is a helper function fetch state id and define state name to id map if
+  // undefined
   //  *
   //  * @param state is String representation of state name
   //  * @return List of State
-  //  * @throws Exception that may occur while fetching from census api, or an exception if state input
+  //  * @throws Exception that may occur while fetching from census api, or an exception if state
+  // input
   //  *     is not valid
   //  */
   // private String fetchStateId(String state) throws Exception {
@@ -151,7 +181,8 @@ public class SpotifySource implements MusicSource {
   //         new URL("https", "api.census.gov", "/data/2010/dec/sf1?get=NAME&for=state:*");
   //     HttpURLConnection clientConnection = connect(requestURL);
   //     List<List<String>> statesFromJson =
-  //         this.listJsonAdapter.fromJson(new Buffer().readFrom(clientConnection.getInputStream()));
+  //         this.listJsonAdapter.fromJson(new
+  // Buffer().readFrom(clientConnection.getInputStream()));
   //     Map<String, String> statesMap = new HashMap<>();
   //     if (statesFromJson != null) {
   //       for (List<String> stateStateId : statesFromJson) {
@@ -217,7 +248,8 @@ public class SpotifySource implements MusicSource {
   // }
 
   // /**
-  //  * fetchPercentBroadband is a helper function to get the percent broadband coverage for a specific
+  //  * fetchPercentBroadband is a helper function to get the percent broadband coverage for a
+  // specific
   //  * county within a state
   //  *
   //  * @param stateId is the stateId of which the county is in
@@ -256,7 +288,8 @@ public class SpotifySource implements MusicSource {
   //  * @param state is String representation of state we are looking for broadband coverage of
   //  * @param county is String representation of county we are looking for broadband coverage of
   //  * @return BroadbandData from ACS API for result
-  //  * @throws DatasourceException that may occur while fetching from census api, or an exception if
+  //  * @throws DatasourceException that may occur while fetching from census api, or an exception
+  // if
   //  *     state/county id input is not valid
   //  */
   // // @Override

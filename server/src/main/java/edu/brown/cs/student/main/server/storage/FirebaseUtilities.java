@@ -25,7 +25,8 @@
 //     // TODO: FIRESTORE PART 0:
 //     // Create /resources/ folder with firebase_config.json and
 //     // add your admin SDK from Firebase. see:
-//     // https://docs.google.com/document/d/10HuDtBWjkUoCaVj_A53IFm5torB_ws06fW3KYFZqKjc/edit?usp=sharing
+//     //
+// https://docs.google.com/document/d/10HuDtBWjkUoCaVj_A53IFm5torB_ws06fW3KYFZqKjc/edit?usp=sharing
 //     String workingDirectory = System.getProperty("user.dir");
 //     Path firebaseConfigPath =
 //         Paths.get(workingDirectory, "src", "main", "resources", "firebase_config.json");
@@ -46,7 +47,8 @@
 //   public List<Map<String, Object>> getCollection(String uid, String collection_id)
 //       throws InterruptedException, ExecutionException, IllegalArgumentException {
 //     if (uid == null || collection_id == null) {
-//       throw new IllegalArgumentException("getCollection: uid and/or collection_id cannot be null");
+//       throw new IllegalArgumentException("getCollection: uid and/or collection_id cannot be
+// null");
 //     }
 //     // QUESTION TO TIM: should we make this an exercise too?
 
@@ -69,7 +71,8 @@
 //   }
 
 //   @Override
-//   public void addDocument(String uid, String collection_id, String doc_id, Map<String, Object> data)
+//   public void addDocument(String uid, String collection_id, String doc_id, Map<String, Object>
+// data)
 //       throws IllegalArgumentException {
 //     if (uid == null || collection_id == null || doc_id == null || data == null) {
 //       throw new IllegalArgumentException(

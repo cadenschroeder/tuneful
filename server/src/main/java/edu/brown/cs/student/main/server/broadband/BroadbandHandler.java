@@ -12,7 +12,8 @@
 // import spark.Route;
 
 // /**
-//  * BroadbandHandler Handles requests to broadband endpoint. Takes in params: state, county and saves
+//  * BroadbandHandler Handles requests to broadband endpoint. Takes in params: state, county and
+// saves
 //  * source in BroadbandSource.
 //  */
 // public class BroadbandHandler implements Route {
@@ -31,7 +32,8 @@
 //   /**
 //    * handle manages request and response to endpoint
 //    *
-//    * @param request is the request to the endpoint. Includes state and county which must be defined.
+//    * @param request is the request to the endpoint. Includes state and county which must be
+// defined.
 //    * @param response is the response from the endpoint
 //    * @return Object response to request
 //    */
@@ -44,7 +46,8 @@
 
 //     if (state == null || county == null) {
 //       return ResponseBuilder.buildException(
-//           "error_bad_request", 400, "Missing params. Please include state and county.", paramMap);
+//           "error_bad_request", 400, "Missing params. Please include state and county.",
+// paramMap);
 //     }
 
 //     try {
@@ -54,7 +57,8 @@
 //       responseMap.put("county", county);
 //       responseMap.put("percent", broadbandData.percentBroadband());
 //       // src:
-//       // https://stackoverflow.com/questions/2942857/how-to-convert-current-date-into-string-in-java
+//       //
+// https://stackoverflow.com/questions/2942857/how-to-convert-current-date-into-string-in-java
 //       SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
 //       dateFormat.setTimeZone(TimeZone.getTimeZone("EST"));
 //       responseMap.put("date", dateFormat.format(new Date()) + " EST");

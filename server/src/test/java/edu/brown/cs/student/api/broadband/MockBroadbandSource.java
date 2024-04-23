@@ -1,12 +1,11 @@
 package edu.brown.cs.student.api.broadband;
 
-import java.net.MalformedURLException;
-import java.util.HashMap;
-import java.util.List;
-
 import edu.brown.cs.student.main.server.broadband.BroadbandData;
 import edu.brown.cs.student.main.server.broadband.MusicSource;
 import edu.brown.cs.student.main.server.broadband.SongData;
+import java.net.MalformedURLException;
+import java.util.HashMap;
+import java.util.List;
 
 public class MockBroadbandSource implements MusicSource {
 
@@ -27,7 +26,8 @@ public class MockBroadbandSource implements MusicSource {
   }
 
   @Override
-  public List<String> getRecommendation(HashMap<String, String> inputs) throws MalformedURLException {
+  public List<String> getRecommendation(HashMap<String, String> inputs)
+      throws MalformedURLException {
     // TODO Auto-generated method stub
     throw new UnsupportedOperationException("Unimplemented method 'getRecommendation'");
   }

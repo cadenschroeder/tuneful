@@ -1,56 +1,50 @@
 package edu.brown.cs.student.main.server.handlers;
 
-import java.io.IOException;
-import java.net.URISyntaxException;
-import java.util.HashMap;
-import java.util.Map;
-
-import com.google.common.util.concurrent.UncheckedExecutionException;
 import com.squareup.moshi.JsonAdapter;
 import com.squareup.moshi.Moshi;
-
 import edu.brown.cs.student.main.server.broadband.MusicSource;
 import edu.brown.cs.student.main.server.broadband.SongData;
+import java.util.HashMap;
+import java.util.Map;
 import spark.Request;
 import spark.Response;
 import spark.Route;
 
 public class SongDataHandler implements Route {
-    private MusicSource datasource;
+  private MusicSource datasource;
 
-    public SongDataHandler(MusicSource datasource){
-        this.datasource = datasource;
+  public SongDataHandler(MusicSource datasource) {
+    this.datasource = datasource;
+  }
+
+  @Override
+  public Object handle(Request request, Response response) throws Exception {
+    String trackID = request.queryParams("trackID");
+
+    if (trackID == null) {
+      return new SongDataFailureResponse("Missing one or more parameters").serialize();
+    }
+    if (trackID.isEmpty()) {
+      return new SongDataFailureResponse("Empty parameter(s)").serialize();
     }
 
-    @Override
-    public Object handle(Request request, Response response) throws Exception {
-        String trackID = request.queryParams("trackID");
+    // Creates a hashmap to store the results of the request
+    Map<String, Object> responseMap = new HashMap<>();
+    try {
+      // get the track data
+      SongData data = this.datasource.getSongData(trackID);
 
-        if (trackID == null) {
-          return new SongDataFailureResponse("Missing one or more parameters").serialize();
-        }
-        if (trackID.isEmpty()) {
-          return new SongDataFailureResponse("Empty parameter(s)").serialize();
-        }
+      // Adds results to the responseMap
+      responseMap.put("result", "success");
+      responseMap.put("songData", data);
 
-        // Creates a hashmap to store the results of the request
-        Map<String, Object> responseMap = new HashMap<>();
-        try {
-            // get the track data
-            SongData data = this.datasource.getSongData(trackID);
-
-          // Adds results to the responseMap
-        responseMap.put("result", "success");
-        responseMap.put("songData", data);
-
-        return new SongDataHandler.SongDataSuccessResponse(responseMap).serialize();
+      return new SongDataHandler.SongDataSuccessResponse(responseMap).serialize();
     } catch (Exception e) {
-        return new SongDataFailureResponse(e.getMessage()).serialize();
+      return new SongDataFailureResponse(e.getMessage()).serialize();
     }
+  }
 
-    }
-
-    /**
+  /**
    * Record that represents a succesful response. Returned to querier in handle(). Stores a response
    * map and has serializing capabilities
    *
@@ -96,5 +90,4 @@ public class SongDataHandler implements Route {
       return moshi.adapter(SongDataHandler.SongDataFailureResponse.class).toJson(this);
     }
   }
-
 }
