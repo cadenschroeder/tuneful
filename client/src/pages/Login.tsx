@@ -15,7 +15,7 @@ const Login = ({ authProps, pageProps }: LoginProps) => {
   const handleLoginIncognito = () => {
     if (authLoginMock()) {
       setIsAuthenticated(true);
-      setPage(Page.MUSIC);
+      setPage(Page.INTERMEDIATE); 
       addLoginCookie("incognito");
     }
   };
@@ -26,11 +26,10 @@ const Login = ({ authProps, pageProps }: LoginProps) => {
     try {
       const response = await signInWithPopup(auth, new GoogleAuthProvider());
       const userEmail = response.user.email || "";
-
       if (!!userEmail) {
         addLoginCookie(response.user.uid);
         setIsAuthenticated(true);
-        setPage(Page.MUSIC);
+        setPage(Page.INTERMEDIATE);
       } else {
         await auth.signOut();
       }

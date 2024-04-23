@@ -1,7 +1,8 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import "./App.css";
 import Login from "./pages/Login";
 import Application from "./pages/Application";
+import Intermediate from "./pages/Intermediate";
 import { AuthProps, Page, PageProps } from "./interfaces/interfaces";
 import { initializeApp } from "firebase/app";
 import { getLoginCookie } from "./utils/cookie";
@@ -19,6 +20,7 @@ const firebaseConfig = {
 initializeApp(firebaseConfig);
 
 function App() {
+  const appRef = useRef(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [page, setPage] = useState("login");
 
@@ -36,18 +38,22 @@ function App() {
 
   useEffect(() => {
     const cookie: string | undefined = getLoginCookie();
-    if (!!cookie && cookie !== "incognito") {
+    if (!!cookie) {
       setIsAuthenticated(true);
-      setPage(Page.MUSIC);
+      setPage(Page.INTERMEDIATE);
     }
   }, []);
 
   return (
-    <div className="App" id="App">
+    <div className="App" ref={appRef} id="App">
       {showLogin ? (
         <Login authProps={authProps} pageProps={pageProps} />
       ) : (
-        <Application authProps={authProps} pageProps={pageProps} />
+        page === Page.INTERMEDIATE ? (
+          <Intermediate pageProps={pageProps} setIsAuthenticated={setIsAuthenticated} />
+        ) : (
+          <Application authProps={authProps} pageProps={pageProps} appRef={appRef} />  // Pass appRef here
+        )
       )}
       <Footer />
     </div>

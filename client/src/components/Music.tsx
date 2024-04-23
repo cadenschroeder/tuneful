@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { songs } from "../utils/consts";
 import { AudioVisualizer } from "react-audio-visualize";
 
@@ -113,38 +113,23 @@ interface Song {
 
 interface CardProps {
   songs: Song[];
+  appRef: React.RefObject<HTMLDivElement>;
 }
 
-const Card = ({ songs }: CardProps) => {
+const Card = ({ songs, appRef }: CardProps) => {
   const [song, setSong] = useState(songs[0]);
   const [blob, setBlob] = useState<Blob>();
   const [playTime, setPlayTime] = useState(0);
-
-  const nextSong = () => {
-    let randomIndex = -1;
-    while (randomIndex < 0 || songs[randomIndex] === song) {
-      randomIndex = Math.floor(Math.random() * songs.length);
-    }
-    setSong(songs[randomIndex]);
-  };
+  const [isPlaying, setIsPlaying] = useState(false);
+  const audioRef = useRef<HTMLAudioElement>(null);
 
   useEffect(() => {
     async function getBlob(filePath: string): Promise<Blob> {
       return new Promise((resolve, reject) => {
         fetch(filePath)
-          .then((response) => {
-            if (response.ok) {
-              return response.blob();
-            } else {
-              throw new Error("Failed to load file");
-            }
-          })
-          .then((blob) => {
-            resolve(blob);
-          })
-          .catch((error) => {
-            reject(error);
-          });
+          .then(response => response.ok ? response.blob() : Promise.reject("Failed to load file"))
+          .then(blob => resolve(blob))
+          .catch(error => reject(error));
       });
     }
 
@@ -153,38 +138,30 @@ const Card = ({ songs }: CardProps) => {
       setPlayTime(0);
     });
 
-    document.getElementById(
-      "App"
-    )!.style.backgroundImage = `url(${song.cover})`;
-    document.getElementById("App")!.style.backdropFilter = "blur(10px)";
-  }, [song]);
-
-  const ref = React.createRef<HTMLAudioElement>();
-  const [isPlaying, setIsPlaying] = useState(false);
+    const appElement = appRef.current;
+    if (appElement) {
+      appElement.style.backgroundImage = `url(${song.cover})`;
+      appElement.style.backdropFilter = "blur(10px)";
+    }
+  }, [song, appRef]);
 
   useEffect(() => {
-    const audioElement = ref.current;
-    setIsPlaying(!audioElement?.paused);
-
-    const updatePlayTime = () => {
-      if (audioElement) setPlayTime(audioElement.currentTime);
-    };
-
-    if (audioElement)
+    const audioElement = audioRef.current;
+    if (audioElement) {
+      setIsPlaying(!audioElement.paused);
+      const updatePlayTime = () => setPlayTime(audioElement.currentTime);
       audioElement.addEventListener("timeupdate", updatePlayTime);
 
-    return () => {
-      if (audioElement)
-        audioElement.removeEventListener("timeupdate", updatePlayTime);
-    };
-  }, [ref]);
+      return () => audioElement.removeEventListener("timeupdate", updatePlayTime);
+    }
+  }, [audioRef]);
 
   const togglePlay = () => {
-    const audioElement = ref.current;
+    const audioElement = audioRef.current;
     if (audioElement) {
-      setIsPlaying(audioElement.paused);
-      if (audioElement.paused) audioElement.play();
-      else audioElement.pause();
+      const newPlayingState = audioElement.paused;
+      setIsPlaying(!newPlayingState);
+      newPlayingState ? audioElement.play() : audioElement.pause();
     }
   };
 
@@ -203,14 +180,14 @@ const Card = ({ songs }: CardProps) => {
             height={30}
             blob={blob}
           />
-          <audio src={song.blob} autoPlay ref={ref} />
+          <audio src={song.blob} autoPlay ref={audioRef} />
         </div>
       ) : (
         <div id="empty-vis"></div>
       )}
       <img src={song.cover} alt="album cover" draggable="false" />
       <Actions
-        nextSong={nextSong}
+        nextSong={() => setSong(songs[(songs.indexOf(song) + 1) % songs.length])}
         isPlaying={isPlaying}
         togglePlay={togglePlay}
       />
@@ -218,10 +195,14 @@ const Card = ({ songs }: CardProps) => {
   );
 };
 
-const Music = () => {
+interface MusicProps {
+  appRef: React.RefObject<HTMLDivElement>;
+}
+
+const Music = ({ appRef }: MusicProps) => {
   return (
     <div id="music">
-      <Card songs={songs} />
+      <Card songs={songs} appRef={appRef} />
     </div>
   );
 };
