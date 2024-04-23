@@ -108,7 +108,23 @@ public class SpotifySource implements MusicSource {
       artistNames.add(artist.get("name").toString());
     }
 
-    return new SongData(snippetURL, explicit, artistNames, albumName, images, null);
+    // get features API call
+    URL featuresURL = new URL("https://api.spotify.com/v1/audio-features/11dFghVXANMlKmJXsNCbNl");
+    HttpURLConnection featuresHttpConn = (HttpURLConnection) featuresURL.openConnection();
+    featuresHttpConn.setRequestMethod("GET");
+    featuresHttpConn.setRequestProperty("Authorization", "Bearer " + accessToken);
+    InputStream featuresResponseStream =
+        featuresHttpConn.getResponseCode() / 100 == 2
+            ? featuresHttpConn.getInputStream()
+            : featuresHttpConn.getErrorStream();
+    Scanner featuresS = new Scanner(featuresResponseStream).useDelimiter("\\A");
+    String featuresResponse = featuresS.hasNext() ? featuresS.next() : "";
+    featuresS.close();
+
+    Map<String, Object> features = deserializeTrack(featuresResponse);
+    // TODO: change features map into integers
+
+    return new SongData(snippetURL, explicit, artistNames, albumName, images, features);
   }
 
   @Override
