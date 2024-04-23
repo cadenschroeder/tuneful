@@ -1,5 +1,6 @@
 import Cookies from "js-cookie";
 
+
 export function addLoginCookie(uid: string): void {
   Cookies.set("uid", uid);
 }
