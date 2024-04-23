@@ -22,6 +22,8 @@ const Menu = ({ authProps, pageProps }: MenuProps) => {
     removeLoginCookie();
     setIsAuthenticated(false);
     setPage(Page.LOGIN);
+    document.getElementById("App")!.style.background =
+      "radial-gradient(#ffffff, #c6bebe)";
   };
 
   const isIncognito = getLoginCookie() === "incognito";
@@ -34,18 +36,18 @@ const Menu = ({ authProps, pageProps }: MenuProps) => {
             className={page === Page.PROFILE ? "selected" : ""}
             onClick={hanleProfileClick}
           >
-            Profile 🤖
+            Profile
           </button>
           <button
             className={page === Page.MUSIC ? "selected" : ""}
             onClick={handleMusicClick}
           >
-            Music 🎶
+            Music
           </button>
         </>
       )}
       <button onClick={handleLogoutClick}>
-        {isIncognito ? "Leave Incognito 👋" : "Logout 👋"}
+        {isIncognito ? "Leave Incognito" : "Logout"}
       </button>
     </div>
   );

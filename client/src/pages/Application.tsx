@@ -11,22 +11,18 @@ interface ApplicationProps {
 const Application = ({ authProps, pageProps }: ApplicationProps) => {
   const { page } = pageProps;
 
-  const handleTunefulClick = () => {
-    window.location.reload();
-  };
-
   const CurrentPage = (): JSX.Element => {
     switch (page) {
       case Page.PROFILE:
         return <Profile props={null} />;
       default:
-        return <Music props={null} />;
+        return <Music />;
     }
   };
 
   return (
     <div id="application">
-      <button onClick={handleTunefulClick}>tuneful</button>
+      <div></div>
       <CurrentPage />
       <Menu authProps={authProps} pageProps={pageProps} />
     </div>

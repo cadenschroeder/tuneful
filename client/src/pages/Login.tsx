@@ -46,7 +46,7 @@ const Login = ({ authProps, pageProps }: LoginProps) => {
         <button onClick={signInWithGoogle}>Continue with Google</button>
       </p>
       <p>
-        <button onClick={handleLoginIncognito}>Incognito 😎</button>
+        <button onClick={handleLoginIncognito}>Incognito</button>
       </p>
     </div>
   );

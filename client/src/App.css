@@ -4,25 +4,43 @@
   display: flex;
   justify-content: center;
   text-align: center;
-  background: radial-gradient(#ffffff, #beb5b5);
+  background: radial-gradient(#ffffff, #c6bebe);
+  background-size: cover;
   font-family: "Lexend";
+  transition: background-image 0.3s ease-in-out;
 }
 
-button {
+.App::before {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  backdrop-filter: blur(100px);
+}
+
+#empty-vis {
+  height: 33px;
+  width: 300px;
+}
+
+button:not(.card button) {
   font-family: "Lexend";
+  font-weight: 800;
   text-transform: lowercase;
-  border-radius: 100px;
   padding: 10px 20px;
-  border-width: 1px;
+  background-color: #00000050;
+  color: #fff;
+  border: none;
+  box-shadow: 3px 3px 0 0 #00000080;
+  transition: all 0.2s;
 }
 
-button.selected {
-  background-color: #cbbaba;
-}
-
-button:hover {
+button:not(.card button):hover {
   cursor: pointer;
-  background-color: #e2dbdb;
+  background-color: #1b1b1b50;
 }
 
 h1 {
@@ -30,18 +48,16 @@ h1 {
   background-image: -webkit-linear-gradient(125deg, #a7271e, #a18f1f, #519519);
   background-clip: text;
   -webkit-text-fill-color: transparent;
-  animation: init-zoom 1s ease-in-out, hue 15s infinite linear;
-  letter-spacing: 0.1rem;
+  animation: init-zoom 5s ease 0.5s forwards, hue 15s infinite linear;
+  letter-spacing: 0em;
 }
 
 @keyframes init-zoom {
   0% {
-    transform: scale(0.95);
-    letter-spacing: 0rem;
+    letter-spacing: 0em;
   }
   100% {
-    transform: scale(1);
-    letter-spacing: 0.1rem;
+    letter-spacing: 0.05em;
   }
 }
 
@@ -57,10 +73,10 @@ h1 {
 #application {
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
+  justify-content: center;
   min-width: 500px;
-  border-left: 1px dashed;
-  border-right: 1px dashed;
+  border-left: 0px dashed;
+  border-right: 0px dashed;
 }
 
 #login {
@@ -71,6 +87,77 @@ h1 {
   height: 100%;
 }
 
-#application button {
-  border-radius: 0;
+#menu {
+  position: absolute;
+  left: 50%;
+  bottom: 0;
+  transform: translate(-50%, 0);
+}
+
+.card {
+  width: 20em;
+  background-color: #00000050;
+  color: #fff;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  box-shadow: 3px 3px 0 0 #00000080;
+}
+
+.card button {
+  font-size: x-large;
+  border: none;
+  padding: 0 0 0.1em 0;
+  background: none;
+  transition: all 0.2s;
+  text-shadow: 2px 2px 0 #00000080;
+  cursor: pointer;
+}
+
+.card button:hover {
+  transform: rotate(5deg);
+  scale: 2.5;
+}
+
+.card button:active {
+  transform: rotate(10deg);
+  scale: 3;
+}
+
+.card img {
+  width: 100%;
+  border: 3px solid rgba(0, 0, 0, 0.3);
+  border-right: none;
+}
+
+.card h2 {
+  font-size: 1.5em;
+  margin: 0.5em 0 0 0;
+}
+
+.card p {
+  margin: 0 0 0.5em;
+}
+
+.buttons {
+  display: flex;
+  justify-content: space-around;
+}
+
+#footer {
+  position: absolute;
+  z-index: 100;
+  bottom: 0;
+  right: 0;
+  padding: 0.35em;
+}
+
+#footer a {
+  text-decoration: none;
+  color: #00000050;
+}
+
+#footer a:hover {
+  color: #00000099;
 }
