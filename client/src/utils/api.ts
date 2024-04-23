@@ -24,23 +24,8 @@ export async function addWord(word: string) {
   });
 }
 
-//long lat
-export async function addCoord(coord : [number,number]) {
-  const stringCoord = coord.toString();
-  return await queryAPI("add-coord", {
-    uid: getLoginCookie() || "",
-    coord: stringCoord,
-  });
-}
-
 export async function getWords() {
   return await queryAPI("list-words", {
-    uid: getLoginCookie() || "",
-  });
-}
-
-export async function getCoords() {
-  return await queryAPI("list-coords", {
     uid: getLoginCookie() || "",
   });
 }
