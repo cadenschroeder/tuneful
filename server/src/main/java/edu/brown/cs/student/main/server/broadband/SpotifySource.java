@@ -17,6 +17,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
 import okio.Buffer;
+import okio.Source;
 
 /**
  * SpotifySource Uses the ACS API to get information about broadband coverage in given county, state
@@ -127,15 +128,65 @@ public class SpotifySource implements MusicSource {
     return new SongData(snippetURL, explicit, artistNames, albumName, images, features);
   }
 
+  private String convertMapToString(Map<String, String> inputs) {
+    //Creates a string for the params from the inputs
+    StringBuilder stringBuilder = new StringBuilder();
+    for (Map.Entry<String, String> entry : inputs.entrySet()) {
+      stringBuilder.append(entry.getKey()).append("=").append(entry.getValue()).append("&");
+    }
+    // Remove the last '&' character
+    if (!stringBuilder.isEmpty()) {
+      stringBuilder.deleteCharAt(stringBuilder.length() - 1);
+    }
+    return stringBuilder.toString();
+  }
+
   @Override
-  public List<String> getRecommendation(HashMap<String, String> inputs)
+  public List<String> getRecommendation(Map<String, String> inputs)
       throws IOException, DatasourceException {
-    // TODO Auto-generated method stub
-    URL requestURL = new URL("https", "api.census.gov", "/data/2010/dec/sf1?get=NAME&for=state:*");
-    HttpURLConnection clientConnection = connect(requestURL);
-    List<List<String>> statesFromJson =
-        this.listJsonAdapter.fromJson(new Buffer().readFrom(clientConnection.getInputStream()));
-    return new ArrayList<String>();
+    String accessToken = getAccessToken();
+    // List of recommended song Ids
+    List<String> songIDs = new ArrayList<>();
+    // Create url from attribute map
+    String params = this.convertMapToString(inputs);
+    System.out.println(params);
+    // Todo: should there be any params we always want to add?
+
+    // fetch from Spotify;
+    URL url = new URL("https://api.spotify.com/v1/recommendations?" + params + "?market=SE");
+    HttpURLConnection httpConn = (HttpURLConnection) url.openConnection();
+    httpConn.setRequestMethod("GET");
+
+    httpConn.setRequestProperty("Authorization", "Bearer " + accessToken);
+
+    InputStream responseStream = httpConn.getResponseCode() / 100 == 2
+            ? httpConn.getInputStream()
+            : httpConn.getErrorStream();
+    Scanner s = new Scanner(responseStream).useDelimiter("\\A");
+    String response = s.hasNext() ? s.next() : "";
+
+    //TODO: Error handle
+    Map<String, Object> recommendations = deserializeRecommendations(response);
+
+    // Extracting the song IDs
+    ArrayList<Map<String,Object>> tracks = (ArrayList<Map<String,Object>>)recommendations.get("tracks");
+    for(Map<String,Object> track : tracks){
+      String id = track.get("id").toString();
+      songIDs.add(id);
+    }
+
+    return songIDs;
+  }
+
+  public static Map<String, Object> deserializeRecommendations(String jsonSong) throws IOException {
+    // Initializes Moshi
+    Moshi moshi = new Moshi.Builder().build();
+
+    // Initializes an adapter to a Broadband class then uses it to parse the JSON.
+    JsonAdapter<Map<String, Object>> adapter =
+            moshi.adapter(Types.newParameterizedType(Map.class, String.class, Object.class));
+
+      return adapter.fromJson(jsonSong);
   }
 
   public static Map<String, Object> deserializeTrack(String jsonSong) throws IOException {

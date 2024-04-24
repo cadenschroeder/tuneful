@@ -8,6 +8,7 @@ import edu.brown.cs.student.main.server.broadband.SpotifySource;
 import edu.brown.cs.student.main.server.csv.LoadCSVHandler;
 import edu.brown.cs.student.main.server.csv.SearchCSVHandler;
 import edu.brown.cs.student.main.server.csv.ViewCSVHandler;
+import edu.brown.cs.student.main.server.handlers.RecommendationHandler;
 import edu.brown.cs.student.main.server.handlers.SongDataHandler;
 import java.util.concurrent.TimeUnit;
 import spark.Spark;
@@ -33,10 +34,12 @@ public class Server {
         CacheBuilder.newBuilder().expireAfterWrite(30, TimeUnit.SECONDS);
 
     // Setting up the handler for the GET /loadcsv, /viewcsv, /searchcsv, /broadband
-    Spark.get("songData", new SongDataHandler(new SpotifySource()));
-    Spark.get("loadcsv", new LoadCSVHandler(parser));
-    Spark.get("viewcsv", new ViewCSVHandler(parser));
-    Spark.get("searchcsv", new SearchCSVHandler(parser));
+    SpotifySource spotifySource = new SpotifySource();
+    Spark.get("songData", new SongDataHandler(spotifySource));
+    Spark.get("recommendation", new RecommendationHandler(spotifySource));
+    //Spark.get("loadcsv", new LoadCSVHandler(parser));
+    //Spark.get("viewcsv", new ViewCSVHandler(parser));
+    //Spark.get("searchcsv", new SearchCSVHandler(parser));
     Spark.init();
     Spark.awaitInitialization();
 

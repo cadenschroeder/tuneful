@@ -35,7 +35,6 @@ public class SongDataHandler implements Route {
       SongData data = this.datasource.getSongData(trackID);
 
       // Adds results to the responseMap
-      responseMap.put("result", "success");
       responseMap.put("songData", data);
 
       return new SongDataHandler.SongDataSuccessResponse(responseMap).serialize();
