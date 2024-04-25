@@ -1,6 +1,7 @@
 import React from 'react';
 import { PageProps } from '../interfaces/interfaces';
 import { removeLoginCookie } from '../utils/cookie';
+import AccountLogin from './AccountLogin';
 
 interface IntermediateProps {
   pageProps: PageProps;
@@ -18,7 +19,8 @@ const Intermediate = ({ pageProps, setIsAuthenticated }: IntermediateProps) => {
 
   return (
     <div style={{ height: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-      <button onClick={() => setPage("music")}>Continue</button>
+      <AccountLogin />
+      <button onClick={() => setPage("music")}>Continue without connecting playlists</button>
       <button onClick={handleLogout} style={{ marginLeft: '20px' }}>Logout</button>
     </div>
   );
