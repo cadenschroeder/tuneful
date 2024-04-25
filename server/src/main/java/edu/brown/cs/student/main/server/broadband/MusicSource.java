@@ -4,6 +4,7 @@ import edu.brown.cs.student.main.exception.DatasourceException;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /** BroadbandSource interface Has function to get broadband data from state and county */
 public interface MusicSource {
@@ -24,7 +25,7 @@ public interface MusicSource {
    * @param inputs max, min, target, etc. (hashmap for now but we can change it)
    * @return a list of song IDs referring to the songs to be recommended
    */
-  List<String> getRecommendation(HashMap<String, String> inputs)
+  List<String> getRecommendation(Map<String, String> inputs)
       throws IOException, DatasourceException;
 
   /**
