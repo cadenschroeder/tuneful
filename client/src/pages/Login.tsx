@@ -1,4 +1,9 @@
-import { AuthProps, Page, PageProps } from "../interfaces/interfaces";
+import {
+  AuthProps,
+  Page,
+  PageProps,
+  SpotifyProps,
+} from "../interfaces/interfaces";
 import { authLoginMock } from "../utils/auth";
 import { getAuth, GoogleAuthProvider, signInWithPopup } from "firebase/auth";
 import { addLoginCookie } from "../utils/cookie";
@@ -6,17 +11,19 @@ import { addLoginCookie } from "../utils/cookie";
 interface LoginProps {
   authProps: AuthProps;
   pageProps: PageProps;
+  spotifyProps: SpotifyProps;
 }
 
-const Login = ({ authProps, pageProps }: LoginProps) => {
+const Login = ({ authProps, pageProps, spotifyProps }: LoginProps) => {
   const { setIsAuthenticated } = authProps;
   const { setPage } = pageProps;
+  const { showSpotify, setShowSpotify } = spotifyProps;
 
   const handleLoginIncognito = () => {
     if (authLoginMock()) {
       setIsAuthenticated(true);
-      setPage(Page.MUSIC);
       addLoginCookie("incognito");
+      setShowSpotify(true);
     }
   };
 
@@ -30,7 +37,7 @@ const Login = ({ authProps, pageProps }: LoginProps) => {
       if (!!userEmail) {
         addLoginCookie(response.user.uid);
         setIsAuthenticated(true);
-        setPage(Page.MUSIC);
+        setShowSpotify(true);
       } else {
         await auth.signOut();
       }
@@ -39,15 +46,36 @@ const Login = ({ authProps, pageProps }: LoginProps) => {
     }
   };
 
+  const handleSpotifyLogin = () => {
+    setPage(Page.MUSIC);
+  };
+
+  const handleSpotifySkip = () => {
+    setPage(Page.MUSIC);
+  };
+
   return (
     <div id="login">
       <h1>tuneful</h1>
-      <p>
-        <button onClick={signInWithGoogle}>Continue with Google</button>
-      </p>
-      <p>
-        <button onClick={handleLoginIncognito}>Incognito</button>
-      </p>
+      {!showSpotify ? (
+        <>
+          <p>
+            <button onClick={signInWithGoogle}>Continue with Google</button>
+          </p>
+          <p>
+            <button onClick={handleLoginIncognito}>Incognito</button>
+          </p>
+        </>
+      ) : (
+        <>
+          <p>
+            <button onClick={handleSpotifyLogin}>Connect Spotify</button>
+          </p>
+          <p>
+            <button onClick={handleSpotifySkip}>Skip</button>
+          </p>
+        </>
+      )}
     </div>
   );
 };

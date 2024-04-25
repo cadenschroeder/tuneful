@@ -3,6 +3,11 @@ export interface AuthProps {
   setIsAuthenticated: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
+export interface SpotifyProps {
+  showSpotify: boolean;
+  setShowSpotify: React.Dispatch<React.SetStateAction<boolean>>;
+}
+
 export interface PageProps {
   page: string;
   setPage: React.Dispatch<React.SetStateAction<string>>;

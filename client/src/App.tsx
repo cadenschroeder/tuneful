@@ -21,6 +21,7 @@ initializeApp(firebaseConfig);
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [page, setPage] = useState("login");
+  const [showSpotify, setShowSpotify] = useState(false);
 
   const authProps: AuthProps = {
     isAuthenticated,
@@ -32,20 +33,29 @@ function App() {
     setPage,
   };
 
+  const spotifyProps = {
+    showSpotify,
+    setShowSpotify,
+  };
+
   const showLogin = !isAuthenticated || page === Page.LOGIN;
 
   useEffect(() => {
     const cookie: string | undefined = getLoginCookie();
     if (!!cookie && cookie !== "incognito") {
       setIsAuthenticated(true);
-      setPage(Page.MUSIC);
+      setShowSpotify(true);
     }
   }, []);
 
   return (
     <div className="App" id="App">
       {showLogin ? (
-        <Login authProps={authProps} pageProps={pageProps} />
+        <Login
+          authProps={authProps}
+          pageProps={pageProps}
+          spotifyProps={spotifyProps}
+        />
       ) : (
         <Application authProps={authProps} pageProps={pageProps} />
       )}
