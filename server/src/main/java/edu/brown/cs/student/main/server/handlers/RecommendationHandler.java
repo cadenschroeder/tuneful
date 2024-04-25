@@ -33,12 +33,14 @@ public class RecommendationHandler implements Route {
     Map<String, Object> responseMap = new HashMap<>();
 
     //add params to run algorithm
+
     //mocked map for now :
 
     Map<String,String> params = new HashMap<>();
     params.put("seed_genres", "classical%2Ccountry");
-    params.put("seed_artists", "4NHQUGzhtTLFvgF5SZesLK");
-    params.put("seed_tracks", "0c6xIDDpzE81m2q797ordA");
+    //params.put("seed_artists", "4NHQUGzhtTLFvgF5SZesLK");
+    //params.put("seed_tracks", "0c6xIDDpzE81m2q797ordA");
+    //params.put("target_acousticness", "0.5");
     params.put("limit", "5");
 
 
