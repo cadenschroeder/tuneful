@@ -16,6 +16,7 @@ export interface PlayProps {
 export enum Page {
   LOGIN = "login",
   APPLICATION = "application",
+  INTERMEDIATE = 'intermediate',
   MUSIC = "music",
   SETTINGS = "settings",
   PROFILE = "profile",
