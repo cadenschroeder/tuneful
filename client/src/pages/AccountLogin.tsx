@@ -10,6 +10,22 @@ const SCOPES = ["playlist-read-private"];
 const SCOPES_URL_PARAM = SCOPES.join("%20");
 const SPOTIFY_AUTHORIZE_ENDPOINT = "https://accounts.spotify.com/authorize";
 
+const getReturnedParamsFromSpotifyAuth = (hash: string) => {
+  const stringAfterHashtag = hash.substring(1);
+  const paramsInUrl = stringAfterHashtag.split("&");
+  const paramsSplitUp = paramsInUrl.reduce(
+    (accumulater: { [key: string]: string }, currentValue) => {
+      console.log(currentValue);
+      const [key, value] = currentValue.split("=");
+      accumulater[key] = value;
+      return accumulater;
+    },
+    {}
+  );
+
+  return paramsSplitUp;
+};
+
 const AccountLogin: React.FC<AccountLoginProps> = ({ onLoginSuccess }) => {
   useEffect(() => {
     if (window.location.hash) {
@@ -36,3 +52,4 @@ const AccountLogin: React.FC<AccountLoginProps> = ({ onLoginSuccess }) => {
 };
 
 export default AccountLogin;
+
