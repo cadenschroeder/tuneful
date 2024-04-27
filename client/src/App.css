@@ -10,6 +10,24 @@
   transition: background-image 0.3s ease-in-out;
 }
 
+.radio-group {
+  display: flex;
+  flex-direction: column;
+  align-items: center; /* Center the items vertically */
+  padding: 20px;
+  background-color: #ffffffb0; /* Slight transparency */
+  border-radius: 10px; /* Rounded corners for the form area */
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1); /* Subtle shadow */
+}
+
+label {
+  margin: 10px;
+}
+
+input[type="radio"] {
+  margin-right: 10px; /* Space between the radio button and label */
+}
+
 .App::before {
   content: "";
   position: absolute;
