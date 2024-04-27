@@ -6,20 +6,25 @@ import edu.brown.cs.student.main.server.broadband.MusicSource;
 import edu.brown.cs.student.main.server.broadband.SongData;
 import java.util.HashMap;
 import java.util.Map;
+
+import edu.brown.cs.student.main.server.storage.StorageInterface;
 import spark.Request;
 import spark.Response;
 import spark.Route;
 
 public class SongDataHandler implements Route {
   private MusicSource datasource;
+  private StorageInterface storageHandler;
 
-  public SongDataHandler(MusicSource datasource) {
+  public SongDataHandler(MusicSource datasource, StorageInterface storageHandler) {
     this.datasource = datasource;
+    this.storageHandler = storageHandler;
   }
 
   @Override
   public Object handle(Request request, Response response) throws Exception {
     String trackID = request.queryParams("trackID");
+    String uid = request.queryParams("uid");
 
     if (trackID == null) {
       return new SongDataFailureResponse("Missing one or more parameters").serialize();
@@ -36,9 +41,19 @@ public class SongDataHandler implements Route {
 
       // Adds results to the responseMap
       responseMap.put("songData", data);
+      Map<String, Object> firebaseData = new HashMap<>();
+      firebaseData.put("songData", data.toMap());
+
+      // TODO: what to do with incognito users?? can we have a designated user id for them that gets cleared?
+      int songCount = this.storageHandler.getCollection(uid, "songs").size();
+      String songID = "song-" + songCount;
+      // use the storage handler to add the document to the database
+      this.storageHandler.addDocument(uid, "songs", songID, firebaseData);
+
 
       return new SongDataHandler.SongDataSuccessResponse(responseMap).serialize();
     } catch (Exception e) {
+      e.printStackTrace();
       return new SongDataFailureResponse(e.getMessage()).serialize();
     }
   }
