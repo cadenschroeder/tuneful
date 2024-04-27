@@ -37,6 +37,7 @@ const AccountLogin: React.FC<AccountLoginProps> = ({ onLoginSuccess }) => {
       localStorage.setItem("accessToken", access_token);
       localStorage.setItem("tokenType", token_type);
       localStorage.setItem("expiresIn", expires_in);
+      onLoginSuccess();
     }
   }, [onLoginSuccess]);
 
