@@ -1,14 +1,24 @@
 import Menu from "../components/Menu";
 import Music from "../components/Music";
 import Profile from "../components/Profile";
-import { AuthProps, Page, PageProps } from "../interfaces/interfaces";
+import {
+  AuthProps,
+  Page,
+  PageProps,
+  SpotifyProps,
+} from "../interfaces/interfaces";
 
 interface ApplicationProps {
   authProps: AuthProps;
   pageProps: PageProps;
+  spotifyProps: SpotifyProps;
 }
 
-const Application = ({ authProps, pageProps }: ApplicationProps) => {
+const Application = ({
+  authProps,
+  pageProps,
+  spotifyProps,
+}: ApplicationProps) => {
   const { page } = pageProps;
 
   const CurrentPage = (): JSX.Element => {
@@ -24,7 +34,11 @@ const Application = ({ authProps, pageProps }: ApplicationProps) => {
     <div id="application">
       <div></div>
       <CurrentPage />
-      <Menu authProps={authProps} pageProps={pageProps} />
+      <Menu
+        spotifyProps={spotifyProps}
+        authProps={authProps}
+        pageProps={pageProps}
+      />
     </div>
   );
 };

@@ -22,6 +22,8 @@ function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [page, setPage] = useState("login");
   const [showSpotify, setShowSpotify] = useState(false);
+  const [showPlaylists, setShowPlaylists] = useState(false);
+  const [playlists, setPlaylists] = useState<string[]>([]);
 
   const authProps: AuthProps = {
     isAuthenticated,
@@ -36,6 +38,10 @@ function App() {
   const spotifyProps = {
     showSpotify,
     setShowSpotify,
+    showPlaylists,
+    setShowPlaylists,
+    playlists,
+    setPlaylists,
   };
 
   const showLogin = !isAuthenticated || page === Page.LOGIN;
@@ -57,7 +63,11 @@ function App() {
           spotifyProps={spotifyProps}
         />
       ) : (
-        <Application authProps={authProps} pageProps={pageProps} />
+        <Application
+          spotifyProps={spotifyProps}
+          authProps={authProps}
+          pageProps={pageProps}
+        />
       )}
       <Footer />
     </div>

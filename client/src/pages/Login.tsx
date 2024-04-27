@@ -7,6 +7,7 @@ import {
 import { authLoginMock } from "../utils/auth";
 import { getAuth, GoogleAuthProvider, signInWithPopup } from "firebase/auth";
 import { addLoginCookie } from "../utils/cookie";
+import SpotifyLogin from "../components/SpotifyLogin";
 
 interface LoginProps {
   authProps: AuthProps;
@@ -17,7 +18,8 @@ interface LoginProps {
 const Login = ({ authProps, pageProps, spotifyProps }: LoginProps) => {
   const { setIsAuthenticated } = authProps;
   const { setPage } = pageProps;
-  const { showSpotify, setShowSpotify } = spotifyProps;
+  const { showSpotify, setShowSpotify, showPlaylists, playlists } =
+    spotifyProps;
 
   const handleLoginIncognito = () => {
     if (authLoginMock()) {
@@ -46,10 +48,6 @@ const Login = ({ authProps, pageProps, spotifyProps }: LoginProps) => {
     }
   };
 
-  const handleSpotifyLogin = () => {
-    setPage(Page.MUSIC);
-  };
-
   const handleSpotifySkip = () => {
     setPage(Page.MUSIC);
   };
@@ -68,12 +66,22 @@ const Login = ({ authProps, pageProps, spotifyProps }: LoginProps) => {
         </>
       ) : (
         <>
-          <p>
-            <button onClick={handleSpotifyLogin}>Connect Spotify</button>
-          </p>
-          <p>
-            <button onClick={handleSpotifySkip}>Skip</button>
-          </p>
+          {!showPlaylists ? (
+            <>
+              <p>
+                <SpotifyLogin spotifyProps={spotifyProps} />
+              </p>
+              <p>
+                <button onClick={handleSpotifySkip}>Skip</button>
+              </p>
+            </>
+          ) : (
+            <ul>
+              {playlists.map((playlist) => (
+                <button key={playlist}>{playlist}</button>
+              ))}
+            </ul>
+          )}
         </>
       )}
     </div>

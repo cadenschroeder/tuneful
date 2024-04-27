@@ -6,6 +6,10 @@ export interface AuthProps {
 export interface SpotifyProps {
   showSpotify: boolean;
   setShowSpotify: React.Dispatch<React.SetStateAction<boolean>>;
+  showPlaylists: boolean;
+  setShowPlaylists: React.Dispatch<React.SetStateAction<boolean>>;
+  playlists: string[];
+  setPlaylists: React.Dispatch<React.SetStateAction<string[]>>;
 }
 
 export interface PageProps {

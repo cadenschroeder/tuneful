@@ -1,6 +1,7 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { songs } from "../utils/consts";
 import { AudioVisualizer } from "react-audio-visualize";
+import dragElement from "./drag";
 
 interface ActionsProps {
   nextSong: () => void;
@@ -9,21 +10,21 @@ interface ActionsProps {
 }
 
 const Actions = ({ nextSong, togglePlay, isPlaying }: ActionsProps) => {
-  const handleLike = () => {
+  const handleLike = useCallback(() => {
     const cardElement = document.getElementById("card");
     if (cardElement) {
       cardElement
         .animate(
           [
             {
-              transform: "translate(-50%, -50%) rotate(0deg)",
+              transform: "translate(-50%, -50%) rotate(0deg) scale(1)",
             },
             {
-              transform: "translate(100vw, -50%) rotate(120deg)",
+              transform: "translate(100vw, -50%) rotate(120deg) scale(0)",
             },
           ],
           {
-            duration: 200,
+            duration: 300,
             easing: "ease-in-out",
           }
         )
@@ -46,23 +47,23 @@ const Actions = ({ nextSong, togglePlay, isPlaying }: ActionsProps) => {
           );
         });
     }
-  };
+  }, [nextSong]);
 
-  const handleDislike = () => {
+  const handleDislike = useCallback(() => {
     const cardElement = document.getElementById("card");
     if (cardElement) {
       cardElement
         .animate(
           [
             {
-              transform: "translate(-50%, -50%) rotate(0deg)",
+              transform: "translate(-50%, -50%) rotate(0deg) scale(1)",
             },
             {
-              transform: "translate(-100vw, -50%) rotate(-120deg)",
+              transform: "translate(-100vw, -50%) rotate(-120deg) scale(0)",
             },
           ],
           {
-            duration: 200,
+            duration: 300,
             easing: "ease-in-out",
             fill: "forwards",
           }
@@ -86,11 +87,25 @@ const Actions = ({ nextSong, togglePlay, isPlaying }: ActionsProps) => {
           );
         });
     }
-  };
+  }, [nextSong]);
 
-  const handleToggle = () => {
+  const handleToggle = useCallback(() => {
     togglePlay();
-  };
+  }, [togglePlay]);
+
+  // keyboard shortcuts
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "ArrowLeft") handleDislike();
+      if (event.key === "ArrowRight") handleLike();
+      if (event.key === " ") handleToggle();
+    };
+
+    document.addEventListener("keydown", handleKeyDown);
+    return () => {
+      document.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [handleDislike, handleLike, handleToggle]);
 
   return (
     <div>
@@ -188,8 +203,17 @@ const Card = ({ songs }: CardProps) => {
     }
   };
 
+  useEffect(() => {
+    dragElement(document.getElementById("card"), nextSong);
+  });
+
   return (
-    <div id="card" className="card">
+    <div
+      id="card"
+      className="card"
+      draggable={true}
+      onDrop={(e) => e.preventDefault()}
+    >
       <a href={song.spotify}>
         <img src="img/spotify.png" alt="spotify" />
       </a>

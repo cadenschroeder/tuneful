@@ -1,14 +1,21 @@
-import { AuthProps, Page, PageProps } from "../interfaces/interfaces";
+import {
+  AuthProps,
+  Page,
+  PageProps,
+  SpotifyProps,
+} from "../interfaces/interfaces";
 import { getLoginCookie, removeLoginCookie } from "../utils/cookie";
 
 interface MenuProps {
   authProps: AuthProps;
   pageProps: PageProps;
+  spotifyProps: SpotifyProps;
 }
 
-const Menu = ({ authProps, pageProps }: MenuProps) => {
+const Menu = ({ authProps, pageProps, spotifyProps }: MenuProps) => {
   const { setIsAuthenticated } = authProps;
   const { page, setPage } = pageProps;
+  const { setShowSpotify } = spotifyProps;
 
   const hanleProfileClick = () => {
     setPage(Page.PROFILE);
@@ -21,6 +28,7 @@ const Menu = ({ authProps, pageProps }: MenuProps) => {
   const handleLogoutClick = () => {
     removeLoginCookie();
     setIsAuthenticated(false);
+    setShowSpotify(false);
     setPage(Page.LOGIN);
     document.getElementById("App")!.style.background =
       "radial-gradient(#ffffff, #c6bebe)";
