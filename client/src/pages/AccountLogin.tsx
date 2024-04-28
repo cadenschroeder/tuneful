@@ -15,7 +15,6 @@ const getReturnedParamsFromSpotifyAuth = (hash: string) => {
   const paramsInUrl = stringAfterHashtag.split("&");
   const paramsSplitUp = paramsInUrl.reduce(
     (accumulater: { [key: string]: string }, currentValue) => {
-      console.log(currentValue);
       const [key, value] = currentValue.split("=");
       accumulater[key] = value;
       return accumulater;
