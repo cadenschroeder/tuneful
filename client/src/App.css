@@ -13,11 +13,19 @@
 .radio-group {
   display: flex;
   flex-direction: column;
-  align-items: center; /* Center the items vertically */
+  align-items: baseline;
   padding: 20px;
   background-color: #ffffffb0; /* Slight transparency */
   border-radius: 10px; /* Rounded corners for the form area */
-  box-shadow: 0 4px 8px rgba(0,0,0,0.1); /* Subtle shadow */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+  height: 20%;
+  min-width: 20%;
+  overflow-y: scroll;
+  margin-bottom: 5%;
+}
+
+.select-header {
+  margin-top: -2%;
 }
 
 label {
@@ -204,7 +212,7 @@ h1 {
   padding: 20px;
   width: 300px;
   box-sizing: border-box;
-  margin: auto; 
+  margin: auto;
 }
 
 .profile-title {
@@ -213,5 +221,5 @@ h1 {
 }
 
 .profile-song {
-  margin: 5px 0; 
+  margin: 5px 0;
 }
