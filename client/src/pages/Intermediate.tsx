@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { PageProps } from "../interfaces/interfaces";
 import { removeLoginCookie } from "../utils/cookie";
 import AccountLogin from "./AccountLogin";
+import signOutSpotify from './AccountLogin';
 import axios from "axios";
 
 const PLAYLIST_ENDPOINT = "https://api.spotify.com/v1/me/playlists";
@@ -10,6 +11,7 @@ interface IntermediateProps {
   pageProps: PageProps;
   setIsAuthenticated: React.Dispatch<React.SetStateAction<boolean>>;
 }
+
 
 const Intermediate = ({ pageProps, setIsAuthenticated }: IntermediateProps) => {
   const [token, setToken] = useState("");
@@ -84,16 +86,14 @@ const Intermediate = ({ pageProps, setIsAuthenticated }: IntermediateProps) => {
         {playlists.map((playlist: { name: string }) => (
           <p>{playlist.name}</p>
         ))}
-
-        <button onClick={() => console.log("Playlist One selected")}>
-          Playlist One
-        </button>
-        <button onClick={() => console.log("Playlist Two selected")}>
-          Playlist Two
-        </button>
-        <button onClick={() => console.log("Playlist Three selected")}>
-          Playlist Three
-        </button>
+        <div className="radio-group">
+          <input type="radio" id="playlist1" name="playlist" value="playlist1"></input>
+          <label htmlFor="playlist1">Playlist One</label>
+          <input type="radio" id="playlist2" name="playlist" value="playlist2"></input>
+          <label htmlFor="playlist2">Playlist Two</label>
+          <input type="radio" id="playlist3" name="playlist" value="playlist3"></input>
+          <label htmlFor="playlist3">Playlist Three</label>
+        </div>
         <button onClick={handleContinue}>Continue</button>
         <button onClick={handleLogout} style={{ marginTop: "20px" }}>
           Logout
