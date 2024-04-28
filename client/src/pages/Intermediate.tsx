@@ -15,14 +15,19 @@ const Intermediate = ({ pageProps, setIsAuthenticated }: IntermediateProps) => {
   const [token, setToken] = useState("");
   const [data, setData] = useState<JSON>();
   const [playlists, setPlaylists] = useState([]);
+  const { setPage } = pageProps;
+  const [signedInWithSpotify, setSignedInWithSpotify] = useState(false);
 
   useEffect(() => {
     const retrievedToken = localStorage.getItem("accessToken");
     if (retrievedToken != null) {
       setToken(retrievedToken);
     }
-    getPlaylists();
-  }, []);
+    // console.log(retrievedToken);
+    if (signedInWithSpotify) {
+      getPlaylists();
+    }
+  }, [signedInWithSpotify]);
 
   const getPlaylists = () => {
     console.log("token: " + token);
@@ -42,9 +47,6 @@ const Intermediate = ({ pageProps, setIsAuthenticated }: IntermediateProps) => {
         console.log(error);
       });
   };
-
-  const { setPage } = pageProps;
-  const [signedInWithSpotify, setSignedInWithSpotify] = useState(false);
 
   useEffect(() => {
     console.log("Signed In With Spotify:", signedInWithSpotify);
