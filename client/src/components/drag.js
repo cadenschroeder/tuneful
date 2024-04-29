@@ -7,39 +7,57 @@ function dragElement(elmnt: HTMLElement, nextSong: () => void) {
   var scale = 1;
   if (document.getElementById(elmnt.id + "header")) {
     // if present, the header is where you move the DIV from:
-    document.getElementById(elmnt.id + "header")!.onmousedown = dragMouseDown;
+    document.getElementById(elmnt.id + "header").onmousedown = dragMouseDown;
+    document.getElementById(elmnt.id + "header").ontouchstart = dragMouseDown;
   } else {
     // otherwise, move the DIV from anywhere inside the DIV:
     elmnt.onmousedown = dragMouseDown;
+    elmnt.ontouchstart = dragMouseDown;
   }
 
   function dragMouseDown(e: any) {
+    console.log("mousedown");
     e = e || window.event;
     e.preventDefault();
     // get the mouse cursor position at startup:
-    pos3 = e.clientX;
-    pos4 = e.clientY;
+
+    if (e.touches) {
+      pos3 = e.touches[e.touches.length - 1].clientX;
+      pos4 = e.touches[e.touches.length - 1].clientY;
+    } else {
+      pos3 = e.clientX;
+      pos4 = e.clientY;
+    }
+
     document.onmouseup = closeDragElement;
-    // call a function whenever the cursor moves:
     document.onmousemove = elementDrag;
+
+    document.ontouchend = closeDragElement;
+    document.ontouchmove = elementDrag;
   }
 
   function elementDrag(e: any) {
-    console.log("dragging");
+    const isMobile = !!e.touches;
     e = e || window.event;
-    e.preventDefault();
-    // calculate the new cursor position:
-    pos1 = pos3 - e.clientX;
-    pos2 = pos4 - e.clientY;
-    pos3 = e.clientX;
-    pos4 = e.clientY;
 
-    console.log(
-      "pos1: " + pos1,
-      "pos2: " + pos2,
-      "pos3: " + pos3,
-      "pos4: " + pos4
-    );
+    var clientX, clientY;
+
+    if (isMobile) {
+      console.log("touchmove1");
+      clientX = e.touches[e.touches.length - 1].clientX;
+      clientY = e.touches[e.touches.length - 1].clientY;
+    } else {
+      e.preventDefault();
+      clientX = e.clientX;
+      clientY = e.clientY;
+    }
+
+    // calculate the new cursor position:
+    pos1 = pos3 - clientX;
+    pos2 = pos4 - clientY;
+    pos3 = clientX;
+    pos4 = clientY;
+
     // set the element's new position:
     elmnt.style.top = elmnt.offsetTop - pos2 + "px";
     elmnt.style.left = elmnt.offsetLeft - pos1 + "px";
@@ -50,18 +68,28 @@ function dragElement(elmnt: HTMLElement, nextSong: () => void) {
     elmnt.style.transform = "translate(-50%, -50%) rotate(" + rotation + "deg)";
     // scale the element
     var distance = Math.abs(offset - center);
-    scale = 1 - distance / center;
+    scale = isMobile ? 1 - distance / center / 2 : 1 - distance / center;
     elmnt.style.transform =
       "translate(-50%, -50%) rotate(" + rotation + "deg) scale(" + scale + ")";
   }
 
-  function closeDragElement() {
+  function closeDragElement(e: any) {
+    const isMobile = !!e.touches;
+
     // stop moving when mouse button is released:
     document.onmouseup = null;
     document.onmousemove = null;
 
     var center = window.innerWidth / 2;
-    if (elmnt.offsetLeft < center - 200) {
+    const isLeft = isMobile
+      ? elmnt.offsetLeft < center - 50
+      : elmnt.offsetLeft < center - 200;
+
+    const isRight = isMobile
+      ? elmnt.offsetLeft > center + 50
+      : elmnt.offsetLeft > center + 200;
+
+    if (isLeft) {
       console.log("left");
       elmnt
         .animate(
@@ -108,7 +136,7 @@ function dragElement(elmnt: HTMLElement, nextSong: () => void) {
               elmnt.style.transform = "translate(-50%, -50%) rotate(0deg)";
             });
         });
-    } else if (elmnt.offsetLeft > center + 200) {
+    } else if (isRight) {
       console.log("right");
       elmnt
         .animate(

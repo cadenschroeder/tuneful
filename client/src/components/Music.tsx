@@ -193,17 +193,17 @@ const Card = ({ songs, appRef }: CardProps) => {
     }
   };
 
-  const nextSong = () => {
+  const nextSong = useCallback(() => {
     let randomIndex = -1;
     while (randomIndex < 0 || songs[randomIndex] === song) {
       randomIndex = Math.floor(Math.random() * songs.length);
     }
     setSong(songs[randomIndex]);
-  };
+  }, [song, songs]);
 
   useEffect(() => {
     dragElement(document.getElementById("card")!, nextSong);
-  });
+  }, [nextSong]);
 
   return (
     <div
