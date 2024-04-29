@@ -159,7 +159,7 @@ const Card = ({ songs, appRef }: CardProps) => {
       return () =>
         audioElement.removeEventListener("timeupdate", updatePlayTime);
     }
-  }, [audioRef]);
+  }, [blob, playTime]);
 
   const togglePlay = () => {
     const audioElement = audioRef.current;
