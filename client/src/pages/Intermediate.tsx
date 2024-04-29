@@ -2,7 +2,6 @@ import React, { useState, useEffect } from "react";
 import { PageProps } from "../interfaces/interfaces";
 import { removeLoginCookie } from "../utils/cookie";
 import AccountLogin from "./AccountLogin";
-import signOutSpotify from "./AccountLogin";
 import axios from "axios";
 
 const PLAYLIST_ENDPOINT = "https://api.spotify.com/v1/me/playlists";
@@ -28,6 +27,7 @@ const Intermediate = ({ pageProps, setIsAuthenticated }: IntermediateProps) => {
   const [playlists, setPlaylists] = useState([]);
   const { setPage } = pageProps;
   const [signedInWithSpotify, setSignedInWithSpotify] = useState(false);
+  const [signedInWithoutSpotify, setSignedInWithoutSpotify] = useState(false);
   const [genreChoice, setGenreChoice] = useState("");
   const [playlistChoice, setPlaylistChoice] = useState("");
 
@@ -70,7 +70,8 @@ const Intermediate = ({ pageProps, setIsAuthenticated }: IntermediateProps) => {
     window.location.hash = "";
     setIsAuthenticated(false);
     setPage("login");
-    setSignedInWithSpotify(false); // Make sure to reset Spotify login state on logout
+    setSignedInWithSpotify(false);
+    setSignedInWithoutSpotify(false);
   };
 
   const handleSpotifyLoginSuccess = () => {
@@ -139,6 +140,47 @@ const Intermediate = ({ pageProps, setIsAuthenticated }: IntermediateProps) => {
     );
   }
 
+  if (signedInWithoutSpotify) {
+    return (
+      <div
+        style={{
+          height: "100vh",
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          justifyContent: "center",
+        }}
+      >
+        <h1>Select to Start</h1>
+
+        <h2 id="select-header">Select a Genre</h2>
+
+        <div className="radio-group">
+          {GENRES.map((genre) => (
+            <div>
+              <input
+                type="radio"
+                id={genre}
+                name="genre"
+                value={genre}
+                onChange={(e) => setGenreChoice(e.target.value)}
+              ></input>
+              <label htmlFor={genre}>{genre}</label>
+            </div>
+          ))}
+        </div>
+
+        <p>{playlistChoice}</p>
+        <p>{genreChoice}</p>
+
+        <button onClick={handleContinue}>Continue</button>
+        <button onClick={handleLogout} style={{ marginTop: "20px" }}>
+          Logout
+        </button>
+      </div>
+    );
+  }
+
   return (
     <div
       style={{
@@ -149,7 +191,7 @@ const Intermediate = ({ pageProps, setIsAuthenticated }: IntermediateProps) => {
       }}
     >
       <AccountLogin onLoginSuccess={handleSpotifyLoginSuccess} />
-      <button onClick={() => setPage("music")}>
+      <button onClick={() => setSignedInWithoutSpotify(true)}>
         Continue without signing into Spotify
       </button>
       <button onClick={handleLogout} style={{ marginLeft: "20px" }}>
