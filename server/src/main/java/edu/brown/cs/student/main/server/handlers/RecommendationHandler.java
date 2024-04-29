@@ -21,13 +21,14 @@ public class RecommendationHandler implements Route {
   public Object handle(Request request, Response response) throws Exception {
     String liked = request.queryParams("liked");
     String songID = request.queryParams("songID");
+    String uid = request.queryParams("uid");
 
-    if (liked == null || songID == null) {
+    if (liked == null || songID == null || uid == null) {
       return new RecommendationHandler.RecommendationFailureResponse(
               "Missing one or more parameters")
           .serialize();
     }
-    if (liked.isEmpty() || songID.isEmpty()) {
+    if (liked.isEmpty() || songID.isEmpty() || uid.isEmpty()) {
       return new RecommendationHandler.RecommendationFailureResponse("Empty parameter(s)")
           .serialize();
     }
@@ -49,6 +50,7 @@ public class RecommendationHandler implements Route {
     List<String> songIDs = this.datasource.getRecommendation(params);
     System.out.println(songIDs);
     responseMap.put("songIDs", songIDs);
+
     return new RecommendationHandler.RecommendationSuccessResponse(responseMap).serialize();
   }
 

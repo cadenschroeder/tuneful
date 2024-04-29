@@ -30,6 +30,7 @@ public class AddLikesHandler implements Route {
             // collect parameters from the request
             String uid = request.queryParams("uid");
             String songName = request.queryParams("songName");
+            // TODO: should we save these in session ids?
 
             Map<String, Object> data = new HashMap<>();
             data.put("songName", songName);

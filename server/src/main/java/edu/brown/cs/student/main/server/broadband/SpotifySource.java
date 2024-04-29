@@ -171,7 +171,24 @@ public class SpotifySource implements MusicSource {
         (ArrayList<Map<String, Object>>) recommendations.get("tracks");
     for (Map<String, Object> track : tracks) {
       String id = track.get("id").toString();
+
+      // TODO: should we just get track data here
       songIDs.add(id);
+//
+//
+//      URL urlSD = new URL("localhost:3232/songData?trackID=2ThslNnPGmK82KFcCF2Lxm&uid=fake");
+//      HttpURLConnection httpConnSD = (HttpURLConnection) url.openConnection();
+//      httpConnSD.setRequestMethod("GET");
+//
+//      httpConnSD.setRequestProperty("Authorization", "Bearer " + accessToken);
+//
+//      InputStream responseStreamSongData =
+//              httpConnSD.getResponseCode() / 100 == 2
+//                      ? httpConnSD.getInputStream()
+//                      : httpConnSD.getErrorStream();
+//      Scanner sSD = new Scanner(responseStream).useDelimiter("\\A");
+//      String responseSongData = sSD.hasNext() ? sSD.next() : "";
+
     }
 
     return songIDs;
