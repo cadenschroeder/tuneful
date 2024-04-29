@@ -10,4 +10,3 @@ public record SongData(
     String album,
     List<Map<String, Object>> images,
     Map<String, Object> features) {}
-

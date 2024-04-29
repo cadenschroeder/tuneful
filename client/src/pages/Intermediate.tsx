@@ -2,16 +2,25 @@ import React, { useState, useEffect } from "react";
 import { PageProps } from "../interfaces/interfaces";
 import { removeLoginCookie } from "../utils/cookie";
 import AccountLogin from "./AccountLogin";
-import signOutSpotify from './AccountLogin';
+import signOutSpotify from "./AccountLogin";
 import axios from "axios";
 
 const PLAYLIST_ENDPOINT = "https://api.spotify.com/v1/me/playlists";
+const GENRES = [
+  "Pop",
+  "Hip Hop",
+  "Rock",
+  "Classical",
+  "Country",
+  "R&B",
+  "Electronic",
+  "Alternative",
+];
 
 interface IntermediateProps {
   pageProps: PageProps;
   setIsAuthenticated: React.Dispatch<React.SetStateAction<boolean>>;
 }
-
 
 const Intermediate = ({ pageProps, setIsAuthenticated }: IntermediateProps) => {
   const [token, setToken] = useState("");
@@ -19,13 +28,15 @@ const Intermediate = ({ pageProps, setIsAuthenticated }: IntermediateProps) => {
   const [playlists, setPlaylists] = useState([]);
   const { setPage } = pageProps;
   const [signedInWithSpotify, setSignedInWithSpotify] = useState(false);
+  const [genreChoice, setGenreChoice] = useState("");
+  const [playlistChoice, setPlaylistChoice] = useState("");
 
   useEffect(() => {
     const retrievedToken = localStorage.getItem("accessToken");
     if (retrievedToken != null) {
       setToken(retrievedToken);
     }
-    // console.log(retrievedToken);
+    console.log(retrievedToken);
     if (signedInWithSpotify) {
       getPlaylists();
     }
@@ -81,19 +92,44 @@ const Intermediate = ({ pageProps, setIsAuthenticated }: IntermediateProps) => {
           justifyContent: "center",
         }}
       >
-        <h1>Select a Playlist</h1>
+        <h1>Select to Start</h1>
 
-        {playlists.map((playlist: { name: string }) => (
-          <p>{playlist.name}</p>
-        ))}
+        <h2 id="select-header">Select a Playlist</h2>
         <div className="radio-group">
-          <input type="radio" id="playlist1" name="playlist" value="playlist1"></input>
-          <label htmlFor="playlist1">Playlist One</label>
-          <input type="radio" id="playlist2" name="playlist" value="playlist2"></input>
-          <label htmlFor="playlist2">Playlist Two</label>
-          <input type="radio" id="playlist3" name="playlist" value="playlist3"></input>
-          <label htmlFor="playlist3">Playlist Three</label>
+          {playlists.map((playlist: { name: string }) => (
+            <div className="radio-element">
+              <input
+                type="radio"
+                id={playlist.name}
+                name="playlist"
+                value={playlist.name}
+                onChange={(e) => setPlaylistChoice(e.target.value)}
+              ></input>
+              <label htmlFor={playlist.name}>{playlist.name}</label>
+            </div>
+          ))}
         </div>
+
+        <h2 id="select-header">or Select a Genre</h2>
+
+        <div className="radio-group">
+          {GENRES.map((genre) => (
+            <div>
+              <input
+                type="radio"
+                id={genre}
+                name="genre"
+                value={genre}
+                onChange={(e) => setGenreChoice(e.target.value)}
+              ></input>
+              <label htmlFor={genre}>{genre}</label>
+            </div>
+          ))}
+        </div>
+
+        <p>{playlistChoice}</p>
+        <p>{genreChoice}</p>
+
         <button onClick={handleContinue}>Continue</button>
         <button onClick={handleLogout} style={{ marginTop: "20px" }}>
           Logout

@@ -38,7 +38,7 @@ const AccountLogin: React.FC<AccountLoginProps> = ({ onLoginSuccess }) => {
       localStorage.setItem("expiresIn", expires_in);
       onLoginSuccess();
     }
-  }, [onLoginSuccess]);
+  }, []);
 
   const handleLogin = () => {
     const authUrl = `${SPOTIFY_AUTHORIZE_ENDPOINT}?client_id=${CLIENT_ID}&redirect_uri=${encodeURIComponent(
