@@ -36,9 +36,9 @@ const Intermediate = ({ pageProps, setIsAuthenticated }: IntermediateProps) => {
     if (retrievedToken != null) {
       setToken(retrievedToken);
     }
-    // console.log(retrievedToken);
+    console.log(retrievedToken);
     if (signedInWithSpotify) {
-      // getPlaylists();
+      getPlaylists();
     }
   }, [signedInWithSpotify]);
 
@@ -94,43 +94,20 @@ const Intermediate = ({ pageProps, setIsAuthenticated }: IntermediateProps) => {
       >
         <h1>Select to Start</h1>
 
-        {playlists.map((playlist: { name: string }) => (
-          <p>{playlist.name}</p>
-        ))}
         <h2 id="select-header">Select a Playlist</h2>
         <div className="radio-group">
-          <input
-            type="radio"
-            id="playlist1"
-            name="playlist"
-            value="playlist1"
-            onChange={(e) => setPlaylistChoice(e.target.value)}
-          ></input>
-          <label htmlFor="playlist1">Playlist One</label>
-          <input
-            type="radio"
-            id="playlist2"
-            name="playlist"
-            value="playlist2"
-            onChange={(e) => setPlaylistChoice(e.target.value)}
-          ></input>
-          <label htmlFor="playlist2">Playlist Two</label>
-          <input
-            type="radio"
-            id="playlist3"
-            name="playlist"
-            value="playlist3"
-            onChange={(e) => setPlaylistChoice(e.target.value)}
-          ></input>
-          <label htmlFor="playlist3">Playlist Three</label>
-          <input
-            type="radio"
-            id="playlist4"
-            name="playlist"
-            value="playlist4"
-            onChange={(e) => setPlaylistChoice(e.target.value)}
-          ></input>
-          <label htmlFor="playlist4">Playlist Four</label>
+          {playlists.map((playlist: { name: string }) => (
+            <div className="radio-element">
+              <input
+                type="radio"
+                id={playlist.name}
+                name="playlist"
+                value={playlist.name}
+                onChange={(e) => setPlaylistChoice(e.target.value)}
+              ></input>
+              <label htmlFor={playlist.name}>{playlist.name}</label>
+            </div>
+          ))}
         </div>
 
         <h2 id="select-header">or Select a Genre</h2>

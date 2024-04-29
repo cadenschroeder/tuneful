@@ -18,8 +18,8 @@
   background-color: #ffffffb0; /* Slight transparency */
   border-radius: 10px; /* Rounded corners for the form area */
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Subtle shadow */
-  height: 20%;
-  min-width: 20%;
+  height: auto;
+  min-width: 30%;
   overflow-y: scroll;
   margin-bottom: 5%;
 }

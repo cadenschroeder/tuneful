@@ -12,12 +12,9 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
-import okio.Buffer;
-import okio.Source;
 
 /**
  * SpotifySource Uses the ACS API to get information about broadband coverage in given county, state
@@ -129,7 +126,7 @@ public class SpotifySource implements MusicSource {
   }
 
   private String convertMapToString(Map<String, String> inputs) {
-    //Creates a string for the params from the inputs
+    // Creates a string for the params from the inputs
     StringBuilder stringBuilder = new StringBuilder();
     for (Map.Entry<String, String> entry : inputs.entrySet()) {
       stringBuilder.append(entry.getKey()).append("=").append(entry.getValue()).append("&");
@@ -159,18 +156,20 @@ public class SpotifySource implements MusicSource {
 
     httpConn.setRequestProperty("Authorization", "Bearer " + accessToken);
 
-    InputStream responseStream = httpConn.getResponseCode() / 100 == 2
+    InputStream responseStream =
+        httpConn.getResponseCode() / 100 == 2
             ? httpConn.getInputStream()
             : httpConn.getErrorStream();
     Scanner s = new Scanner(responseStream).useDelimiter("\\A");
     String response = s.hasNext() ? s.next() : "";
 
-    //TODO: Error handle
+    // TODO: Error handle
     Map<String, Object> recommendations = deserializeRecommendations(response);
 
     // Extracting the song IDs
-    ArrayList<Map<String,Object>> tracks = (ArrayList<Map<String,Object>>)recommendations.get("tracks");
-    for(Map<String,Object> track : tracks){
+    ArrayList<Map<String, Object>> tracks =
+        (ArrayList<Map<String, Object>>) recommendations.get("tracks");
+    for (Map<String, Object> track : tracks) {
       String id = track.get("id").toString();
       songIDs.add(id);
     }
@@ -184,9 +183,9 @@ public class SpotifySource implements MusicSource {
 
     // Initializes an adapter to a Broadband class then uses it to parse the JSON.
     JsonAdapter<Map<String, Object>> adapter =
-            moshi.adapter(Types.newParameterizedType(Map.class, String.class, Object.class));
+        moshi.adapter(Types.newParameterizedType(Map.class, String.class, Object.class));
 
-      return adapter.fromJson(jsonSong);
+    return adapter.fromJson(jsonSong);
   }
 
   public static Map<String, Object> deserializeTrack(String jsonSong) throws IOException {
