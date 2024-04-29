@@ -93,9 +93,11 @@ const Intermediate = ({ pageProps, setIsAuthenticated }: IntermediateProps) => {
           justifyContent: "center",
         }}
       >
-        <h1>Select to Start</h1>
+        <h1 className="intermediate">Select to Start</h1>
 
-        <h2 id="select-header">Select a Playlist</h2>
+        <h2 id="select-header">
+          {playlistChoice ? `Chosen: ${playlistChoice}` : "Select a Playlist"}
+        </h2>
         <div className="radio-group">
           {playlists.map((playlist: { name: string }) => (
             <div className="radio-element">
@@ -111,7 +113,9 @@ const Intermediate = ({ pageProps, setIsAuthenticated }: IntermediateProps) => {
           ))}
         </div>
 
-        <h2 id="select-header">or Select a Genre</h2>
+        <h2 id="select-header">
+          {genreChoice ? `Chosen: ${genreChoice}` : "or select a Genre"}
+        </h2>
 
         <div className="radio-group">
           {GENRES.map((genre) => (
@@ -128,13 +132,10 @@ const Intermediate = ({ pageProps, setIsAuthenticated }: IntermediateProps) => {
           ))}
         </div>
 
-        <p>{playlistChoice}</p>
-        <p>{genreChoice}</p>
-
-        <button onClick={handleContinue}>Continue</button>
-        <button onClick={handleLogout} style={{ marginTop: "20px" }}>
-          Logout
-        </button>
+        <div>
+          <button onClick={handleContinue}>Continue</button>
+          <button onClick={handleLogout}>Logout</button>
+        </div>
       </div>
     );
   }
@@ -150,9 +151,11 @@ const Intermediate = ({ pageProps, setIsAuthenticated }: IntermediateProps) => {
           justifyContent: "center",
         }}
       >
-        <h1>Select to Start</h1>
+        <h1 className="intermediate">Select to Start</h1>
 
-        <h2 id="select-header">Select a Genre</h2>
+        <h2 id="select-header">
+          {genreChoice ? `Chosen: ${genreChoice}` : "Select a Genre"}
+        </h2>
 
         <div className="radio-group">
           {GENRES.map((genre) => (
@@ -169,13 +172,10 @@ const Intermediate = ({ pageProps, setIsAuthenticated }: IntermediateProps) => {
           ))}
         </div>
 
-        <p>{playlistChoice}</p>
-        <p>{genreChoice}</p>
-
-        <button onClick={handleContinue}>Continue</button>
-        <button onClick={handleLogout} style={{ marginTop: "20px" }}>
-          Logout
-        </button>
+        <div>
+          <button onClick={handleContinue}>Continue</button>
+          <button onClick={handleLogout}>Logout</button>
+        </div>
       </div>
     );
   }
