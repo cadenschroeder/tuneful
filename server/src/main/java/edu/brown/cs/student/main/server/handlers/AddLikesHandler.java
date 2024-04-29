@@ -37,11 +37,11 @@ public class AddLikesHandler implements Route {
             System.out.println("adding song: " + songName + " for user: " + uid);
 
             // get the current song count to make a unique song_id by index.
-            int songCount = this.storageHandler.getCollection(uid, "songNames").size();
+            int songCount = this.storageHandler.getCollection(uid, "likedSongs").size();
             String songId = "songName-" + songCount;
 
             // use the storage handler to add the document to the database
-            this.storageHandler.addDocument(uid, "songNames", songId, data);
+            this.storageHandler.addDocument(uid, "likedSongs", songId, data);
 
             responseMap.put("response_type", "success");
             responseMap.put("songName", songName);

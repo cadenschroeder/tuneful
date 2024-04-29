@@ -33,13 +33,13 @@ public class ListLikesHandler implements Route {
             System.out.println("listing liked songs for user: " + uid);
 
             // get all the song names for the user
-            List<Map<String, Object>> vals = this.storageHandler.getCollection(uid, "songNames");
+            List<Map<String, Object>> vals = this.storageHandler.getCollection(uid, "likedSongs");
 
             // convert the key,value map to just a list of the song names.
-            List<String> songNames = vals.stream().map(song -> song.get("songName").toString()).toList();
+            List<String> likedSongs = vals.stream().map(song -> song.get("songName").toString()).toList();
 
             responseMap.put("response_type", "success");
-            responseMap.put("songNames", songNames);
+            responseMap.put("likedSongs", likedSongs);
         } catch (Exception e) {
             // error likely occurred in the storage handler
             e.printStackTrace();

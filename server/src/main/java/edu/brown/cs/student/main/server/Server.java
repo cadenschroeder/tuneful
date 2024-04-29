@@ -6,13 +6,11 @@ import com.google.common.cache.CacheBuilder;
 import edu.brown.cs.student.main.csv.ParserState;
 import edu.brown.cs.student.main.server.broadband.SpotifySource;
 import edu.brown.cs.student.main.server.csv.ViewCSVHandler;
-import edu.brown.cs.student.main.server.handlers.RecommendationHandler;
-import edu.brown.cs.student.main.server.handlers.SongDataHandler;
+import edu.brown.cs.student.main.server.handlers.*;
 
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 
-import edu.brown.cs.student.main.server.handlers.ViewSongHandler;
 import edu.brown.cs.student.main.server.storage.FirebaseUtilities;
 import edu.brown.cs.student.main.server.storage.StorageInterface;
 import spark.Spark;
@@ -45,6 +43,8 @@ public class Server {
       Spark.get("songData", new SongDataHandler(spotifySource, storageInterface));
       Spark.get("viewSongs", new ViewSongHandler(storageInterface));
       Spark.get("recommendation", new RecommendationHandler(spotifySource));
+      Spark.get("addLikes", new AddLikesHandler(storageInterface));
+      Spark.get("listLikes", new ListLikesHandler(storageInterface));
 
       Spark.init();
       Spark.awaitInitialization();
