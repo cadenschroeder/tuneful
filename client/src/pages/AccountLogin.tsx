@@ -15,7 +15,6 @@ const getReturnedParamsFromSpotifyAuth = (hash: string) => {
   const paramsInUrl = stringAfterHashtag.split("&");
   const paramsSplitUp = paramsInUrl.reduce(
     (accumulater: { [key: string]: string }, currentValue) => {
-      console.log(currentValue);
       const [key, value] = currentValue.split("=");
       accumulater[key] = value;
       return accumulater;
@@ -39,7 +38,7 @@ const AccountLogin: React.FC<AccountLoginProps> = ({ onLoginSuccess }) => {
       localStorage.setItem("expiresIn", expires_in);
       onLoginSuccess();
     }
-  }, [onLoginSuccess]);
+  }, []);
 
   const handleLogin = () => {
     const authUrl = `${SPOTIFY_AUTHORIZE_ENDPOINT}?client_id=${CLIENT_ID}&redirect_uri=${encodeURIComponent(

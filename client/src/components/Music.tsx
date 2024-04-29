@@ -127,9 +127,13 @@ const Card = ({ songs, appRef }: CardProps) => {
     async function getBlob(filePath: string): Promise<Blob> {
       return new Promise((resolve, reject) => {
         fetch(filePath)
-          .then(response => response.ok ? response.blob() : Promise.reject("Failed to load file"))
-          .then(blob => resolve(blob))
-          .catch(error => reject(error));
+          .then((response) =>
+            response.ok
+              ? response.blob()
+              : Promise.reject("Failed to load file")
+          )
+          .then((blob) => resolve(blob))
+          .catch((error) => reject(error));
       });
     }
 
@@ -152,9 +156,10 @@ const Card = ({ songs, appRef }: CardProps) => {
       const updatePlayTime = () => setPlayTime(audioElement.currentTime);
       audioElement.addEventListener("timeupdate", updatePlayTime);
 
-      return () => audioElement.removeEventListener("timeupdate", updatePlayTime);
+      return () =>
+        audioElement.removeEventListener("timeupdate", updatePlayTime);
     }
-  }, [audioRef]);
+  }, [blob, playTime]);
 
   const togglePlay = () => {
     const audioElement = audioRef.current;
@@ -187,7 +192,9 @@ const Card = ({ songs, appRef }: CardProps) => {
       )}
       <img src={song.cover} alt="album cover" draggable="false" />
       <Actions
-        nextSong={() => setSong(songs[(songs.indexOf(song) + 1) % songs.length])}
+        nextSong={() =>
+          setSong(songs[(songs.indexOf(song) + 1) % songs.length])
+        }
         isPlaying={isPlaying}
         togglePlay={togglePlay}
       />
