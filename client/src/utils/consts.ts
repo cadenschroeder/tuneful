@@ -40,3 +40,54 @@ export const songs = [
     spotify: "https://open.spotify.com/track/3Z2y6rX1dZCfLJ9yZGzQw5",
   },
 ];
+
+export const mockData = [
+  {
+    session: "Session on 04/21/2024 at 6:00pm",
+    songs: ["Song 1", "Song 2", "Song 3", "Song 4"],
+  },
+  {
+    session: "Session on 04/22/2024 at 6:00pm",
+    songs: ["Song 5", "Song 6", "Song 7", "Song 8"],
+  },
+  {
+    session: "Session on 04/23/2024 at 6:00pm",
+    songs: ["Song 9", "Song 10", "Song 11", "Song 12"],
+  },
+  {
+    session: "Session on 04/24/2024 at 6:00pm",
+    songs: ["Song 13", "Song 14", "Song 15", "Song 16"],
+  },
+  {
+    session: "Session on 04/25/2024 at 6:00pm",
+    songs: ["Song 17", "Song 18", "Song 19", "Song 20"],
+  },
+  {
+    session: "Session on 04/25/2024 at 6:00pm",
+    songs: ["Song 17", "Song 18", "Song 19", "Song 20"],
+  },
+  {
+    session: "Session on 04/25/2024 at 6:00pm",
+    songs: ["Song 17", "Song 18", "Song 19", "Song 20"],
+  },
+  {
+    session: "Session on 04/25/2024 at 6:00pm",
+    songs: ["Song 17", "Song 18", "Song 19", "Song 20"],
+  },
+  {
+    session: "Session on 04/25/2024 at 6:00pm",
+    songs: ["Song 17", "Song 18", "Song 19", "Song 20"],
+  },
+  {
+    session: "Session on 04/25/2024 at 6:00pm",
+    songs: ["Song 17", "Song 18", "Song 19", "Song 20"],
+  },
+  {
+    session: "Session on 04/25/2024 at 6:00pm",
+    songs: ["Song 17", "Song 18", "Song 19", "Song 20"],
+  },
+  {
+    session: "Session on 04/25/2024 at 6:00pm",
+    songs: ["Song 17", "Song 18", "Song 19", "Song 20"],
+  },
+];
