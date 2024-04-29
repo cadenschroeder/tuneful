@@ -141,7 +141,8 @@ const Intermediate = ({ pageProps, setIsAuthenticated }: IntermediateProps) => {
         <p>{genreChoice}</p>
 
         <button onClick={handleContinue}>Continue</button>
-        <button onClick={handleBackClick}>
+        <button onClick={handleBackClick}
+        style={{ marginTop: "20px"}}>
         {"back"}
       </button>
         <button onClick={handleLogout} style={{ marginTop: "20px" }}>
@@ -187,7 +188,9 @@ const Intermediate = ({ pageProps, setIsAuthenticated }: IntermediateProps) => {
         <p>{genreChoice}</p>
 
         <button onClick={handleContinue}>Continue</button>
-        <button onClick={handleBackClick}>
+        <button 
+        onClick={handleBackClick}
+        style={{ marginTop: "20px"}}>
         {"back"}
         </button>
         <button onClick={handleLogout} style={{ marginTop: "20px" }}>
@@ -199,21 +202,27 @@ const Intermediate = ({ pageProps, setIsAuthenticated }: IntermediateProps) => {
 
   return (
     <div
-      style={{
-        height: "100vh",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-      }}
-    >
-      <AccountLogin onLoginSuccess={handleSpotifyLoginSuccess} />
-      <button onClick={() => setSignedInWithoutSpotify(true)}>
-        Continue without signing into Spotify
-      </button>
-      <button onClick={handleLogout} style={{ marginLeft: "20px" }}>
-        Logout
-      </button>
-    </div>
+  style={{
+    height: "100vh",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+  }}
+>
+  <AccountLogin onLoginSuccess={handleSpotifyLoginSuccess} />
+  <button
+    onClick={() => setSignedInWithoutSpotify(true)}
+    style={{ marginLeft: "20px", marginRight: "10px" }}
+  >
+    Continue without signing into Spotify
+  </button>
+  <button
+    onClick={handleLogout}
+    style={{ marginLeft: "10px", marginRight: "10px" }}
+  >
+    Logout
+  </button>
+</div>
   );
 };
 
