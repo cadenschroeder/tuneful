@@ -5,9 +5,15 @@ import static spark.Spark.after;
 import com.google.common.cache.CacheBuilder;
 import edu.brown.cs.student.main.csv.ParserState;
 import edu.brown.cs.student.main.server.broadband.SpotifySource;
-import edu.brown.cs.student.main.server.handlers.RecommendationHandler;
-import edu.brown.cs.student.main.server.handlers.SongDataHandler;
+
+import edu.brown.cs.student.main.server.handlers.*;
+
+import java.io.IOException;
+
 import java.util.concurrent.TimeUnit;
+
+import edu.brown.cs.student.main.server.storage.FirebaseUtilities;
+import edu.brown.cs.student.main.server.storage.StorageInterface;
 import spark.Spark;
 
 /**
@@ -32,14 +38,24 @@ public class Server {
 
     // Setting up the handler for the GET /loadcsv, /viewcsv, /searchcsv, /broadband
     SpotifySource spotifySource = new SpotifySource();
-    Spark.get("songData", new SongDataHandler(spotifySource));
-    Spark.get("recommendation", new RecommendationHandler(spotifySource));
-    // Spark.get("loadcsv", new LoadCSVHandler(parser));
-    // Spark.get("viewcsv", new ViewCSVHandler(parser));
-    // Spark.get("searchcsv", new SearchCSVHandler(parser));
-    Spark.init();
-    Spark.awaitInitialization();
+    StorageInterface storageInterface;
+    try {
+      storageInterface = new FirebaseUtilities();
+      Spark.get("songData", new SongDataHandler(spotifySource, storageInterface));
+      Spark.get("viewSongs", new ViewSongHandler(storageInterface));
+      Spark.get("recommendation", new RecommendationHandler(spotifySource));
+      Spark.get("addLikes", new AddLikesHandler(storageInterface));
+      Spark.get("listLikes", new ListLikesHandler(storageInterface));
 
-    System.out.println("Server started at http://localhost:" + port);
+      Spark.init();
+      Spark.awaitInitialization();
+
+      System.out.println("Server started at http://localhost:" + port);
+    } catch (IOException e){
+      e.printStackTrace();
+      System.err.println(
+              "Error: Could not initialize Firebase. Likely due to firebase_config.json not being found. Exiting.");
+      System.exit(1);
+    }
   }
 }
