@@ -9,6 +9,7 @@ public record SongData(
     List<String> artists,
     String album,
     List<Map<String, Object>> images,
+  
     Map<String, Object> features) {
 
     public Map<String, Object> toMap() {
