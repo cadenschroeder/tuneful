@@ -74,6 +74,12 @@ const Intermediate = ({ pageProps, setIsAuthenticated }: IntermediateProps) => {
     setSignedInWithoutSpotify(false);
   };
 
+  const handleBackClick = () => {
+    setSignedInWithSpotify(false);
+    window.location.hash = "";
+    setSignedInWithoutSpotify(false);
+  };
+
   const handleSpotifyLoginSuccess = () => {
     console.log("Spotify login successful");
     setSignedInWithSpotify(true);
@@ -133,6 +139,9 @@ const Intermediate = ({ pageProps, setIsAuthenticated }: IntermediateProps) => {
         <p>{genreChoice}</p>
 
         <button onClick={handleContinue}>Continue</button>
+        <button onClick={handleBackClick}>
+        {"back"}
+      </button>
         <button onClick={handleLogout} style={{ marginTop: "20px" }}>
           Logout
         </button>
@@ -174,6 +183,9 @@ const Intermediate = ({ pageProps, setIsAuthenticated }: IntermediateProps) => {
         <p>{genreChoice}</p>
 
         <button onClick={handleContinue}>Continue</button>
+        <button onClick={handleBackClick}>
+        {"back"}
+        </button>
         <button onClick={handleLogout} style={{ marginTop: "20px" }}>
           Logout
         </button>
