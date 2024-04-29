@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { PageProps } from "../interfaces/interfaces";
 import { removeLoginCookie } from "../utils/cookie";
 import AccountLogin from "./AccountLogin";
@@ -23,13 +23,31 @@ interface IntermediateProps {
 
 const Intermediate = ({ pageProps, setIsAuthenticated }: IntermediateProps) => {
   const [token, setToken] = useState("");
-  const [data, setData] = useState<JSON>();
+  const [, setData] = useState<JSON>();
   const [playlists, setPlaylists] = useState([]);
   const { setPage } = pageProps;
   const [signedInWithSpotify, setSignedInWithSpotify] = useState(false);
   const [signedInWithoutSpotify, setSignedInWithoutSpotify] = useState(false);
   const [genreChoice, setGenreChoice] = useState("");
   const [playlistChoice, setPlaylistChoice] = useState("");
+  const getPlaylists = useCallback(() => {
+    console.log("token: " + token);
+
+    axios
+      .get(PLAYLIST_ENDPOINT, {
+        headers: {
+          Authorization: "Bearer " + token,
+        },
+      })
+      .then((response: any) => {
+        setData(response.data);
+        setPlaylists(response.data.items);
+        console.log(response.data.items);
+      })
+      .catch((error: any) => {
+        console.log(error);
+      });
+  }, [token]);
 
   useEffect(() => {
     const retrievedToken = localStorage.getItem("accessToken");
@@ -40,26 +58,7 @@ const Intermediate = ({ pageProps, setIsAuthenticated }: IntermediateProps) => {
     if (signedInWithSpotify) {
       getPlaylists();
     }
-  }, [signedInWithSpotify]);
-
-  const getPlaylists = () => {
-    console.log("token: " + token);
-
-    axios
-      .get(PLAYLIST_ENDPOINT, {
-        headers: {
-          Authorization: "Bearer " + token,
-        },
-      })
-      .then((response) => {
-        setData(response.data);
-        setPlaylists(response.data.items);
-        console.log(response.data.items);
-      })
-      .catch((error) => {
-        console.log(error);
-      });
-  };
+  }, [signedInWithSpotify, getPlaylists]);
 
   useEffect(() => {
     console.log("Signed In With Spotify:", signedInWithSpotify);
