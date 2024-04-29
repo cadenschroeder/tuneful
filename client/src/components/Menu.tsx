@@ -26,6 +26,10 @@ const Menu = ({ authProps, pageProps }: MenuProps) => {
       "radial-gradient(#ffffff, #c6bebe)";
   };
 
+  const handleFinishClick = () => {
+    setPage(Page.FINISH);
+  };
+
   const isIncognito = getLoginCookie() === "incognito";
 
   return (
@@ -49,6 +53,9 @@ const Menu = ({ authProps, pageProps }: MenuProps) => {
       <button onClick={handleLogoutClick}>
         {isIncognito ? "Leave Incognito" : "Logout"}
       </button>
+      {page !== Page.FINISH && (
+        <button onClick={handleFinishClick}>Finish</button>
+      )}
     </div>
   );
 };

@@ -1,3 +1,4 @@
+import Finish from "../components/Finish";
 import Menu from "../components/Menu";
 import Music from "../components/Music";
 import Profile from "../components/Profile";
@@ -16,6 +17,8 @@ const Application = ({ authProps, pageProps, appRef }: ApplicationProps) => {
     switch (page) {
       case Page.PROFILE:
         return <Profile props={null} />;
+      case Page.FINISH:
+        return <Finish props={null} />;
       default:
         return <Music appRef={appRef} />;
     }
