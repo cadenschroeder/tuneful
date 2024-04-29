@@ -48,12 +48,17 @@ function App() {
     <div className="App" ref={appRef} id="App">
       {showLogin ? (
         <Login authProps={authProps} pageProps={pageProps} />
+      ) : page === Page.INTERMEDIATE ? (
+        <Intermediate
+          pageProps={pageProps}
+          setIsAuthenticated={setIsAuthenticated}
+        />
       ) : (
-        page === Page.INTERMEDIATE ? (
-          <Intermediate pageProps={pageProps} setIsAuthenticated={setIsAuthenticated} />
-        ) : (
-          <Application authProps={authProps} pageProps={pageProps} appRef={appRef} />  // Pass appRef here
-        )
+        <Application
+          authProps={authProps}
+          pageProps={pageProps}
+          appRef={appRef}
+        />
       )}
       <Footer />
     </div>

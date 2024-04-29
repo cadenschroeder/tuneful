@@ -3,17 +3,17 @@ package edu.brown.cs.student.main.server.handlers;
 import com.squareup.moshi.JsonAdapter;
 import com.squareup.moshi.Moshi;
 import edu.brown.cs.student.main.server.broadband.MusicSource;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import spark.Request;
 import spark.Response;
 import spark.Route;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 public class RecommendationHandler implements Route {
   private MusicSource datasource;
-  public RecommendationHandler(MusicSource datasource) { //also pass in algorithm class
+
+  public RecommendationHandler(MusicSource datasource) { // also pass in algorithm class
     this.datasource = datasource;
   }
 
@@ -23,26 +23,28 @@ public class RecommendationHandler implements Route {
     String songID = request.queryParams("songID");
 
     if (liked == null || songID == null) {
-      return new RecommendationHandler.RecommendationFailureResponse("Missing one or more parameters").serialize();
+      return new RecommendationHandler.RecommendationFailureResponse(
+              "Missing one or more parameters")
+          .serialize();
     }
     if (liked.isEmpty() || songID.isEmpty()) {
-      return new RecommendationHandler.RecommendationFailureResponse("Empty parameter(s)").serialize();
+      return new RecommendationHandler.RecommendationFailureResponse("Empty parameter(s)")
+          .serialize();
     }
 
     // Creates a hashmap to store the results of the request
     Map<String, Object> responseMap = new HashMap<>();
 
-    //add params to run algorithm
+    // add params to run algorithm
 
-    //mocked map for now :
+    // mocked map for now :
 
-    Map<String,String> params = new HashMap<>();
+    Map<String, String> params = new HashMap<>();
     params.put("seed_genres", "classical%2Ccountry");
-    //params.put("seed_artists", "4NHQUGzhtTLFvgF5SZesLK");
-    //params.put("seed_tracks", "0c6xIDDpzE81m2q797ordA");
-    //params.put("target_acousticness", "0.5");
+    // params.put("seed_artists", "4NHQUGzhtTLFvgF5SZesLK");
+    // params.put("seed_tracks", "0c6xIDDpzE81m2q797ordA");
+    // params.put("target_acousticness", "0.5");
     params.put("limit", "5");
-
 
     List<String> songIDs = this.datasource.getRecommendation(params);
     System.out.println(songIDs);
@@ -57,7 +59,8 @@ public class RecommendationHandler implements Route {
    * @param response_type
    * @param responseMap
    */
-  public record RecommendationSuccessResponse(String response_type, Map<String, Object> responseMap) {
+  public record RecommendationSuccessResponse(
+      String response_type, Map<String, Object> responseMap) {
     public RecommendationSuccessResponse(Map<String, Object> responseMap) {
       this("success", responseMap);
     }
@@ -68,7 +71,7 @@ public class RecommendationHandler implements Route {
       try {
         Moshi moshi = new Moshi.Builder().build();
         JsonAdapter<RecommendationHandler.RecommendationSuccessResponse> adapter =
-                moshi.adapter(RecommendationHandler.RecommendationSuccessResponse.class);
+            moshi.adapter(RecommendationHandler.RecommendationSuccessResponse.class);
         return adapter.toJson(this);
       } catch (Exception e) {
         e.printStackTrace();
