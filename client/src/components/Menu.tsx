@@ -18,6 +18,12 @@ const Menu = ({ authProps, pageProps }: MenuProps) => {
     setPage(Page.MUSIC);
   };
 
+  const handleBackClick = () => {
+    setPage(Page.INTERMEDIATE);
+    document.getElementById("App")!.style.background =
+      "radial-gradient(#ffffff, #c6bebe)";
+  };
+
   const handleLogoutClick = () => {
     removeLoginCookie();
     setIsAuthenticated(false);
@@ -53,6 +59,9 @@ const Menu = ({ authProps, pageProps }: MenuProps) => {
       )}
       <button onClick={handleLogoutClick}>
         {isIncognito ? "Leave Incognito" : "Logout"}
+      </button>
+      <button onClick={handleBackClick}>
+        {"back"}
       </button>
       {page !== Page.FINISH && (
         <button onClick={handleFinishClick}>Finish</button>
