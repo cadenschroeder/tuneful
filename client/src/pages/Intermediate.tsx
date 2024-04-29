@@ -67,6 +67,7 @@ const Intermediate = ({ pageProps, setIsAuthenticated }: IntermediateProps) => {
 
   const handleLogout = () => {
     removeLoginCookie();
+    window.location.hash = "";
     setIsAuthenticated(false);
     setPage("login");
     setSignedInWithSpotify(false); // Make sure to reset Spotify login state on logout
