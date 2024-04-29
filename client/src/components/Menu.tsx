@@ -22,6 +22,7 @@ const Menu = ({ authProps, pageProps }: MenuProps) => {
     removeLoginCookie();
     setIsAuthenticated(false);
     setPage(Page.LOGIN);
+    window.location.hash = "";
     document.getElementById("App")!.style.background =
       "radial-gradient(#ffffff, #c6bebe)";
   };
