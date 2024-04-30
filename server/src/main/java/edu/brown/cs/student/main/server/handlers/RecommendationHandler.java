@@ -1,20 +1,27 @@
 package edu.brown.cs.student.main.server.handlers;
 
+import com.google.cloud.firestore.FieldValue;
 import com.squareup.moshi.JsonAdapter;
 import com.squareup.moshi.Moshi;
 import edu.brown.cs.student.main.server.broadband.MusicSource;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import edu.brown.cs.student.main.server.broadband.SongData;
+import edu.brown.cs.student.main.server.storage.StorageInterface;
 import spark.Request;
 import spark.Response;
 import spark.Route;
 
 public class RecommendationHandler implements Route {
   private MusicSource datasource;
+  private StorageInterface storageHandler;
 
-  public RecommendationHandler(MusicSource datasource) { // also pass in algorithm class
+  public RecommendationHandler(MusicSource datasource, StorageInterface storageHandler) {
+    // also pass in algorithm class
     this.datasource = datasource;
+    this.storageHandler = storageHandler;
   }
 
   @Override
@@ -41,15 +48,34 @@ public class RecommendationHandler implements Route {
     // mocked map for now :
 
     Map<String, String> params = new HashMap<>();
-    params.put("seed_genres", "classical%2Ccountry");
+    params.put("seed_genres", "new-release%2Cpop");
     // params.put("seed_artists", "4NHQUGzhtTLFvgF5SZesLK");
     // params.put("seed_tracks", "0c6xIDDpzE81m2q797ordA");
     // params.put("target_acousticness", "0.5");
     params.put("limit", "5");
 
-    List<String> songIDs = this.datasource.getRecommendation(params);
-    System.out.println(songIDs);
-    responseMap.put("songIDs", songIDs);
+    List<Map<String,Object>> songs = this.datasource.getRecommendation(params, uid);
+    //TODO: if songs is empty then call getRecommendation again?
+    responseMap.put("songs", songs);
+
+    try {
+      Map<String, Object> firebaseData = new HashMap<>();
+      firebaseData.put("songList", songs);
+
+      // TODO: what to do with incognito users?? can we have a designated user id for them that gets cleared?
+      int songCount = this.storageHandler.getCollection(uid, "songs").size();
+      if (songCount == 0) {
+        String songListID = "list-" + songCount; //TODO : Make session based
+        // use the storage handler to add the document to the database
+        this.storageHandler.addDocument(uid, "songs", songListID, firebaseData);
+      } else {
+        this.storageHandler.addToList(uid, "songs", "list-0", "songList", songs);
+      }
+    } catch(Exception e){
+      e.printStackTrace();
+      return new RecommendationHandler.RecommendationFailureResponse(e.getMessage()).serialize();
+    }
+
 
     return new RecommendationHandler.RecommendationSuccessResponse(responseMap).serialize();
   }

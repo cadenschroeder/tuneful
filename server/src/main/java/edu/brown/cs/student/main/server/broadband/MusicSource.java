@@ -16,6 +16,7 @@ public interface MusicSource {
    * @return SongData for the song
    */
   SongData getSongData(String songID) throws IOException, DatasourceException;
+  Map<String, Object> getFeatures(String songID) throws IOException;
 
   /**
    * Takes in max, min, and target values for all audio features and queries API to get a list of
@@ -24,7 +25,8 @@ public interface MusicSource {
    * @param inputs max, min, target, etc. (hashmap for now but we can change it)
    * @return a list of song IDs referring to the songs to be recommended
    */
-  List<String> getRecommendation(Map<String, String> inputs)
+  // TODO : should this be map string --> object or T instead for generalization?
+  List<Map<String, Object>> getRecommendation(Map<String, String> inputs, String uid)
       throws IOException, DatasourceException;
 
   /**

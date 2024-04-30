@@ -8,9 +8,7 @@ public record SongData(
     String explicit,
     List<String> artists,
     String album,
-    List<Map<String, Object>> images,
-  
-    Map<String, Object> features) {
+    List<Map<String, Object>> images) {
 
     public Map<String, Object> toMap() {
         return Map.of(
@@ -18,8 +16,7 @@ public record SongData(
                 "explicit", explicit,
                 "artists", artists,
                 "album", album,
-                "images", images,
-                "features", features
+                "images", images
         );
     }
 }

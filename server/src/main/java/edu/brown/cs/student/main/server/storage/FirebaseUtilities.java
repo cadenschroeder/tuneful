@@ -2,11 +2,7 @@
 
  import com.google.api.core.ApiFuture;
  import com.google.auth.oauth2.GoogleCredentials;
- import com.google.cloud.firestore.CollectionReference;
- import com.google.cloud.firestore.DocumentReference;
- import com.google.cloud.firestore.Firestore;
- import com.google.cloud.firestore.QueryDocumentSnapshot;
- import com.google.cloud.firestore.QuerySnapshot;
+ import com.google.cloud.firestore.*;
  import com.google.firebase.FirebaseApp;
  import com.google.firebase.FirebaseOptions;
  import com.google.firebase.cloud.FirestoreClient;
@@ -91,6 +87,26 @@
      // 2: Write data to the collection ref
      collectionRef.document(doc_id).set(data);
    }
+
+     @Override
+     public void addToList(String uid, String collection_id, String doc_id, String list_id, List<Map<String,Object>>
+             data)
+             throws IllegalArgumentException {
+         if (uid == null || collection_id == null || doc_id == null || data == null) {
+             throw new IllegalArgumentException(
+                     "addTOList: uid, collection_id, doc_id, or data cannot be null");
+         }
+         Firestore db = FirestoreClient.getFirestore();
+         // 1: Get a ref to the collection that you created
+         CollectionReference collectionRef =
+                 db.collection("users").document(uid).collection(collection_id);
+
+         // 2: Write data to the collection ref
+         for(Map<String,Object> song : data) {
+             collectionRef.document(doc_id).update(list_id, FieldValue.arrayUnion(song));
+         }
+     }
+
 
    // clears the collections inside of a specific user.
    @Override
