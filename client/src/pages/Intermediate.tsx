@@ -29,7 +29,7 @@ const Intermediate = ({ pageProps, setIsAuthenticated }: IntermediateProps) => {
   const [signedInWithSpotify, setSignedInWithSpotify] = useState(false);
   const [signedInWithoutSpotify, setSignedInWithoutSpotify] = useState(false);
   const [genreChoice, setGenreChoice] = useState("");
-  const [playlistChoice, setPlaylistChoice] = useState("");
+  const [playlistChoice, setPlaylistChoice] = useState<{ name: string }>();
   const getPlaylists = useCallback(() => {
     console.log("token: " + token);
 
@@ -102,7 +102,9 @@ const Intermediate = ({ pageProps, setIsAuthenticated }: IntermediateProps) => {
         <h1 className="intermediate">Select to Start</h1>
 
         <h2 id="select-header">
-          {playlistChoice ? `Chosen: ${playlistChoice}` : "Select a Playlist"}
+          {playlistChoice
+            ? `Chosen: ${playlistChoice.name}`
+            : "Select a Playlist"}
         </h2>
         <div className="radio-group">
           {playlists.map((playlist: { name: string }) => (
@@ -112,7 +114,7 @@ const Intermediate = ({ pageProps, setIsAuthenticated }: IntermediateProps) => {
                 id={playlist.name}
                 name="playlist"
                 value={playlist.name}
-                onChange={(e) => setPlaylistChoice(e.target.value)}
+                onChange={(e) => setPlaylistChoice(playlist)}
               ></input>
               <label htmlFor={playlist.name}>{playlist.name}</label>
             </div>
