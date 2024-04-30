@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
-// import { songs } from "../utils/consts";
+import { songs } from "../utils/consts";
 import { AudioVisualizer } from "react-audio-visualize";
 import dragElement from "./drag";
 
@@ -245,34 +245,11 @@ interface MusicProps {
 }
 
 const Music = ({ appRef }: MusicProps) => {
-  const result =  viewSong();
-  result.then((output) =>{
-
-  })
   return (
     <div id="music">
       <Card songs={songs} appRef={appRef} />
     </div>
   );
 };
-
-async function viewSong(uid: string): Promise<string | string[][]> {
-  return await fetch("http://localhost:3232/viewSongs?uid=fake")
-    .then((response) => response.json())
-    .then(async (json) => {
-      console.log(json);
-      const response_type: string = await json["response_type"];
-      if (response_type === "error") {
-        return await json.error_message;
-      } else if (response_type === "success") {
-        // const data = await json.responseMap["dataset"];
-        console.log(await json.responseMap["CSV data"]["dataset"]);
-        return await json.responseMap["CSV data"]["dataset"];
-      }
-    })
-    .catch((error) => {
-      return Promise<"Error in fetch">;
-    });
-}
 
 export default Music;
