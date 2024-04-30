@@ -4,6 +4,8 @@ import com.google.cloud.firestore.FieldValue;
 import com.squareup.moshi.JsonAdapter;
 import com.squareup.moshi.Moshi;
 import edu.brown.cs.student.main.server.broadband.MusicSource;
+
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -27,15 +29,15 @@ public class RecommendationHandler implements Route {
   @Override
   public Object handle(Request request, Response response) throws Exception {
     String liked = request.queryParams("liked");
-    String songID = request.queryParams("songID");
+    String lastSongID = request.queryParams("songID");
     String uid = request.queryParams("uid");
 
-    if (liked == null || songID == null || uid == null) {
+    if (liked == null || lastSongID == null || uid == null) {
       return new RecommendationHandler.RecommendationFailureResponse(
               "Missing one or more parameters")
           .serialize();
     }
-    if (liked.isEmpty() || songID.isEmpty() || uid.isEmpty()) {
+    if (liked.isEmpty() || lastSongID.isEmpty() || uid.isEmpty()) {
       return new RecommendationHandler.RecommendationFailureResponse("Empty parameter(s)")
           .serialize();
     }
@@ -54,24 +56,31 @@ public class RecommendationHandler implements Route {
     // params.put("target_acousticness", "0.5");
     params.put("limit", "5");
 
-    List<Map<String,Object>> songs = this.datasource.getRecommendation(params, uid);
-    //TODO: if songs is empty then call getRecommendation again?
+    List<Map<String,Object>> songs = new ArrayList<>();
+
+    int tries = 0;
+    while(songs.isEmpty()){
+      songs = this.datasource.getRecommendation(params, uid);
+      tries++;
+      if(tries > 5){
+        return new RecommendationHandler.RecommendationFailureResponse("Could not fetch more recommendations. Attempts exceeded").serialize();
+      }
+    }
+
     responseMap.put("songs", songs);
 
     try {
       Map<String, Object> firebaseData = new HashMap<>();
-      firebaseData.put("songList", songs);
 
-      // TODO: what to do with incognito users?? can we have a designated user id for them that gets cleared?
-      int songCount = this.storageHandler.getCollection(uid, "songs").size();
-      if (songCount == 0) {
-        String songListID = "list-" + songCount; //TODO : Make session based
+      for(Map<String,Object> song : songs){
+        //TODO : Make session based
+        firebaseData.put("song", song);
         // use the storage handler to add the document to the database
-        this.storageHandler.addDocument(uid, "songs", songListID, firebaseData);
-      } else {
-        this.storageHandler.addToList(uid, "songs", "list-0", "songList", songs);
+        this.storageHandler.addDocument(uid, "songs", song.get("trackID").toString(), firebaseData);
       }
+      // TODO: what to do with incognito users?? can we have a designated user id for them that gets cleared?
     } catch(Exception e){
+      //TODO take out
       e.printStackTrace();
       return new RecommendationHandler.RecommendationFailureResponse(e.getMessage()).serialize();
     }

@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Map;
 
 public record SongData(
+    String trackID,
     String snippetURL,
     String explicit,
     List<String> artists,
@@ -12,6 +13,7 @@ public record SongData(
 
     public Map<String, Object> toMap() {
         return Map.of(
+                "trackID", trackID,
                 "snippetURL", snippetURL,
                 "explicit", explicit,
                 "artists", artists,

@@ -100,9 +100,10 @@ public class SpotifySource implements MusicSource {
     for (Map<String, Object> artist : artists) {
       artistNames.add(artist.get("name").toString());
     }
+    String id = track.get("id").toString();
 
 
-    return new SongData(snippetURL, explicit, artistNames, albumName, images);
+    return new SongData(id, snippetURL, explicit, artistNames, albumName, images);
   }
 
   @Override
@@ -171,7 +172,6 @@ public class SpotifySource implements MusicSource {
     ArrayList<Map<String, Object>> tracks =
         (ArrayList<Map<String, Object>>) recommendations.get("tracks");
     for (Map<String, Object> track : tracks) {
-      String id = track.get("id").toString();
       try {
         songList.add(this.trackToSongData(track).toMap());
       } catch (DatasourceException e){
@@ -184,13 +184,17 @@ public class SpotifySource implements MusicSource {
 
   private SongData trackToSongData(Map<String, Object> track) throws DatasourceException {
     //TODO error handle ?? These don't have great runtime since they repeat every time to error check rn
+
     if(track.get("preview_url") == null ||
             track.get("explicit") == null ||
             track.get("album") == null ||
-            track.get("artists") == null
+            track.get("artists") == null ||
+            track.get("id") == null
     ){
       throw new DatasourceException("Missing required aspects");
     }
+
+    String id = track.get("id").toString();
     String snippetURL = track.get("preview_url").toString();
     String explicit = track.get("explicit").toString();
     Map<String, Object> albumInfo = (Map<String, Object>) track.get("album");
@@ -212,7 +216,7 @@ public class SpotifySource implements MusicSource {
       }
       artistNames.add(artist.get("name").toString());
     }
-    return new SongData(snippetURL, explicit, artistNames, albumName, images);
+    return new SongData(id, snippetURL, explicit, artistNames, albumName, images);
   }
 
   public static Map<String, Object> deserializeRecommendations(String jsonSong) throws IOException {

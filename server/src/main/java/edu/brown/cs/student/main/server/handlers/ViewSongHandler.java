@@ -48,7 +48,7 @@ public class ViewSongHandler implements Route {
 
       //get all songs for user
       List<Map<String, Object>> vals = this.storageHandler.getCollection(uid, "songs");
-      List<Object> songs = vals.stream().map(song -> song.get("songData")).toList();
+      List<Object> songs = vals.stream().map(song -> song.get("song")).toList();
       //convert to a songData
 //      System.out.println(songs);
 //      System.out.println(songs.get(0).getClass());
