@@ -7,9 +7,15 @@ interface ActionsProps {
   nextSong: () => void;
   isPlaying: boolean;
   togglePlay: () => void;
+  isDesktop: boolean;
 }
 
-const Actions = ({ nextSong, togglePlay, isPlaying }: ActionsProps) => {
+const Actions = ({
+  nextSong,
+  togglePlay,
+  isPlaying,
+  isDesktop,
+}: ActionsProps) => {
   const handleLike = useCallback(() => {
     const cardElement = document.getElementById("card");
     if (cardElement) {
@@ -115,12 +121,20 @@ const Actions = ({ nextSong, togglePlay, isPlaying }: ActionsProps) => {
     };
   }, [handleDislike, handleLike, handleToggle]);
 
+  useEffect(() => {
+    dragElement(document.getElementById("card")!, nextSong, handleToggle);
+  }, [nextSong, handleToggle]);
+
   return (
     <div>
       <div className="buttons">
-        <button onClick={handleDislike}>👎</button>
-        <button onClick={handleToggle}>{isPlaying ? "⏸️" : "▶️"}</button>
-        <button onClick={handleLike}>👍</button>
+        {isDesktop && (
+          <>
+            <button onClick={handleDislike}>👎</button>
+            <button onClick={handleToggle}>{isPlaying ? "⏸️" : "▶️"}</button>
+            <button onClick={handleLike}>👍</button>
+          </>
+        )}
       </div>
     </div>
   );
@@ -201,9 +215,7 @@ const Card = ({ songs, appRef }: CardProps) => {
     setSong(songs[randomIndex]);
   }, [song, songs]);
 
-  useEffect(() => {
-    dragElement(document.getElementById("card")!, nextSong);
-  }, [nextSong]);
+  const isDesktop = window.matchMedia("(min-width: 768px)").matches;
 
   return (
     <div
@@ -230,11 +242,42 @@ const Card = ({ songs, appRef }: CardProps) => {
       ) : (
         <div id="empty-vis"></div>
       )}
-      <img src={song.cover} alt="album cover" draggable="false" />
+      <div style={{ position: "relative" }}>
+        {!isPlaying && (
+          <img
+            src="img/pause.png"
+            alt="play"
+            className="play"
+            style={{
+              width: "150px",
+              position: "absolute",
+              top: "50%",
+              left: "50%",
+              transform: "translate(-50%, -50%)",
+              zIndex: 1,
+              filter: "invert(1)",
+              opacity: 0.8,
+              border: "none",
+            }}
+          />
+        )}
+        <img
+          src={song.cover}
+          alt="album cover"
+          draggable="false"
+          style={{
+            display: "block",
+            width: "100%",
+            height: "auto",
+            filter: `${isPlaying ? "none" : "brightness(0.9)"}`,
+          }}
+        />
+      </div>
       <Actions
         nextSong={nextSong}
         isPlaying={isPlaying}
         togglePlay={togglePlay}
+        isDesktop={isDesktop}
       />
     </div>
   );
