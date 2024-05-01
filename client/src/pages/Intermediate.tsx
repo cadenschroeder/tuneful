@@ -29,7 +29,12 @@ const Intermediate = ({ pageProps, setIsAuthenticated }: IntermediateProps) => {
   const [signedInWithSpotify, setSignedInWithSpotify] = useState(false);
   const [signedInWithoutSpotify, setSignedInWithoutSpotify] = useState(false);
   const [genreChoice, setGenreChoice] = useState("");
-  const [playlistChoice, setPlaylistChoice] = useState<{ name: string }>();
+
+  const [playlistChoice, setPlaylistChoice] = useState<{
+    name: string;
+    tracks: { href: string };
+  }>();
+
   const getPlaylists = useCallback(() => {
     console.log("token: " + token);
 
@@ -40,7 +45,7 @@ const Intermediate = ({ pageProps, setIsAuthenticated }: IntermediateProps) => {
         },
       })
       .then((response: any) => {
-        setData(response.data);
+        setData(response.data.items);
         setPlaylists(response.data.items);
         console.log(response.data.items);
       })
@@ -48,6 +53,22 @@ const Intermediate = ({ pageProps, setIsAuthenticated }: IntermediateProps) => {
         console.log(error);
       });
   }, [token]);
+
+  const getTrackList = async (trackListURL: string) => {
+    console.log("api url: " + trackListURL);
+
+    try {
+      const response = await axios.get(trackListURL, {
+        headers: {
+          Authorization: "Bearer " + token,
+        },
+      });
+
+      return response.data.items; // returns data as a Promise
+    } catch (e) {
+      console.log(e);
+    }
+  };
 
   useEffect(() => {
     const retrievedToken = localStorage.getItem("accessToken");
@@ -84,7 +105,35 @@ const Intermediate = ({ pageProps, setIsAuthenticated }: IntermediateProps) => {
     setSignedInWithSpotify(true);
   };
 
+  interface Playlist {
+    track: {
+      id: string;
+    };
+  }
+
   const handleContinue = () => {
+    let playlist: Playlist[] = [];
+    // TODO: somehow send playlist / genre information to backend
+    if (playlistChoice) {
+      console.log("link: " + playlistChoice.tracks.href);
+      getTrackList(playlistChoice.tracks.href).then((response) => {
+        playlist = response;
+        console.log("first track id");
+        console.log(playlist[0].track.id);
+
+        let trackIDs: string[] = [];
+        playlist.forEach(function (track) {
+          trackIDs.push(track.track.id);
+        });
+
+        // make an api call from the tracks link and stringify the result of that
+
+        const trackIDsString = JSON.stringify(trackIDs);
+
+        console.log(trackIDsString);
+      });
+    }
+
     setPage("music");
   };
 
@@ -107,18 +156,20 @@ const Intermediate = ({ pageProps, setIsAuthenticated }: IntermediateProps) => {
             : "Select a Playlist"}
         </h2>
         <div className="radio-group">
-          {playlists.map((playlist: { name: string }) => (
-            <div className="radio-element">
-              <input
-                type="radio"
-                id={playlist.name}
-                name="playlist"
-                value={playlist.name}
-                onChange={(e) => setPlaylistChoice(playlist)}
-              ></input>
-              <label htmlFor={playlist.name}>{playlist.name}</label>
-            </div>
-          ))}
+          {playlists.map(
+            (playlist: { name: string; tracks: { href: string } }) => (
+              <div className="radio-element">
+                <input
+                  type="radio"
+                  id={playlist.name}
+                  name="playlist"
+                  value={playlist.name}
+                  onChange={(e) => setPlaylistChoice(playlist)}
+                ></input>
+                <label htmlFor={playlist.name}>{playlist.name}</label>
+              </div>
+            )
+          )}
         </div>
 
         <h2 id="select-header">
@@ -139,14 +190,13 @@ const Intermediate = ({ pageProps, setIsAuthenticated }: IntermediateProps) => {
             </div>
           ))}
         </div>
-        <p>{playlistChoice}</p>
-        <p>{genreChoice}</p>
+        {/* <p>{playlistChoice}</p>
+        <p>{genreChoice}</p> */}
 
         <button onClick={handleContinue}>Continue</button>
-        <button onClick={handleBackClick}
-        style={{ marginTop: "20px"}}>
-        {"back"}
-      </button>
+        <button onClick={handleBackClick} style={{ marginTop: "20px" }}>
+          {"back"}
+        </button>
         <button onClick={handleLogout} style={{ marginTop: "20px" }}>
           Logout
         </button>
@@ -186,14 +236,12 @@ const Intermediate = ({ pageProps, setIsAuthenticated }: IntermediateProps) => {
           ))}
         </div>
 
-        <p>{playlistChoice}</p>
-        <p>{genreChoice}</p>
+        {/* <p>{playlistChoice}</p>
+        <p>{genreChoice}</p> */}
 
         <button onClick={handleContinue}>Continue</button>
-        <button 
-        onClick={handleBackClick}
-        style={{ marginTop: "20px"}}>
-        {"back"}
+        <button onClick={handleBackClick} style={{ marginTop: "20px" }}>
+          {"back"}
         </button>
         <button onClick={handleLogout} style={{ marginTop: "20px" }}>
           Logout

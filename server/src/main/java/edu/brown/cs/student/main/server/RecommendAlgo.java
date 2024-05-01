@@ -1,10 +1,14 @@
 package edu.brown.cs.student.main.server;
 
 import java.util.HashMap;
+import java.util.List;
 
 import edu.brown.cs.student.main.server.storage.StorageInterface;
+import spark.Request;
+import spark.Response;
+import spark.Route;
 
-public class RecommendAlgo {
+public class RecommendAlgo implements Route{
     private StorageInterface storageHandler;
     public RecommendAlgo(StorageInterface storageHandler){
         this.storageHandler = storageHandler;
@@ -22,7 +26,12 @@ public class RecommendAlgo {
         // 
     }
 
-    public void instantiateProfile(){
-        
+    public void instantiateProfile(List<String> playlists, String genre){
+
+    }
+
+    @Override
+    public Object handle(Request request, Response response) throws Exception {
+        return null;
     }
 }
