@@ -139,14 +139,13 @@ const Intermediate = ({ pageProps, setIsAuthenticated }: IntermediateProps) => {
             </div>
           ))}
         </div>
-        <p>{playlistChoice}</p>
+        <p>{playlistChoice?.name}</p>
         <p>{genreChoice}</p>
 
         <button onClick={handleContinue}>Continue</button>
-        <button onClick={handleBackClick}
-        style={{ marginTop: "20px"}}>
-        {"back"}
-      </button>
+        <button onClick={handleBackClick} style={{ marginTop: "20px" }}>
+          {"back"}
+        </button>
         <button onClick={handleLogout} style={{ marginTop: "20px" }}>
           Logout
         </button>
@@ -186,14 +185,12 @@ const Intermediate = ({ pageProps, setIsAuthenticated }: IntermediateProps) => {
           ))}
         </div>
 
-        <p>{playlistChoice}</p>
+        <p>{playlistChoice?.name}</p>
         <p>{genreChoice}</p>
 
         <button onClick={handleContinue}>Continue</button>
-        <button 
-        onClick={handleBackClick}
-        style={{ marginTop: "20px"}}>
-        {"back"}
+        <button onClick={handleBackClick} style={{ marginTop: "20px" }}>
+          {"back"}
         </button>
         <button onClick={handleLogout} style={{ marginTop: "20px" }}>
           Logout
