@@ -7,6 +7,7 @@ import java.util.concurrent.ExecutionException;
 public interface StorageInterface {
 
   void addDocument(String uid, String collection_id, String doc_id, Map<String, Object> data);
+  void addToList(String uid, String collection_id, String doc_id, String list_id, Object data);
 
   void updateDocument(String uid, String collection_id, String doc_id, Map<String, Object> data);
 

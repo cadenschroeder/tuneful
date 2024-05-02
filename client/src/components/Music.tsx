@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
+
 import { AudioVisualizer } from "react-audio-visualize";
 import dragElement from "./drag";
 import { songs } from "../utils/consts";
@@ -133,7 +134,7 @@ const Actions = ({
   );
 };
 
-interface Song {
+export interface Song {
   name: string;
   cover: string;
   artist: string;
@@ -144,6 +145,7 @@ interface Song {
 interface CardProps {
   songs: Song[];
 }
+
 
 const Card = ({ songs }: CardProps) => {
   const [song, setSong] = useState(songs[0]);
@@ -317,6 +319,6 @@ const Music = () => {
       <Card songs={songs} />
     </div>
   );
-};
+}
 
 export default Music;

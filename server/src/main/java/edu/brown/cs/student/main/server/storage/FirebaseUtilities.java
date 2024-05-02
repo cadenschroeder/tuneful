@@ -2,11 +2,7 @@
 
  import com.google.api.core.ApiFuture;
  import com.google.auth.oauth2.GoogleCredentials;
- import com.google.cloud.firestore.CollectionReference;
- import com.google.cloud.firestore.DocumentReference;
- import com.google.cloud.firestore.Firestore;
- import com.google.cloud.firestore.QueryDocumentSnapshot;
- import com.google.cloud.firestore.QuerySnapshot;
+ import com.google.cloud.firestore.*;
  import com.google.firebase.FirebaseApp;
  import com.google.firebase.FirebaseOptions;
  import com.google.firebase.cloud.FirestoreClient;
@@ -31,7 +27,9 @@
          Paths.get(workingDirectory, "src", "main", "resources", "firebase_config.json");
      // ^-- if your /resources/firebase_config.json exists but is not found,
      // try printing workingDirectory and messing around with this path.
+       // System.out.println(workingDirectory);
 
+     System.out.println(firebaseConfigPath.toString());
      FileInputStream serviceAccount = new FileInputStream(firebaseConfigPath.toString());
 
      FirebaseOptions options =
@@ -91,6 +89,36 @@
      // 2: Write data to the collection ref
      collectionRef.document(doc_id).set(data);
    }
+
+    /**
+     * Adds an element to the end of a user's list
+     * @param uid
+     * @param collection_id
+     * @param doc_id
+     * @param list_id --> indicates which list in a set to add to
+     * @param data --> data to be added to the list
+     */
+     @Override
+     public void addToList(String uid, String collection_id, String doc_id, String list_id, Object
+             data)
+             throws IllegalArgumentException {
+         if (uid == null || collection_id == null || doc_id == null || data == null) {
+             throw new IllegalArgumentException(
+                     "addTOList: uid, collection_id, doc_id, or data cannot be null");
+         }
+         Firestore db = FirestoreClient.getFirestore();
+         // 1: Get a ref to the collection that you created
+         CollectionReference collectionRef =
+                 db.collection("users").document(uid).collection(collection_id);
+
+         // 2: Add the data element to the array by reference to the list id
+         
+        DocumentReference doc = collectionRef.document(doc_id);
+        ArrayList<Double> dataArrayList = (ArrayList<Double>) data;
+
+        doc.update(list_id, FieldValue.arrayUnion(dataArrayList.toArray()));
+     }
+
 
    // clears the collections inside of a specific user.
    @Override
