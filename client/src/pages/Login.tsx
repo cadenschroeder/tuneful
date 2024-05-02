@@ -2,6 +2,7 @@ import { AuthProps, Page, PageProps } from "../interfaces/interfaces";
 import { authLoginMock } from "../utils/auth";
 import { getAuth, GoogleAuthProvider, signInWithPopup } from "firebase/auth";
 import { addLoginCookie } from "../utils/cookie";
+import { emojis } from "../utils/consts";
 
 interface LoginProps {
   authProps: AuthProps;
@@ -15,7 +16,7 @@ const Login = ({ authProps, pageProps }: LoginProps) => {
   const handleLoginIncognito = () => {
     if (authLoginMock()) {
       setIsAuthenticated(true);
-      setPage(Page.INTERMEDIATE); 
+      setPage(Page.INTERMEDIATE);
       addLoginCookie("incognito");
     }
   };
@@ -40,12 +41,42 @@ const Login = ({ authProps, pageProps }: LoginProps) => {
 
   return (
     <div id="login">
+      {emojis.map((emoji, i) => {
+        return (
+          <span
+            key={i}
+            role="img"
+            aria-label="SFX"
+            style={{
+              position: "absolute",
+              top: "-10vh",
+              left: `${Math.random() * 100}vw`,
+              zIndex: -1,
+              animation: `fallingAnimation 10s ease ${
+                (i / emojis.length) * 10
+              }s infinite`,
+            }}
+          >
+            {emoji}
+          </span>
+        );
+      })}
       <h1>tuneful</h1>
       <p>
-        <button onClick={signInWithGoogle}>Continue with Google</button>
+        <button
+          onClick={signInWithGoogle}
+          style={{ zIndex: 5, background: "rgb(158 155 155)" }}
+        >
+          Continue with Google
+        </button>
       </p>
       <p>
-        <button onClick={handleLoginIncognito}>Incognito</button>
+        <button
+          onClick={handleLoginIncognito}
+          style={{ zIndex: 5, background: "rgb(158 155 155)" }}
+        >
+          Incognito
+        </button>
       </p>
     </div>
   );
