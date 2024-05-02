@@ -38,16 +38,16 @@ public class RecommendationHandler implements Route {
   @Override
   public Object handle(Request request, Response response) throws Exception {
     String liked = request.queryParams("liked");
-    String trackIDs = request.queryParams("songID"); // array of track ids
+    String trackIDs = request.queryParams("trackIDs"); // array of track ids
     String first = request.queryParams("first"); // indicates if it is the first time called or not
     String uid = request.queryParams("uid");
 
-    if (liked == null || trackIDs == null) {
+    if (liked == null || trackIDs == null || first ==  null || uid == null) {
       return new RecommendationHandler.RecommendationFailureResponse(
               "Missing one or more parameters")
           .serialize();
     }
-    if (liked.isEmpty() || trackIDs.isEmpty() || uid.isEmpty()) {
+    if (liked.isEmpty() || trackIDs.isEmpty() || first.isEmpty() || uid.isEmpty()) {
       return new RecommendationHandler.RecommendationFailureResponse("Empty parameter(s)")
           .serialize();
     }
