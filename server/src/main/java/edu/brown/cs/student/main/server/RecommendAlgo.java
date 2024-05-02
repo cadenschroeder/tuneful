@@ -74,7 +74,7 @@ public class RecommendAlgo {
         this.storageHandler.addDocument(uid, "attributes", "session-0", stats);
     }
 
-    public static double calculateStandardDeviation(ArrayList<Double> array) {
+    private static double calculateStandardDeviation(List<Double> array) {
 
         // get the sum of array
         double sum = 0.0;
@@ -133,7 +133,7 @@ public class RecommendAlgo {
         return min;
     }
 
-    public static double findMedian(List<Double> list) {
+    private static double findMedian(List<Double> list) {
         Collections.sort(list); // Sort the ArrayList
         int n = list.size();
         if (n % 2 != 0) {
@@ -145,14 +145,29 @@ public class RecommendAlgo {
         }
     }
 
-    private Map<String, Map<String, Double>> rankAttributes (Map<String, List<Double>> likeAttributes, Map<String, List<Double>> dislikeAttributes){
+    public Map<String, Map<String, Double>> rankAttributes (Map<String, List<Double>> likeAttributes, Map<String, List<Double>> dislikeAttributes){
         Map<String, Map<String, Double>> rankings = new HashMap<>();
         for (String attribute : likeAttributes.keySet()) {
-            Double likeMedian = findMedian(likeAttributes.get(attribute));
-            Double dislikeMedian = findMedian(dislikeAttributes.get(attribute));
-
+            Double rawLikeMedian = findMedian(likeAttributes.get(attribute));
+            Double rawLikeStdDev = calculateStandardDeviation(likeAttributes.get(attribute));
+            if (!(getMax(attribute) == 1.0 && getMin(attribute) == 0.0)){
+                likeAttributes.put(attribute, normalizeList(likeAttributes.get(attribute), getMin(attribute), getMax(attribute)));
+                dislikeAttributes.put(attribute, normalizeList(dislikeAttributes.get(attribute), getMin(attribute), getMax(attribute)));
+            }
+            Double normalizedLikeMedian = findMedian(likeAttributes.get(attribute));
+            Double normalizedDislikeMedian = findMedian(dislikeAttributes.get(attribute));
+            Double difference = Math.abs(normalizedLikeMedian - normalizedDislikeMedian);
+            Double likeStdDev = calculateStandardDeviation(likeAttributes.get(attribute));
+            Double dislikeStdDev = calculateStandardDeviation(dislikeAttributes.get(attribute));
+            Double ranking = 3.0 * difference + 2.0 * likeStdDev + dislikeStdDev;
+            Map<String, Double> tempMap= new HashMap<>();
+            tempMap.put("ranking", ranking);
+            tempMap.put("target", rawLikeMedian);
+            tempMap.put("minimum", rawLikeMedian - rawLikeStdDev);
+            tempMap.put("maximum", rawLikeMedian + rawLikeStdDev);
+            rankings.put(attribute, tempMap);
         }
-        return null;
+        return rankings;
     }
 
     private Map<String, Object> reduceMap(Map<String, Object> features){
