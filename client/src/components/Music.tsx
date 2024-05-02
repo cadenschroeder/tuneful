@@ -8,6 +8,8 @@ interface ActionsProps {
   isPlaying: boolean;
   togglePlay: () => void;
   isDesktop: boolean;
+  setLikeCount: React.Dispatch<React.SetStateAction<number>>;
+  setDislikeCount: React.Dispatch<React.SetStateAction<number>>;
 }
 
 const Actions = ({
@@ -15,8 +17,11 @@ const Actions = ({
   togglePlay,
   isPlaying,
   isDesktop,
+  setLikeCount,
+  setDislikeCount,
 }: ActionsProps) => {
   const handleLike = useCallback(() => {
+    setLikeCount(prev => prev + 1);
     const cardElement = document.getElementById("card");
     if (cardElement) {
       cardElement
@@ -54,6 +59,7 @@ const Actions = ({
   }, [nextSong]);
 
   const handleDislike = useCallback(() => {
+    setDislikeCount(prev => prev + 1);
     const cardElement = document.getElementById("card");
     if (cardElement) {
       cardElement
@@ -151,9 +157,11 @@ interface Song {
 interface CardProps {
   songs: Song[];
   appRef: React.RefObject<HTMLDivElement>;
+  setLikeCount: React.Dispatch<React.SetStateAction<number>>;
+  setDislikeCount: React.Dispatch<React.SetStateAction<number>>;
 }
 
-const Card = ({ songs, appRef }: CardProps) => {
+const Card = ({ songs, appRef, setLikeCount, setDislikeCount }: CardProps) => {
   const [song, setSong] = useState(songs[0]);
   const [blob, setBlob] = useState<Blob>();
   const [playTime, setPlayTime] = useState(0);
@@ -219,6 +227,7 @@ const Card = ({ songs, appRef }: CardProps) => {
   }, [song, songs]);
 
   return (
+    
     <div
       id="card"
       className="card"
@@ -281,6 +290,8 @@ const Card = ({ songs, appRef }: CardProps) => {
         isPlaying={isPlaying}
         togglePlay={togglePlay}
         isDesktop={isDesktop}
+        setLikeCount={setLikeCount}
+        setDislikeCount={setDislikeCount}
       />
     </div>
   );
@@ -291,9 +302,37 @@ interface MusicProps {
 }
 
 const Music = ({ appRef }: MusicProps) => {
+  const [likeCount, setLikeCount] = useState(0);
+  const [dislikeCount, setDislikeCount] = useState(0);
   return (
     <div id="music">
-      <Card songs={songs} appRef={appRef} />
+      <div className="counter-display" style={{ textAlign: "center", fontSize: "20px", marginBottom: "20px" }}>
+        Likes: {likeCount} | Dislikes: {dislikeCount}
+      </div>
+      <Card
+        songs={songs}
+        appRef={appRef}
+        setLikeCount={setLikeCount}
+        setDislikeCount={setDislikeCount}
+      />
+      <button
+        onClick={() => { /* Placeholder for future functionality */ }}
+        style={{
+          position: 'absolute',
+          bottom: '70px',
+          left: '50%',
+          transform: 'translateX(-50%)',
+          padding: '10px 20px',
+          fontSize: '16px',
+          borderRadius: '5px',
+          background: '#007BFF',
+          color: 'white',
+          border: 'none',
+          cursor: 'pointer'
+        }}
+      >
+        Clear session data
+      </button>
     </div>
   );
 };

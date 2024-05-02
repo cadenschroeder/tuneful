@@ -6,6 +6,7 @@ import axios from "axios";
 
 const PLAYLIST_ENDPOINT = "https://api.spotify.com/v1/me/playlists";
 const GENRES = [
+  "",
   "Pop",
   "Hip Hop",
   "Rock",
@@ -111,7 +112,7 @@ const Intermediate = ({ pageProps, setIsAuthenticated }: IntermediateProps) => {
      </h2>
 
 
-     <div className="radio-group">
+     <div className="radio-group" style={{ marginBottom: "10px" }}>
        {playlists.map((playlist: { name: string }) => (
          <div key={playlist.name} className="radio-element">
            <input
@@ -127,7 +128,7 @@ const Intermediate = ({ pageProps, setIsAuthenticated }: IntermediateProps) => {
      </div>
 
 
-     <div className="radio-group">
+     <div className="radio-group" >
        {GENRES.map((genre) => (
          <div key={genre}>
            <input
