@@ -247,10 +247,15 @@ interface MusicProps {
 }
 
 export function Music({ appRef, songs }: MusicProps) {
-  // console.log(songs)
+  console.log(songs)
+  let toUse = mocked;
+  if(songs.length != 0){
+    toUse = songs;
+  }
+
   return (
     <div id="music">
-      <Card songs={mocked} appRef={appRef} />
+      <Card songs={toUse} appRef={appRef} />
     </div>
   );
 }
