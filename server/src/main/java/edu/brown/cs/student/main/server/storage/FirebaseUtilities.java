@@ -24,10 +24,11 @@
      //https://docs.google.com/document/d/10HuDtBWjkUoCaVj_A53IFm5torB_ws06fW3KYFZqKjc/edit?usp=sharing
      String workingDirectory = System.getProperty("user.dir");
      Path firebaseConfigPath =
-         Paths.get(workingDirectory, "src", "main", "resources", "firebase_config.json");
+         Paths.get(workingDirectory, "server","src", "main", "resources", "firebase_config.json");
      // ^-- if your /resources/firebase_config.json exists but is not found,
      // try printing workingDirectory and messing around with this path.
 
+     System.out.println(firebaseConfigPath.toString());
      FileInputStream serviceAccount = new FileInputStream(firebaseConfigPath.toString());
 
      FirebaseOptions options =
@@ -157,4 +158,18 @@
        System.err.println("Error deleting collection : " + e.getMessage());
      }
    }
+
+  @Override
+  public void updateDocument(String uid, String collection_id, String doc_id, Map<String, Object> data) {
+
+    if (uid == null || collection_id == null || doc_id == null || data == null) {
+      throw new IllegalArgumentException(
+          "addDocument: uid, collection_id, doc_id, or data cannot be null");
+    }
+
+    Firestore db = FirestoreClient.getFirestore();
+    CollectionReference collectionRef = db.collection("users").document(uid).collection(collection_id);
+    collectionRef.document(doc_id).update(data);
+    
+  }
  }

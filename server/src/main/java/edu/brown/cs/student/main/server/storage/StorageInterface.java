@@ -9,6 +9,8 @@ public interface StorageInterface {
   void addDocument(String uid, String collection_id, String doc_id, Map<String, Object> data);
   void addToList(String uid, String collection_id, String doc_id, String list_id, List<Map<String,Object>> data);
 
+  void updateDocument(String uid, String collection_id, String doc_id, Map<String, Object> data);
+
   List<Map<String, Object>> getCollection(String uid, String collection_id)
       throws InterruptedException, ExecutionException;
 
