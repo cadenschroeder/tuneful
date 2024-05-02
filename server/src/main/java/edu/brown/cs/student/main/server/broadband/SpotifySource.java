@@ -8,13 +8,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStreamWriter;
 import java.lang.reflect.Type;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.net.URLConnection;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Scanner;
+import java.net.*;
+import java.util.*;
 
 /**
  * SpotifySource Uses the ACS API to get information about broadband coverage in given county, state
@@ -98,6 +93,7 @@ public class SpotifySource implements MusicSource {
     String albumName = albumInfo.get("name").toString();
     ArrayList<Map<String, Object>> images =
         (ArrayList<Map<String, Object>>) albumInfo.get("images");
+    String imageUrl = images.get(0).get("url").toString();
 
     ArrayList<Map<String, Object>> artists =
         (ArrayList<Map<String, Object>>) track.get("artists"); // check this cast
@@ -105,24 +101,31 @@ public class SpotifySource implements MusicSource {
     for (Map<String, Object> artist : artists) {
       artistNames.add(artist.get("name").toString());
     }
+    String id = track.get("id").toString();
 
+
+    return new SongData(id, snippetURL, explicit, artistNames, albumName, imageUrl);
+  }
+
+  @Override
+  public Map<String, Object> getFeatures(String songID) throws IOException {
+    // TODO: change features map into integers
+    String accessToken = getAccessToken();
     // get features API call
-    URL featuresURL = new URL("https://api.spotify.com/v1/audio-features/11dFghVXANMlKmJXsNCbNl");
+    URL featuresURL = new URL("https://api.spotify.com/v1/audio-features/" + songID);
     HttpURLConnection featuresHttpConn = (HttpURLConnection) featuresURL.openConnection();
     featuresHttpConn.setRequestMethod("GET");
     featuresHttpConn.setRequestProperty("Authorization", "Bearer " + accessToken);
     InputStream featuresResponseStream =
-        featuresHttpConn.getResponseCode() / 100 == 2
-            ? featuresHttpConn.getInputStream()
-            : featuresHttpConn.getErrorStream();
+            featuresHttpConn.getResponseCode() / 100 == 2
+                    ? featuresHttpConn.getInputStream()
+                    : featuresHttpConn.getErrorStream();
     Scanner featuresS = new Scanner(featuresResponseStream).useDelimiter("\\A");
     String featuresResponse = featuresS.hasNext() ? featuresS.next() : "";
     featuresS.close();
 
     Map<String, Object> features = deserializeTrack(featuresResponse);
-    // TODO: change features map into integers
-
-    return new SongData(snippetURL, explicit, artistNames, albumName, images, features);
+    return features;
   }
 
   private String convertMapToString(Map<String, String> inputs) {
@@ -139,14 +142,14 @@ public class SpotifySource implements MusicSource {
   }
 
   @Override
-  public List<String> getRecommendation(Map<String, String> inputs)
+  public List<Map<String,Object>> getRecommendation(Map<String, String> inputs, String uid)
       throws IOException, DatasourceException {
     String accessToken = getAccessToken();
     // List of recommended song Ids
-    List<String> songIDs = new ArrayList<>();
+    //List<String> songIDs = new ArrayList<>();
+    List<Map<String,Object>> songList = new ArrayList<>();
     // Create url from attribute map
     String params = this.convertMapToString(inputs);
-    System.out.println(params);
     // Todo: should there be any params we always want to add?
 
     // fetch from Spotify;
@@ -170,11 +173,52 @@ public class SpotifySource implements MusicSource {
     ArrayList<Map<String, Object>> tracks =
         (ArrayList<Map<String, Object>>) recommendations.get("tracks");
     for (Map<String, Object> track : tracks) {
-      String id = track.get("id").toString();
-      songIDs.add(id);
+      try {
+        songList.add(this.trackToSongData(track).toMap());
+      } catch (DatasourceException e){
+        //don't do anything rn just continue to next song
+      }
     }
 
-    return songIDs;
+    return songList;
+  }
+
+  private SongData trackToSongData(Map<String, Object> track) throws DatasourceException {
+    //TODO error handle ?? These don't have great runtime since they repeat every time to error check rn
+
+    if(track.get("preview_url") == null ||
+            track.get("explicit") == null ||
+            track.get("album") == null ||
+            track.get("artists") == null ||
+            track.get("id") == null
+    ){
+      throw new DatasourceException("Missing required aspects");
+    }
+
+    String id = track.get("id").toString();
+    String snippetURL = track.get("preview_url").toString();
+    String explicit = track.get("explicit").toString();
+    Map<String, Object> albumInfo = (Map<String, Object>) track.get("album");
+
+    if(albumInfo.get("name") == null || albumInfo.get("images") == null){
+      throw new DatasourceException("Missing required aspects");
+    }
+    String albumName = albumInfo.get("name").toString();
+    ArrayList<Map<String, Object>> images =
+            (ArrayList<Map<String, Object>>) albumInfo.get("images");
+    String imageUrl = images.get(0).get("url").toString();
+
+    ArrayList<Map<String, Object>> artists =
+            (ArrayList<Map<String, Object>>) track.get("artists"); // check this cast
+
+    ArrayList<String> artistNames = new ArrayList<>();
+    for (Map<String, Object> artist : artists) {
+      if(artist.get("name") == null){
+        throw new DatasourceException("Missing required aspects");
+      }
+      artistNames.add(artist.get("name").toString());
+    }
+    return new SongData(id, snippetURL, explicit, artistNames, albumName, imageUrl);
   }
 
   public static Map<String, Object> deserializeRecommendations(String jsonSong) throws IOException {

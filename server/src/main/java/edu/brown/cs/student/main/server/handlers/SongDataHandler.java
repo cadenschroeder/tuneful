@@ -37,18 +37,23 @@ public class SongDataHandler implements Route {
     Map<String, Object> responseMap = new HashMap<>();
     try {
       // get the track data
-      SongData data = this.datasource.getSongData(trackID);
+      //SongData data = this.datasource.getSongData(trackID);
+
+      //get Features Data instead
+      Map<String, Object> data = this.datasource.getFeatures(trackID);
 
       // Adds results to the responseMap
       responseMap.put("songData", data);
-      Map<String, Object> firebaseData = new HashMap<>();
-      firebaseData.put("songData", data.toMap());
 
-      // TODO: what to do with incognito users?? can we have a designated user id for them that gets cleared?
-      int songCount = this.storageHandler.getCollection(uid, "songs").size();
-      String songID = "song-" + songCount;
-      // use the storage handler to add the document to the database
-      this.storageHandler.addDocument(uid, "songs", songID, firebaseData);
+      //put into firebase
+//      Map<String, Object> firebaseData = new HashMap<>();
+//      firebaseData.put("songData", data.toMap());
+//
+//      // TODO: what to do with incognito users?? can we have a designated user id for them that gets cleared?
+//      int songCount = this.storageHandler.getCollection(uid, "songs").size();
+//      String songID = "song-" + songCount;
+//      // use the storage handler to add the document to the database
+//      this.storageHandler.addDocument(uid, "songs", songID, firebaseData);
 
 
       return new SongDataHandler.SongDataSuccessResponse(responseMap).serialize();
