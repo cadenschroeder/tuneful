@@ -17,14 +17,14 @@ const Application = ({ authProps, pageProps, appRef }: ApplicationProps) => {
   const { page } = pageProps;
   const [songs, setList] = useState<Song[]>([]);
 
-  // useEffect(() => {
-  //   async function callFormat(){
-  //     let songList = await formatSongs(songs, setList)
-  //     console.log(songList)
-  //     setList(songList)
-  //   }
-  //   callFormat()
-  // }, []);
+  useEffect(() => {
+    async function callFormat(){
+      let songList = await formatSongs(songs, setList)
+      console.log(songList)
+      setList(songList)
+    }
+    callFormat()
+  }, []);
 
   const CurrentPage = (): JSX.Element => {
     switch (page) {
