@@ -1,15 +1,28 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
-import { songs as mocked } from "../utils/consts";
+
 import { AudioVisualizer } from "react-audio-visualize";
 import dragElement from "./drag";
+import { songs } from "../utils/consts";
+import {
+  addToLocalStorage,
+  clearLocalStorage,
+  getFromLocalStorage,
+  getThemeFromLocalStorage,
+} from "../utils/storage";
 
 interface ActionsProps {
-  nextSong: () => void;
+  nextSong: (liked: boolean) => void;
   isPlaying: boolean;
   togglePlay: () => void;
+  isDesktop: boolean;
 }
 
-const Actions = ({ nextSong, togglePlay, isPlaying }: ActionsProps) => {
+const Actions = ({
+  nextSong,
+  togglePlay,
+  isPlaying,
+  isDesktop,
+}: ActionsProps) => {
   const handleLike = useCallback(() => {
     const cardElement = document.getElementById("card");
     if (cardElement) {
@@ -28,7 +41,7 @@ const Actions = ({ nextSong, togglePlay, isPlaying }: ActionsProps) => {
           }
         )
         .finished.then(() => {
-          nextSong();
+          nextSong(true);
           cardElement.animate(
             [
               {
@@ -66,7 +79,7 @@ const Actions = ({ nextSong, togglePlay, isPlaying }: ActionsProps) => {
           }
         )
         .finished.then(() => {
-          nextSong();
+          nextSong(false);
           cardElement.animate(
             [
               {
@@ -103,24 +116,19 @@ const Actions = ({ nextSong, togglePlay, isPlaying }: ActionsProps) => {
   }, [handleDislike, handleLike, handleToggle]);
 
   useEffect(() => {
-    const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key === "ArrowLeft") handleDislike();
-      if (event.key === "ArrowRight") handleLike();
-      if (event.key === " ") handleToggle();
-    };
-
-    document.addEventListener("keydown", handleKeyDown);
-    return () => {
-      document.removeEventListener("keydown", handleKeyDown);
-    };
-  }, [handleDislike, handleLike, handleToggle]);
+    dragElement(document.getElementById("card")!, nextSong, handleToggle);
+  }, [nextSong, handleToggle]);
 
   return (
     <div>
       <div className="buttons">
-        <button onClick={handleDislike}>👎</button>
-        <button onClick={handleToggle}>{isPlaying ? "⏸️" : "▶️"}</button>
-        <button onClick={handleLike}>👍</button>
+        {isDesktop && (
+          <>
+            <button onClick={handleDislike}>👎</button>
+            <button onClick={handleToggle}>{isPlaying ? "⏸️" : "▶️"}</button>
+            <button onClick={handleLike}>👍</button>
+          </>
+        )}
       </div>
     </div>
   );
@@ -136,18 +144,25 @@ export interface Song {
 
 interface CardProps {
   songs: Song[];
-  appRef: React.RefObject<HTMLDivElement>;
 }
 
-const Card = ({ songs, appRef }: CardProps) => {
-  // console.log(songs)
+
+const Card = ({ songs }: CardProps) => {
   const [song, setSong] = useState(songs[0]);
   const [blob, setBlob] = useState<Blob>();
   const [playTime, setPlayTime] = useState(0);
   const [isPlaying, setIsPlaying] = useState(false);
   const audioRef = useRef<HTMLAudioElement>(null);
 
+  const isDesktop = window.matchMedia("(min-width: 768px)").matches;
+
+  const [likes, setLikes] = useState<Song[]>([]);
+  const [dislikes, setDislikes] = useState<Song[]>([]);
+
   useEffect(() => {
+    setLikes(getFromLocalStorage("likes"));
+    setDislikes(getFromLocalStorage("dislikes"));
+
     async function getBlob(filePath: string): Promise<Blob> {
       return new Promise((resolve, reject) => {
         fetch(filePath)
@@ -166,12 +181,13 @@ const Card = ({ songs, appRef }: CardProps) => {
       setPlayTime(0);
     });
 
-    const appElement = appRef.current;
-    if (appElement) {
-      appElement.style.backgroundImage = `url(${song.cover})`;
-      appElement.style.backdropFilter = "blur(10px)";
+    if (isDesktop) {
+      document.getElementById(
+        "App"
+      )!.style.backgroundImage = `url(${song.cover})`;
+      document.getElementById("App")!.style.backdropFilter = "blur(10px)";
     }
-  }, [song, appRef]);
+  }, [song, isDesktop]);
 
   useEffect(() => {
     const audioElement = audioRef.current;
@@ -194,68 +210,113 @@ const Card = ({ songs, appRef }: CardProps) => {
     }
   };
 
-  const nextSong = useCallback(() => {
-    let randomIndex = -1;
-    while (randomIndex < 0 || songs[randomIndex] === song) {
-      randomIndex = Math.floor(Math.random() * songs.length);
-    }
-    setSong(songs[randomIndex]);
-  }, [song, songs]);
+  const nextSong = useCallback(
+    (liked: boolean) => {
+      if (liked) {
+        addToLocalStorage("likes", song);
+      } else {
+        addToLocalStorage("dislikes", song);
+      }
+      let randomIndex = -1;
+      while (randomIndex < 0 || songs[randomIndex] === song) {
+        randomIndex = Math.floor(Math.random() * songs.length);
+      }
+      setSong(songs[randomIndex]);
+    },
+    [song, songs]
+  );
 
-  useEffect(() => {
-    dragElement(document.getElementById("card")!, nextSong);
-  }, [nextSong]);
+  const theme = getThemeFromLocalStorage();
 
   return (
-    <div
-      id="card"
-      className="card"
-      draggable={true}
-      onDrop={(e) => e.preventDefault()}
-    >
-      <a href={song.spotify}>
-        <img src="img/spotify.png" alt="spotify" />
-      </a>
-      <h2>"{song.name}"</h2>
-      <p>{song.artist}</p>
-      {blob ? (
-        <div>
-          <AudioVisualizer
-            currentTime={playTime}
-            width={300}
-            height={30}
-            blob={blob}
+    <>
+      <div
+        className="counter-display"
+        style={{
+          textAlign: "center",
+          fontSize: "20px",
+          marginBottom: "20px",
+          position: "absolute",
+        }}
+      >
+        <button>{theme || "random"}</button>
+        <button>
+          👍: {likes.length} 👎: {dislikes.length}
+        </button>
+        <button>clear session</button>
+      </div>
+      <div
+        id="card"
+        className="card"
+        draggable={true}
+        onDrop={(e) => e.preventDefault()}
+      >
+        <a href={song.spotify}>
+          <img src="img/spotify.png" alt="spotify" />
+        </a>
+        <h2>"{song.name}"</h2>
+        <p>{song.artist}</p>
+        {blob ? (
+          <div>
+            <AudioVisualizer
+              currentTime={playTime}
+              width={300}
+              height={30}
+              blob={blob}
+            />
+            <audio src={song.blob} autoPlay ref={audioRef} />
+          </div>
+        ) : (
+          <div id="empty-vis"></div>
+        )}
+        <div style={{ position: "relative" }}>
+          {!isPlaying && (
+            <img
+              src="img/pause.png"
+              alt="play"
+              className="play"
+              style={{
+                width: "150px",
+                position: "absolute",
+                top: "50%",
+                left: "50%",
+                transform: "translate(-50%, -50%)",
+                zIndex: 1,
+                filter: "invert(1)",
+                opacity: 0.8,
+                border: "none",
+              }}
+            />
+          )}
+          <img
+            src={song.cover}
+            alt="album cover"
+            draggable="false"
+            style={{
+              display: "block",
+              width: "100%",
+              height: "auto",
+              filter: `${isPlaying ? "none" : "brightness(0.9)"}`,
+              borderBottom: isDesktop ? "" : "2px solid #bdb6b6",
+              marginBottom: isDesktop ? "" : "1em",
+            }}
           />
-          <audio src={song.blob} autoPlay ref={audioRef} />
         </div>
-      ) : (
-        <div id="empty-vis"></div>
-      )}
-      <img src={song.cover} alt="album cover" draggable="false" />
-      <Actions
-        nextSong={nextSong}
-        isPlaying={isPlaying}
-        togglePlay={togglePlay}
-      />
-    </div>
+        <Actions
+          nextSong={(liked: boolean) => nextSong(liked)}
+          isPlaying={isPlaying}
+          togglePlay={togglePlay}
+          isDesktop={isDesktop}
+        />
+      </div>
+    </>
   );
 };
 
-interface MusicProps {
-  appRef: React.RefObject<HTMLDivElement>;
-  songs: Song[];
-}
-
-export function Music({ appRef, songs }: MusicProps) {
-  console.log(songs)
-  let toUse = mocked;
-  if(songs.length != 0){
-    toUse = songs;
-  }
-
+const Music = () => {
   return (
     <div id="music">
-      <Card songs={toUse} appRef={appRef} />
+      <Card songs={songs} />
     </div>
   );
 }

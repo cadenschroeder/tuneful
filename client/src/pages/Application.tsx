@@ -10,10 +10,9 @@ import React, { useState, useEffect, useRef, useCallback } from "react";
 interface ApplicationProps {
   authProps: AuthProps;
   pageProps: PageProps;
-  appRef: React.RefObject<HTMLDivElement>;
 }
 
-const Application = ({ authProps, pageProps, appRef }: ApplicationProps) => {
+const Application = ({ authProps, pageProps }: ApplicationProps) => {
   const { page } = pageProps;
   const [songs, setList] = useState<Song[]>([]);
 
@@ -31,9 +30,9 @@ const Application = ({ authProps, pageProps, appRef }: ApplicationProps) => {
       case Page.PROFILE:
         return <Profile props={null} />;
       case Page.FINISH:
-        return <Finish props={null} />;
+        return <Finish />;
       default:
-        return <Music appRef={appRef} songs={songs} />;
+        return <Music />;
     }
   };
 

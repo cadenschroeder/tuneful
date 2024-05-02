@@ -3,9 +3,11 @@ import { PageProps } from "../interfaces/interfaces";
 import { removeLoginCookie } from "../utils/cookie";
 import AccountLogin from "./AccountLogin";
 import axios from "axios";
+import { setThemeToLocalStorage } from "../utils/storage";
 
 const PLAYLIST_ENDPOINT = "https://api.spotify.com/v1/me/playlists";
 const GENRES = [
+  "",
   "Pop",
   "Hip Hop",
   "Rock",
@@ -29,11 +31,12 @@ const Intermediate = ({ pageProps, setIsAuthenticated }: IntermediateProps) => {
   const [signedInWithSpotify, setSignedInWithSpotify] = useState(false);
   const [signedInWithoutSpotify, setSignedInWithoutSpotify] = useState(false);
   const [genreChoice, setGenreChoice] = useState("");
-
   const [playlistChoice, setPlaylistChoice] = useState<{
     name: string;
     tracks: { href: string };
   }>();
+  const [selectedItem, setSelectedItem] = useState({ type: "", name: "" });
+
 
   const getPlaylists = useCallback(() => {
     console.log("token: " + token);
@@ -85,6 +88,10 @@ const Intermediate = ({ pageProps, setIsAuthenticated }: IntermediateProps) => {
     console.log("Signed In With Spotify:", signedInWithSpotify);
   }, [signedInWithSpotify]);
 
+  const handleSelection = (type: string, name: string) => {
+    setSelectedItem({ type, name });
+  };
+
   const handleLogout = () => {
     removeLoginCookie();
     window.location.hash = "";
@@ -134,6 +141,7 @@ const Intermediate = ({ pageProps, setIsAuthenticated }: IntermediateProps) => {
       });
     }
 
+    setThemeToLocalStorage(selectedItem.name);
     setPage("music");
   };
 
@@ -149,11 +157,10 @@ const Intermediate = ({ pageProps, setIsAuthenticated }: IntermediateProps) => {
         }}
       >
         <h1 className="intermediate">Select to Start</h1>
-
         <h2 id="select-header">
-          {playlistChoice
-            ? `Chosen: ${playlistChoice.name}`
-            : "Select a Playlist"}
+          {selectedItem.name
+            ? `Chosen: ${selectedItem.name}`
+            : "Select a Playlist or a Genre"}
         </h2>
         <div className="radio-group">
           {playlists.map(
@@ -164,7 +171,10 @@ const Intermediate = ({ pageProps, setIsAuthenticated }: IntermediateProps) => {
                   id={playlist.name}
                   name="playlist"
                   value={playlist.name}
-                  onChange={(e) => setPlaylistChoice(playlist)}
+                  onChange={(e) => {
+                    setPlaylistChoice(playlist);
+                    handleSelection("playlist", playlist.name);
+                  }}
                 ></input>
                 <label htmlFor={playlist.name}>{playlist.name}</label>
               </div>
@@ -172,34 +182,30 @@ const Intermediate = ({ pageProps, setIsAuthenticated }: IntermediateProps) => {
           )}
         </div>
 
-        <h2 id="select-header">
-          {genreChoice ? `Chosen: ${genreChoice}` : "or select a Genre"}
-        </h2>
-
         <div className="radio-group">
           {GENRES.map((genre) => (
-            <div>
+            <div key={genre}>
               <input
                 type="radio"
                 id={genre}
-                name="genre"
+                name="selection"
                 value={genre}
-                onChange={(e) => setGenreChoice(e.target.value)}
-              ></input>
+                onChange={() => handleSelection("genre", genre)}
+              />
               <label htmlFor={genre}>{genre}</label>
             </div>
           ))}
         </div>
-        {/* <p>{playlistChoice}</p>
-        <p>{genreChoice}</p> */}
 
-        <button onClick={handleContinue}>Continue</button>
-        <button onClick={handleBackClick} style={{ marginTop: "20px" }}>
-          {"back"}
-        </button>
-        <button onClick={handleLogout} style={{ marginTop: "20px" }}>
-          Logout
-        </button>
+        <div className="flex">
+          <button onClick={handleContinue}>Continue</button>
+          <button onClick={handleBackClick} style={{ marginTop: "20px" }}>
+            {"back"}
+          </button>
+          <button onClick={handleLogout} style={{ marginTop: "20px" }}>
+            Logout
+          </button>
+        </div>
       </div>
     );
   }
@@ -218,34 +224,37 @@ const Intermediate = ({ pageProps, setIsAuthenticated }: IntermediateProps) => {
         <h1 className="intermediate">Select to Start</h1>
 
         <h2 id="select-header">
-          {genreChoice ? `Chosen: ${genreChoice}` : "Select a Genre"}
+          {selectedItem.name
+            ? `Chosen: ${selectedItem.name}`
+            : "Select a Playlist or a Genre"}
         </h2>
 
         <div className="radio-group">
-          {GENRES.map((genre) => (
-            <div>
+          {GENRES.map((genre, key) => (
+            <div key={key}>
               <input
                 type="radio"
                 id={genre}
                 name="genre"
                 value={genre}
-                onChange={(e) => setGenreChoice(e.target.value)}
+                onChange={(e) => handleSelection("genre", genre)}
               ></input>
               <label htmlFor={genre}>{genre}</label>
             </div>
           ))}
         </div>
+        <p>{playlistChoice?.name}</p>
+        <p>{genreChoice}</p>
 
-        {/* <p>{playlistChoice}</p>
-        <p>{genreChoice}</p> */}
-
-        <button onClick={handleContinue}>Continue</button>
-        <button onClick={handleBackClick} style={{ marginTop: "20px" }}>
-          {"back"}
-        </button>
-        <button onClick={handleLogout} style={{ marginTop: "20px" }}>
-          Logout
-        </button>
+        <div className="flex">
+          <button onClick={handleContinue}>Continue</button>
+          <button onClick={handleBackClick} style={{ marginTop: "20px" }}>
+            {"back"}
+          </button>
+          <button onClick={handleLogout} style={{ marginTop: "20px" }}>
+            Logout
+          </button>
+        </div>
       </div>
     );
   }
@@ -266,12 +275,6 @@ const Intermediate = ({ pageProps, setIsAuthenticated }: IntermediateProps) => {
         Continue without signing into Spotify
       </button>
       <button onClick={handleLogout}>Logout</button>
-      <button
-        onClick={handleLogout}
-        style={{ marginLeft: "10px", marginRight: "10px" }}
-      >
-        Logout
-      </button>
     </div>
   );
 };

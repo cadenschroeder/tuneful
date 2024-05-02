@@ -1,21 +1,38 @@
-import { songs } from "../utils/consts";
+import { useEffect, useState } from "react";
+import { getFromLocalStorage } from "../utils/storage";
+import { Song } from "../utils/consts";
 
-interface FinishProps {
-  props: any; // Placeholder, replace or remove as needed
-}
+const Finish = () => {
+  const [likes, setLikes] = useState<Song[]>([]);
+  const [dislikes, setDislikes] = useState<Song[]>([]);
 
-const Finish = ({ props }: FinishProps) => {
+  useEffect(() => {
+    setLikes(getFromLocalStorage("likes"));
+    setDislikes(getFromLocalStorage("dislikes"));
+  }, []);
+
   return (
     <div id="finish">
       <h2>Session Finished! 🎉</h2>
       <ul>
-        {songs.map((song: any, index: any) => (
-          <li key={index}>
-            <a href={song.spotify}>{song.name}: 👍</a>
-          </li>
-        ))}
+        {likes.length > 0 || dislikes.length > 0 ? (
+          <>
+            {likes.map((song: any, index: any) => (
+              <li key={index}>
+                <a href={song.spotify}>{song.name}: 👍</a>
+              </li>
+            ))}
+            {dislikes.map((song: any, index: any) => (
+              <li key={index}>
+                <a href={song.spotify}>{song.name}: 👎</a>
+              </li>
+            ))}
+          </>
+        ) : (
+          <li>No songs liked or disliked :(</li>
+        )}
       </ul>
-      <button>export</button>
+      <button>save</button>
     </div>
   );
 };

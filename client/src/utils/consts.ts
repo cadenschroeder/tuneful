@@ -1,4 +1,12 @@
-export const songs = [
+export interface Song {
+  name: string;
+  cover: string;
+  artist: string;
+  blob: string;
+  spotify: string;
+}
+
+export const songs: Song[] = [
   {
     name: "Truth Hurts",
     cover:
@@ -90,4 +98,23 @@ export const mockData = [
     session: "Session on 04/25/2024 at 6:00pm",
     songs: ["Song 17", "Song 18", "Song 19", "Song 20"],
   },
+];
+
+export const emojis = [
+  "🎶",
+  "🎵",
+  "🎧",
+  "🎶",
+  "🎵",
+  "🎧",
+  "🎶",
+  "🎵",
+  "🎧",
+  "🎶",
+  "🎵",
+  "🎧",
+  "🎶",
+  "🎵",
+  "🎧",
+  "💩",
 ];

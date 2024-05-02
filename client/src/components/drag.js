@@ -1,4 +1,8 @@
-function dragElement(elmnt: HTMLElement, nextSong: () => void) {
+function dragElement(
+  elmnt: HTMLElement,
+  nextSong: (i) => void,
+  handleToggle: (i) => void
+) {
   var pos1 = 0,
     pos2 = 0,
     pos3 = 0,
@@ -82,12 +86,17 @@ function dragElement(elmnt: HTMLElement, nextSong: () => void) {
 
     var center = window.innerWidth / 2;
     const isLeft = isMobile
-      ? elmnt.offsetLeft < center - 50
+      ? elmnt.offsetLeft < center - 100
       : elmnt.offsetLeft < center - 200;
 
     const isRight = isMobile
-      ? elmnt.offsetLeft > center + 50
+      ? elmnt.offsetLeft > center + 100
       : elmnt.offsetLeft > center + 200;
+
+    const isPause =
+      isMobile &&
+      elmnt.offsetLeft > center - 10 &&
+      elmnt.offsetLeft < center + 10;
 
     if (isLeft) {
       console.log("left");
@@ -112,7 +121,7 @@ function dragElement(elmnt: HTMLElement, nextSong: () => void) {
           }
         )
         .finished.then(() => {
-          nextSong();
+          nextSong(false);
           elmnt.style.top = "50%";
           elmnt.style.left = "50%";
           elmnt
@@ -159,7 +168,7 @@ function dragElement(elmnt: HTMLElement, nextSong: () => void) {
           }
         )
         .finished.then(() => {
-          nextSong();
+          nextSong(true);
           elmnt.style.top = "50%";
           elmnt.style.left = "50%";
           elmnt
@@ -182,6 +191,31 @@ function dragElement(elmnt: HTMLElement, nextSong: () => void) {
               elmnt.style.left = "50%";
               elmnt.style.transform = "translate(-50%, -50%) rotate(0deg)";
             });
+        });
+    } else if (isPause) {
+      handleToggle();
+      elmnt
+        .animate(
+          [
+            {
+              transform: "translate(-50%, -50%)",
+            },
+            {
+              transform: "translate(-50%, -50%)",
+              top: "50%",
+              left: "50%",
+              rotate: "0deg",
+            },
+          ],
+          {
+            duration: 100,
+            easing: "ease-in-out",
+          }
+        )
+        .finished.then(() => {
+          elmnt.style.top = "50%";
+          elmnt.style.left = "50%";
+          elmnt.style.transform = "translate(-50%, -50%) rotate(0deg)";
         });
     } else {
       elmnt
