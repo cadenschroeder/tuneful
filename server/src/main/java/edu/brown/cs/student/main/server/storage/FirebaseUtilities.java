@@ -113,8 +113,9 @@
          // 2: Add the data element to the array by reference to the list id
          
         DocumentReference doc = collectionRef.document(doc_id);
-     
-        doc.update(list_id, FieldValue.arrayUnion(data));
+        ArrayList<Double> dataArrayList = (ArrayList<Double>) data;
+
+        doc.update(list_id, FieldValue.arrayUnion(dataArrayList.toArray()));
      }
 
 
