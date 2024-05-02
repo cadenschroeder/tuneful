@@ -2,6 +2,7 @@ package edu.brown.cs.student.main.server;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -9,6 +10,7 @@ import java.util.Map;
 
 import edu.brown.cs.student.main.server.broadband.MusicSource;
 import edu.brown.cs.student.main.server.storage.StorageInterface;
+import edu.brown.cs.student.main.server.Constants;
 
 public class RecommendAlgo {
     private StorageInterface storageHandler;
@@ -70,6 +72,87 @@ public class RecommendAlgo {
         Map<String, Object> stats = new HashMap<String,Object>(attributes);
 
         this.storageHandler.addDocument(uid, "attributes", "session-0", stats);
+    }
+
+    public static double calculateStandardDeviation(ArrayList<Double> array) {
+
+        // get the sum of array
+        double sum = 0.0;
+        for (double i : array) {
+            sum += i;
+        }
+    
+        // get the mean of array
+        int length = array.size();
+        double mean = sum / length;
+    
+        // calculate the standard deviation
+        double standardDeviation = 0.0;
+        for (double num : array) {
+            standardDeviation += Math.pow(num - mean, 2);
+        }
+    
+        return Math.sqrt(standardDeviation / length);
+    }
+
+    private static List<Double> normalizeList(List<Double> array, Double min, Double max){
+        ArrayList<Double> newArray = new ArrayList<>();
+        for (Double num : array) {
+            newArray.add((num - min) / (max - min));
+        }
+        return newArray;
+    }
+
+    private static Double getMin(String attribute){
+        Double min;
+        switch(attribute){
+            case "loudness":
+                min = Constants.LOUDNESS_MIN;
+                break;
+            case "tempo":
+                min = Constants.TEMPO_MIN;
+                break;
+            default: 
+                min = Constants.GENERAL_MIN;
+        }
+        return min;
+    }
+
+    private static Double getMax(String attribute){
+        Double min;
+        switch(attribute){
+            case "loudness":
+                min = Constants.LOUDNESS_MAX;
+                break;
+            case "tempo":
+                min = Constants.TEMPO_MAX;
+                break;
+            default: 
+                min = Constants.GENERAL_MAX;
+        }
+        return min;
+    }
+
+    public static double findMedian(List<Double> list) {
+        Collections.sort(list); // Sort the ArrayList
+        int n = list.size();
+        if (n % 2 != 0) {
+            // If the number of elements is odd, return the middle element
+            return list.get(n / 2);
+        } else {
+            // If the number of elements is even, return the average of the two middle elements
+            return (list.get((n - 1) / 2) + list.get(n / 2)) / 2.0;
+        }
+    }
+
+    private Map<String, Map<String, Double>> rankAttributes (Map<String, List<Double>> likeAttributes, Map<String, List<Double>> dislikeAttributes){
+        Map<String, Map<String, Double>> rankings = new HashMap<>();
+        for (String attribute : likeAttributes.keySet()) {
+            Double likeMedian = findMedian(likeAttributes.get(attribute));
+            Double dislikeMedian = findMedian(dislikeAttributes.get(attribute));
+
+        }
+        return null;
     }
 
     private Map<String, Object> reduceMap(Map<String, Object> features){
