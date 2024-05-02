@@ -35,3 +35,18 @@ export async function clearUser(uid: string = getLoginCookie() || "") {
     uid: uid,
   });
 }
+
+export async function viewSongs() {
+  return await queryAPI("viewSongs", {
+    uid: "fake",//getLoginCookie() || "",
+    isAllSongs: "true"
+  });
+}
+
+export async function getRecommendations(songID: string, liked: string) {
+  return await queryAPI("recommendation", {
+    uid:  "fake", // getLoginCookie() || "",
+    songID: songID,
+    liked: liked
+  });
+}

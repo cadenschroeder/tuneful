@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
-import { songs } from "../utils/consts";
+import { songs as mocked } from "../utils/consts";
 import { AudioVisualizer } from "react-audio-visualize";
 import dragElement from "./drag";
 
@@ -126,7 +126,7 @@ const Actions = ({ nextSong, togglePlay, isPlaying }: ActionsProps) => {
   );
 };
 
-interface Song {
+export interface Song {
   name: string;
   cover: string;
   artist: string;
@@ -140,6 +140,7 @@ interface CardProps {
 }
 
 const Card = ({ songs, appRef }: CardProps) => {
+  console.log(songs)
   const [song, setSong] = useState(songs[0]);
   const [blob, setBlob] = useState<Blob>();
   const [playTime, setPlayTime] = useState(0);
@@ -242,12 +243,14 @@ const Card = ({ songs, appRef }: CardProps) => {
 
 interface MusicProps {
   appRef: React.RefObject<HTMLDivElement>;
+  songs: Song[]
 }
 
-const Music = ({ appRef }: MusicProps) => {
+const Music = ({ appRef, songs }: MusicProps) => {
+  console.log(songs)
   return (
     <div id="music">
-      <Card songs={songs} appRef={appRef} />
+      <Card songs={(mocked)} appRef={appRef} />
     </div>
   );
 };

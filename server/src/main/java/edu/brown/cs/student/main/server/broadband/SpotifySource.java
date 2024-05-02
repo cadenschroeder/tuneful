@@ -93,6 +93,7 @@ public class SpotifySource implements MusicSource {
     String albumName = albumInfo.get("name").toString();
     ArrayList<Map<String, Object>> images =
         (ArrayList<Map<String, Object>>) albumInfo.get("images");
+    String imageUrl = images.get(0).get("url").toString();
 
     ArrayList<Map<String, Object>> artists =
         (ArrayList<Map<String, Object>>) track.get("artists"); // check this cast
@@ -103,7 +104,7 @@ public class SpotifySource implements MusicSource {
     String id = track.get("id").toString();
 
 
-    return new SongData(id, snippetURL, explicit, artistNames, albumName, images);
+    return new SongData(id, snippetURL, explicit, artistNames, albumName, imageUrl);
   }
 
   @Override
@@ -205,6 +206,7 @@ public class SpotifySource implements MusicSource {
     String albumName = albumInfo.get("name").toString();
     ArrayList<Map<String, Object>> images =
             (ArrayList<Map<String, Object>>) albumInfo.get("images");
+    String imageUrl = images.get(0).get("url").toString();
 
     ArrayList<Map<String, Object>> artists =
             (ArrayList<Map<String, Object>>) track.get("artists"); // check this cast
@@ -216,7 +218,7 @@ public class SpotifySource implements MusicSource {
       }
       artistNames.add(artist.get("name").toString());
     }
-    return new SongData(id, snippetURL, explicit, artistNames, albumName, images);
+    return new SongData(id, snippetURL, explicit, artistNames, albumName, imageUrl);
   }
 
   public static Map<String, Object> deserializeRecommendations(String jsonSong) throws IOException {
