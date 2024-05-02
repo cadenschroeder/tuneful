@@ -41,6 +41,8 @@ body {
   min-width: 30%;
   overflow-y: scroll;
   margin-bottom: 5%;
+  justify-content: center;
+  width: 100%;
 }
 
 .select-header {
