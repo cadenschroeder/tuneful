@@ -30,6 +30,8 @@ const Intermediate = ({ pageProps, setIsAuthenticated }: IntermediateProps) => {
   const [signedInWithoutSpotify, setSignedInWithoutSpotify] = useState(false);
   const [genreChoice, setGenreChoice] = useState("");
   const [playlistChoice, setPlaylistChoice] = useState<{ name: string }>();
+  const [selectedItem, setSelectedItem] = useState({ type: "", name: "" });
+
   const getPlaylists = useCallback(() => {
     console.log("token: " + token);
 
@@ -64,6 +66,10 @@ const Intermediate = ({ pageProps, setIsAuthenticated }: IntermediateProps) => {
     console.log("Signed In With Spotify:", signedInWithSpotify);
   }, [signedInWithSpotify]);
 
+  const handleSelection = (type:string, name:string) => {
+    setSelectedItem({ type, name });
+  };
+
   const handleLogout = () => {
     removeLoginCookie();
     window.location.hash = "";
@@ -91,65 +97,58 @@ const Intermediate = ({ pageProps, setIsAuthenticated }: IntermediateProps) => {
   if (signedInWithSpotify) {
     return (
       <div
-        style={{
-          height: "100vh",
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-          justifyContent: "center",
-        }}
-      >
-        <h1 className="intermediate">Select to Start</h1>
+     style={{
+       height: "100vh",
+       display: "flex",
+       flexDirection: "column",
+       alignItems: "center",
+       justifyContent: "center",
+     }}
+   >
+     <h1 className="intermediate">Select to Start</h1>
+     <h2 id="select-header">
+       {selectedItem.name ? `Chosen: ${selectedItem.name}` : "Select a Playlist or a Genre"}
+     </h2>
 
-        <h2 id="select-header">
-          {playlistChoice
-            ? `Chosen: ${playlistChoice.name}`
-            : "Select a Playlist"}
-        </h2>
-        <div className="radio-group">
-          {playlists.map((playlist: { name: string }) => (
-            <div className="radio-element">
-              <input
-                type="radio"
-                id={playlist.name}
-                name="playlist"
-                value={playlist.name}
-                onChange={(e) => setPlaylistChoice(playlist)}
-              ></input>
-              <label htmlFor={playlist.name}>{playlist.name}</label>
-            </div>
-          ))}
-        </div>
 
-        <h2 id="select-header">
-          {genreChoice ? `Chosen: ${genreChoice}` : "or select a Genre"}
-        </h2>
+     <div className="radio-group">
+       {playlists.map((playlist: { name: string }) => (
+         <div key={playlist.name} className="radio-element">
+           <input
+             type="radio"
+             id={playlist.name}
+             name="selection"
+             value={playlist.name}
+             onChange={() => handleSelection("playlist", playlist.name)}
+           />
+           <label htmlFor={playlist.name}>{playlist.name}</label>
+         </div>
+       ))}
+     </div>
 
-        <div className="radio-group">
-          {GENRES.map((genre) => (
-            <div>
-              <input
-                type="radio"
-                id={genre}
-                name="genre"
-                value={genre}
-                onChange={(e) => setGenreChoice(e.target.value)}
-              ></input>
-              <label htmlFor={genre}>{genre}</label>
-            </div>
-          ))}
-        </div>
-        <p>{playlistChoice?.name}</p>
-        <p>{genreChoice}</p>
 
-        <button onClick={handleContinue}>Continue</button>
-        <button onClick={handleBackClick} style={{ marginTop: "20px" }}>
+     <div className="radio-group">
+       {GENRES.map((genre) => (
+         <div key={genre}>
+           <input
+             type="radio"
+             id={genre}
+             name="selection"
+             value={genre}
+             onChange={() => handleSelection("genre", genre)}
+           />
+           <label htmlFor={genre}>{genre}</label>
+         </div>
+       ))}
+     </div>
+     <button onClick={handleContinue}>Continue</button>
+     <button onClick={handleBackClick} style={{ marginTop: "20px" }}>
           {"back"}
         </button>
         <button onClick={handleLogout} style={{ marginTop: "20px" }}>
           Logout
         </button>
-      </div>
+    </div>
     );
   }
 
