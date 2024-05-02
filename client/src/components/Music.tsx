@@ -315,6 +315,24 @@ const Music = ({ appRef }: MusicProps) => {
         setLikeCount={setLikeCount}
         setDislikeCount={setDislikeCount}
       />
+      <button
+        onClick={() => { /* Placeholder for future functionality */ }}
+        style={{
+          position: 'absolute',
+          bottom: '70px',
+          left: '50%',
+          transform: 'translateX(-50%)',
+          padding: '10px 20px',
+          fontSize: '16px',
+          borderRadius: '5px',
+          background: '#007BFF',
+          color: 'white',
+          border: 'none',
+          cursor: 'pointer'
+        }}
+      >
+        Clear session data
+      </button>
     </div>
   );
 };
