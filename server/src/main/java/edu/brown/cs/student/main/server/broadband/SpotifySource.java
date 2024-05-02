@@ -102,9 +102,10 @@ public class SpotifySource implements MusicSource {
       artistNames.add(artist.get("name").toString());
     }
     String id = track.get("id").toString();
+    String name = track.get("name").toString();
 
 
-    return new SongData(id, snippetURL, explicit, artistNames, albumName, imageUrl);
+    return new SongData(id, name, snippetURL, explicit, artistNames, albumName, imageUrl);
   }
 
   @Override
@@ -190,12 +191,14 @@ public class SpotifySource implements MusicSource {
             track.get("explicit") == null ||
             track.get("album") == null ||
             track.get("artists") == null ||
-            track.get("id") == null
+            track.get("id") == null ||
+            track.get("name") == null
     ){
       throw new DatasourceException("Missing required aspects");
     }
 
     String id = track.get("id").toString();
+    String name = track.get("name").toString();
     String snippetURL = track.get("preview_url").toString();
     String explicit = track.get("explicit").toString();
     Map<String, Object> albumInfo = (Map<String, Object>) track.get("album");
@@ -218,7 +221,7 @@ public class SpotifySource implements MusicSource {
       }
       artistNames.add(artist.get("name").toString());
     }
-    return new SongData(id, snippetURL, explicit, artistNames, albumName, imageUrl);
+    return new SongData(id, name, snippetURL, explicit, artistNames, albumName, imageUrl);
   }
 
   public static Map<String, Object> deserializeRecommendations(String jsonSong) throws IOException {

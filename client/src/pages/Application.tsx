@@ -49,7 +49,7 @@ const Application = ({ authProps, pageProps, appRef }: ApplicationProps) => {
 async function formatSongs(songs: Song[], setList: (list: Song[]) => void) {
   const result = await viewSongs();
   return result.responseMap.songs.map((mapSong: { [key: string]: any }) => {
-    const name: string = "placeHolder";
+    const name: string = mapSong.name?.toString() || "";
     const cover: string = mapSong.images?.toString() || "";
     const artist: string = mapSong.artists?.toString() || "";
     const blob: string = mapSong.snippetURL?.toString() || "";
