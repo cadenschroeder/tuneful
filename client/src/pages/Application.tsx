@@ -32,7 +32,7 @@ const Application = ({ authProps, pageProps }: ApplicationProps) => {
       case Page.FINISH:
         return <Finish />;
       default:
-        return <Music />;
+        return <Music songs={songs} />;
     }
   };
 

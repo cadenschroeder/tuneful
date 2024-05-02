@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef, useCallback } from "react";
 
 import { AudioVisualizer } from "react-audio-visualize";
 import dragElement from "./drag";
-import { songs } from "../utils/consts";
+import { songs as mocked } from "../utils/consts";
 import {
   addToLocalStorage,
   clearLocalStorage,
@@ -313,10 +313,20 @@ const Card = ({ songs }: CardProps) => {
   );
 };
 
-const Music = () => {
+interface MusicProps {
+  songs: Song[]; // Placeholder, replace or remove as needed
+}
+
+export function Music(props : MusicProps) {
+  let toUse = mocked
+  console.log(props.songs.length)
+  if(props.songs.length > 0){
+    toUse = props.songs
+  }
+  console.log(props.songs)
   return (
     <div id="music">
-      <Card songs={songs} />
+      <Card songs={toUse} />
     </div>
   );
 }
