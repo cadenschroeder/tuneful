@@ -10,6 +10,7 @@ interface ActionsProps {
   isDesktop: boolean;
   setLikeCount: React.Dispatch<React.SetStateAction<number>>;
   setDislikeCount: React.Dispatch<React.SetStateAction<number>>;
+  setDataCount: React.Dispatch<React.SetStateAction<number>>;
 }
 
 const Actions = ({
@@ -19,9 +20,11 @@ const Actions = ({
   isDesktop,
   setLikeCount,
   setDislikeCount,
+  setDataCount,
 }: ActionsProps) => {
   const handleLike = useCallback(() => {
     setLikeCount(prev => prev + 1);
+    setDataCount(prev => prev + 1);
     const cardElement = document.getElementById("card");
     if (cardElement) {
       cardElement
@@ -60,6 +63,7 @@ const Actions = ({
 
   const handleDislike = useCallback(() => {
     setDislikeCount(prev => prev + 1);
+    setDataCount(prev => prev + 1);
     const cardElement = document.getElementById("card");
     if (cardElement) {
       cardElement
@@ -159,9 +163,10 @@ interface CardProps {
   appRef: React.RefObject<HTMLDivElement>;
   setLikeCount: React.Dispatch<React.SetStateAction<number>>;
   setDislikeCount: React.Dispatch<React.SetStateAction<number>>;
+  setDataCount: React.Dispatch<React.SetStateAction<number>>;
 }
 
-const Card = ({ songs, appRef, setLikeCount, setDislikeCount }: CardProps) => {
+const Card = ({ songs, appRef, setLikeCount, setDislikeCount, setDataCount }: CardProps) => {
   const [song, setSong] = useState(songs[0]);
   const [blob, setBlob] = useState<Blob>();
   const [playTime, setPlayTime] = useState(0);
@@ -292,6 +297,7 @@ const Card = ({ songs, appRef, setLikeCount, setDislikeCount }: CardProps) => {
         isDesktop={isDesktop}
         setLikeCount={setLikeCount}
         setDislikeCount={setDislikeCount}
+        setDataCount={setDataCount}
       />
     </div>
   );
@@ -304,19 +310,21 @@ interface MusicProps {
 const Music = ({ appRef }: MusicProps) => {
   const [likeCount, setLikeCount] = useState(0);
   const [dislikeCount, setDislikeCount] = useState(0);
+  const [dataCount, setDataCount] = useState(0);
   return (
     <div id="music">
       <div className="counter-display" style={{ textAlign: "center", fontSize: "20px", marginBottom: "20px" }}>
-        Likes: {likeCount} | Dislikes: {dislikeCount}
+        Likes: {likeCount} | Dislikes: {dislikeCount} | Session Data Count: {dataCount}
       </div>
       <Card
         songs={songs}
         appRef={appRef}
         setLikeCount={setLikeCount}
         setDislikeCount={setDislikeCount}
+        setDataCount={setDataCount}
       />
       <button
-        onClick={() => { /* Placeholder for future functionality */ }}
+        onClick={() => { setDataCount(0) }}
         style={{
           position: 'absolute',
           bottom: '70px',
