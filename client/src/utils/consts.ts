@@ -1,4 +1,12 @@
-export const songs = [
+export interface Song {
+  name: string;
+  cover: string;
+  artist: string;
+  blob: string;
+  spotify: string;
+}
+
+export const songs: Song[] = [
   {
     name: "Truth Hurts",
     cover:
