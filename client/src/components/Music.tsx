@@ -241,6 +241,7 @@ const Card = ({ songs }: CardProps) => {
         <button>
           👍: {likes.length} 👎: {dislikes.length}
         </button>
+        <button>clear session</button>
       </div>
       <div
         id="card"
