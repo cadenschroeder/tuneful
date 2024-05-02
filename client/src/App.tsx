@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect } from "react";
 import "./App.css";
 import Login from "./pages/Login";
 import Application from "./pages/Application";
@@ -7,6 +7,7 @@ import { AuthProps, Page, PageProps } from "./interfaces/interfaces";
 import { initializeApp } from "firebase/app";
 import { getLoginCookie } from "./utils/cookie";
 import Footer from "./components/Footer";
+import { clearLocalStorage } from "./utils/storage";
 
 const firebaseConfig = {
   apiKey: process.env.REACT_APP_API_KEY,
@@ -20,7 +21,6 @@ const firebaseConfig = {
 initializeApp(firebaseConfig);
 
 function App() {
-  const appRef = useRef(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [page, setPage] = useState("login");
 
@@ -44,8 +44,15 @@ function App() {
     }
   }, []);
 
+  useEffect(() => {
+    if (page === Page.INTERMEDIATE) {
+      clearLocalStorage("likes");
+      clearLocalStorage("dislikes");
+    }
+  }, [page]);
+
   return (
-    <div className="App" ref={appRef} id="App">
+    <div className="App" id="App">
       {showLogin ? (
         <Login authProps={authProps} pageProps={pageProps} />
       ) : page === Page.INTERMEDIATE ? (
@@ -54,11 +61,7 @@ function App() {
           setIsAuthenticated={setIsAuthenticated}
         />
       ) : (
-        <Application
-          authProps={authProps}
-          pageProps={pageProps}
-          appRef={appRef}
-        />
+        <Application authProps={authProps} pageProps={pageProps} />
       )}
       <Footer />
     </div>

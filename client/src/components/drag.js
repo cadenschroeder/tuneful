@@ -1,6 +1,6 @@
 function dragElement(
   elmnt: HTMLElement,
-  nextSong: () => void,
+  nextSong: (i) => void,
   handleToggle: (i) => void
 ) {
   var pos1 = 0,
@@ -121,7 +121,7 @@ function dragElement(
           }
         )
         .finished.then(() => {
-          nextSong();
+          nextSong(false);
           elmnt.style.top = "50%";
           elmnt.style.left = "50%";
           elmnt
@@ -168,7 +168,7 @@ function dragElement(
           }
         )
         .finished.then(() => {
-          nextSong();
+          nextSong(true);
           elmnt.style.top = "50%";
           elmnt.style.left = "50%";
           elmnt

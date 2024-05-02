@@ -3,6 +3,7 @@ import { PageProps } from "../interfaces/interfaces";
 import { removeLoginCookie } from "../utils/cookie";
 import AccountLogin from "./AccountLogin";
 import axios from "axios";
+import { setThemeToLocalStorage } from "../utils/storage";
 
 const PLAYLIST_ENDPOINT = "https://api.spotify.com/v1/me/playlists";
 const GENRES = [
@@ -67,7 +68,7 @@ const Intermediate = ({ pageProps, setIsAuthenticated }: IntermediateProps) => {
     console.log("Signed In With Spotify:", signedInWithSpotify);
   }, [signedInWithSpotify]);
 
-  const handleSelection = (type:string, name:string) => {
+  const handleSelection = (type: string, name: string) => {
     setSelectedItem({ type, name });
   };
 
@@ -92,64 +93,67 @@ const Intermediate = ({ pageProps, setIsAuthenticated }: IntermediateProps) => {
   };
 
   const handleContinue = () => {
+    setThemeToLocalStorage(selectedItem.name);
     setPage("music");
   };
 
   if (signedInWithSpotify) {
     return (
       <div
-     style={{
-       height: "100vh",
-       display: "flex",
-       flexDirection: "column",
-       alignItems: "center",
-       justifyContent: "center",
-     }}
-   >
-     <h1 className="intermediate">Select to Start</h1>
-     <h2 id="select-header">
-       {selectedItem.name ? `Chosen: ${selectedItem.name}` : "Select a Playlist or a Genre"}
-     </h2>
+        style={{
+          height: "100vh",
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          justifyContent: "center",
+        }}
+      >
+        <h1 className="intermediate">Select to Start</h1>
+        <h2 id="select-header">
+          {selectedItem.name
+            ? `Chosen: ${selectedItem.name}`
+            : "Select a Playlist or a Genre"}
+        </h2>
 
+        <div className="radio-group" style={{ marginBottom: "10px" }}>
+          {playlists.map((playlist: { name: string }) => (
+            <div key={playlist.name} className="radio-element">
+              <input
+                type="radio"
+                id={playlist.name}
+                name="selection"
+                value={playlist.name}
+                onChange={() => handleSelection("playlist", playlist.name)}
+              />
+              <label htmlFor={playlist.name}>{playlist.name}</label>
+            </div>
+          ))}
+        </div>
 
-     <div className="radio-group" style={{ marginBottom: "10px" }}>
-       {playlists.map((playlist: { name: string }) => (
-         <div key={playlist.name} className="radio-element">
-           <input
-             type="radio"
-             id={playlist.name}
-             name="selection"
-             value={playlist.name}
-             onChange={() => handleSelection("playlist", playlist.name)}
-           />
-           <label htmlFor={playlist.name}>{playlist.name}</label>
-         </div>
-       ))}
-     </div>
-
-
-     <div className="radio-group" >
-       {GENRES.map((genre) => (
-         <div key={genre}>
-           <input
-             type="radio"
-             id={genre}
-             name="selection"
-             value={genre}
-             onChange={() => handleSelection("genre", genre)}
-           />
-           <label htmlFor={genre}>{genre}</label>
-         </div>
-       ))}
-     </div>
-     <button onClick={handleContinue}>Continue</button>
-     <button onClick={handleBackClick} style={{ marginTop: "20px" }}>
-          {"back"}
-        </button>
-        <button onClick={handleLogout} style={{ marginTop: "20px" }}>
-          Logout
-        </button>
-    </div>
+        <div className="radio-group">
+          {GENRES.map((genre) => (
+            <div key={genre}>
+              <input
+                type="radio"
+                id={genre}
+                name="selection"
+                value={genre}
+                onChange={() => handleSelection("genre", genre)}
+              />
+              <label htmlFor={genre}>{genre}</label>
+            </div>
+          ))}
+        </div>
+        <div className="flex">
+          <button onClick={handleContinue}>Continue</button>
+          <button onClick={handleBackClick} style={{ marginTop: "20px" }}>
+            {"back"}
+          </button>
+          <button onClick={handleLogout} style={{ marginTop: "20px" }}>
+            Logout
+          </button>
+        </div>
+      </div>
     );
   }
 
@@ -167,18 +171,20 @@ const Intermediate = ({ pageProps, setIsAuthenticated }: IntermediateProps) => {
         <h1 className="intermediate">Select to Start</h1>
 
         <h2 id="select-header">
-          {genreChoice ? `Chosen: ${genreChoice}` : "Select a Genre"}
+          {selectedItem.name
+            ? `Chosen: ${selectedItem.name}`
+            : "Select a Playlist or a Genre"}
         </h2>
 
         <div className="radio-group">
-          {GENRES.map((genre) => (
-            <div>
+          {GENRES.map((genre, key) => (
+            <div key={key}>
               <input
                 type="radio"
                 id={genre}
                 name="genre"
                 value={genre}
-                onChange={(e) => setGenreChoice(e.target.value)}
+                onChange={(e) => handleSelection("genre", genre)}
               ></input>
               <label htmlFor={genre}>{genre}</label>
             </div>
@@ -188,13 +194,15 @@ const Intermediate = ({ pageProps, setIsAuthenticated }: IntermediateProps) => {
         <p>{playlistChoice?.name}</p>
         <p>{genreChoice}</p>
 
-        <button onClick={handleContinue}>Continue</button>
-        <button onClick={handleBackClick} style={{ marginTop: "20px" }}>
-          {"back"}
-        </button>
-        <button onClick={handleLogout} style={{ marginTop: "20px" }}>
-          Logout
-        </button>
+        <div className="flex">
+          <button onClick={handleContinue}>Continue</button>
+          <button onClick={handleBackClick} style={{ marginTop: "20px" }}>
+            {"back"}
+          </button>
+          <button onClick={handleLogout} style={{ marginTop: "20px" }}>
+            Logout
+          </button>
+        </div>
       </div>
     );
   }

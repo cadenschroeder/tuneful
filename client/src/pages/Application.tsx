@@ -7,10 +7,9 @@ import { AuthProps, Page, PageProps } from "../interfaces/interfaces";
 interface ApplicationProps {
   authProps: AuthProps;
   pageProps: PageProps;
-  appRef: React.RefObject<HTMLDivElement>;
 }
 
-const Application = ({ authProps, pageProps, appRef }: ApplicationProps) => {
+const Application = ({ authProps, pageProps }: ApplicationProps) => {
   const { page } = pageProps;
 
   const CurrentPage = (): JSX.Element => {
@@ -18,9 +17,9 @@ const Application = ({ authProps, pageProps, appRef }: ApplicationProps) => {
       case Page.PROFILE:
         return <Profile props={null} />;
       case Page.FINISH:
-        return <Finish props={null} />;
+        return <Finish />;
       default:
-        return <Music appRef={appRef} />;
+        return <Music />;
     }
   };
 
