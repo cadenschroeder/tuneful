@@ -96,7 +96,6 @@ public class RecommendationHandler implements Route {
       System.out.println(e.getMessage());
     }
     
-
     // add params to run algorithm
 
     // mocked map for now :

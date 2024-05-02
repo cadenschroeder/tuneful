@@ -250,7 +250,7 @@ export function Music({ appRef, songs }: MusicProps) {
   // console.log(songs)
   return (
     <div id="music">
-      <Card songs={songs} appRef={appRef} />
+      <Card songs={mocked} appRef={appRef} />
     </div>
   );
 }

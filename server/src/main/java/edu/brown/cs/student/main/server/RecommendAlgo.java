@@ -31,7 +31,6 @@ public class RecommendAlgo {
         for(String key :  attributes.keySet()){
             this.storageHandler.addToList(uid, "attributes", "session-0", key, attributes.get(key));
         }
-        
     }
 
     public void instantiateProfile(List<String> songIDs, String uid) throws IOException{
