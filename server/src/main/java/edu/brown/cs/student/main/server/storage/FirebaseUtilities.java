@@ -89,8 +89,16 @@
      collectionRef.document(doc_id).set(data);
    }
 
+    /**
+     * Adds an element to the end of a user's list
+     * @param uid
+     * @param collection_id
+     * @param doc_id
+     * @param list_id --> indicates which list in a set to add to
+     * @param data --> data to be added to the list
+     */
      @Override
-     public void addToList(String uid, String collection_id, String doc_id, String list_id, List<Map<String,Object>>
+     public void addToList(String uid, String collection_id, String doc_id, String list_id, Object
              data)
              throws IllegalArgumentException {
          if (uid == null || collection_id == null || doc_id == null || data == null) {
@@ -102,10 +110,11 @@
          CollectionReference collectionRef =
                  db.collection("users").document(uid).collection(collection_id);
 
-         // 2: Write data to the collection ref
-         for(Map<String,Object> song : data) {
-             collectionRef.document(doc_id).update(list_id, FieldValue.arrayUnion(song));
-         }
+         // 2: Add the data element to the array by reference to the list id
+         
+        DocumentReference doc = collectionRef.document(doc_id);
+     
+        doc.update(list_id, FieldValue.arrayUnion(data));
      }
 
 

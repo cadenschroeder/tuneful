@@ -5,12 +5,14 @@ import com.squareup.moshi.JsonAdapter;
 import com.squareup.moshi.Moshi;
 import com.squareup.moshi.Types;
 
+import edu.brown.cs.student.main.server.RecommendAlgo;
 import edu.brown.cs.student.main.server.broadband.MusicSource;
 
 import edu.brown.cs.student.main.server.storage.StorageInterface;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -24,27 +26,28 @@ import spark.Route;
 public class RecommendationHandler implements Route {
   private MusicSource datasource;
   private StorageInterface storageHandler;
+  private RecommendAlgo algorithm;
 
 
-  public RecommendationHandler(MusicSource datasource, StorageInterface storageHandler) { // also pass in algorithm class
+  public RecommendationHandler(MusicSource datasource, StorageInterface storageHandler, RecommendAlgo algorithm) { // also pass in algorithm class
     this.datasource = datasource;
     this.storageHandler = storageHandler;
+    this.algorithm = algorithm;
   }
 
   @Override
   public Object handle(Request request, Response response) throws Exception {
     String liked = request.queryParams("liked");
-
-    String songs = request.queryParams("songID"); // array of songs
+    String trackIDs = request.queryParams("songID"); // array of track ids
     String first = request.queryParams("first"); // indicates if it is the first time called or not
     String uid = request.queryParams("uid");
 
-    if (liked == null || songs == null) {
+    if (liked == null || trackIDs == null) {
       return new RecommendationHandler.RecommendationFailureResponse(
               "Missing one or more parameters")
           .serialize();
     }
-    if (liked.isEmpty() || lastSongID.isEmpty() || uid.isEmpty()) {
+    if (liked.isEmpty() || trackIDs.isEmpty() || uid.isEmpty()) {
       return new RecommendationHandler.RecommendationFailureResponse("Empty parameter(s)")
           .serialize();
     }
@@ -66,6 +69,7 @@ public class RecommendationHandler implements Route {
           .serialize();
     }
 
+    //beautiful :)
     if (first.equals("true")){
       firstBool = true;
     } else if (first.equals("false")){
@@ -76,13 +80,22 @@ public class RecommendationHandler implements Route {
           .serialize();
     }
 
-    // deserialize the songs list
-    List<Map<String, Object>> songList = deserializeTracks(songs);
+    // deserialize the track ids list
+    //List<String> idList = deserializeTracks(trackIDs);
+    
+    List<String> songIDsList = Arrays.asList(trackIDs.replaceAll("[\\[\\]\"]","").split(","));
 
     // create session stats if first time call
-    if (firstBool){
-      this.storageHandler.addDocument(uid, "stats", "session", responseMap);
+    try{
+      if (firstBool){
+        this.algorithm.instantiateProfile(songIDsList, uid);
+      } else {
+        this.algorithm.updateProfile(true, songIDsList.get(0) , uid);
+      }
+    } catch (Exception e) {
+      System.out.println(e.getMessage());
     }
+    
 
     // add params to run algorithm
 
@@ -95,23 +108,23 @@ public class RecommendationHandler implements Route {
     // params.put("target_acousticness", "0.5");
     params.put("limit", "5");
 
-    List<Map<String,Object>> songs = new ArrayList<>();
+    List<Map<String,Object>> recSongs = new ArrayList<>();
 
     int tries = 0;
-    while(songs.isEmpty()){
-      songs = this.datasource.getRecommendation(params, uid);
+    while(recSongs.isEmpty()){
+      recSongs = this.datasource.getRecommendation(params, uid);
       tries++;
       if(tries > 5){
         return new RecommendationHandler.RecommendationFailureResponse("Could not fetch more recommendations. Attempts exceeded").serialize();
       }
     }
 
-    responseMap.put("songs", songs);
+    responseMap.put("songs", recSongs);
 
     try {
       Map<String, Object> firebaseData = new HashMap<>();
 
-      for(Map<String,Object> song : songs){
+      for(Map<String,Object> song : recSongs){
         //TODO : Make session based
         firebaseData.put("song", song);
         // use the storage handler to add the document to the database
@@ -128,15 +141,15 @@ public class RecommendationHandler implements Route {
     return new RecommendationHandler.RecommendationSuccessResponse(responseMap).serialize();
   }
 
-  public static List<Map<String, Object>> deserializeTracks(String jsonSongList) throws IOException {
+  public static List<String> deserializeTracks(String jsonSongList) throws IOException {
     // Initializes Moshi
     Moshi moshi = new Moshi.Builder().build();
 
     // Initializes an adapter to a Broadband class then uses it to parse the JSON.
-    JsonAdapter<List<Map<String, Object>>> adapter =
-        moshi.adapter(Types.newParameterizedType(Map.class, String.class, Object.class, List.class));
+    JsonAdapter<List<String>> adapter =
+        moshi.adapter(Types.newParameterizedType(String.class, List.class));
 
-    List<Map<String, Object>> trackList = adapter.fromJson(jsonSongList);
+    List<String> trackList = adapter.fromJson(jsonSongList);
 
     return trackList;
   }

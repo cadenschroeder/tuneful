@@ -140,7 +140,7 @@ interface CardProps {
 }
 
 const Card = ({ songs, appRef }: CardProps) => {
-  console.log(songs)
+  // console.log(songs)
   const [song, setSong] = useState(songs[0]);
   const [blob, setBlob] = useState<Blob>();
   const [playTime, setPlayTime] = useState(0);
@@ -243,16 +243,16 @@ const Card = ({ songs, appRef }: CardProps) => {
 
 interface MusicProps {
   appRef: React.RefObject<HTMLDivElement>;
-  songs: Song[]
+  songs: Song[];
 }
 
-const Music = ({ appRef, songs }: MusicProps) => {
-  console.log(songs)
+export function Music({ appRef, songs }: MusicProps) {
+  // console.log(songs)
   return (
     <div id="music">
-      <Card songs={(mocked)} appRef={appRef} />
+      <Card songs={songs} appRef={appRef} />
     </div>
   );
-};
+}
 
 export default Music;

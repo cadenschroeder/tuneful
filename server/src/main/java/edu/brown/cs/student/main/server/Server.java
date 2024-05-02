@@ -41,9 +41,10 @@ public class Server {
     StorageInterface storageInterface;
     try {
       storageInterface = new FirebaseUtilities();
+      RecommendAlgo algorithm = new RecommendAlgo(spotifySource, storageInterface);
       Spark.get("songData", new SongDataHandler(spotifySource, storageInterface)); //todo clean this up
       Spark.get("viewSongs", new ViewSongHandler(storageInterface));
-      Spark.get("recommendation", new RecommendationHandler(spotifySource, storageInterface));
+      Spark.get("recommendation", new RecommendationHandler(spotifySource, storageInterface, algorithm));
       Spark.get("addLikes", new AddLikesHandler(storageInterface));
       Spark.get("listLikes", new ListLikesHandler(storageInterface));
 
