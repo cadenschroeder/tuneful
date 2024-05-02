@@ -45,6 +45,19 @@ body {
   width: 100%;
 }
 
+.counter-display {
+  position: fixed; /* Fixed at the top of the viewport */
+  top: 0; /* Aligns to the top */
+  left: 0; /* Starts from the left */
+  width: 100%; /* Spans the full width of the viewport */
+  text-align: center; /* Centers the text within the div */
+  padding: 10px 0; /* Adds some padding above and below the text */
+  background: rgba(0, 0, 0, 0.5); /* Semi-transparent black background */
+  color: white; /* White text color */
+  font-size: 20px; /* Larger font size for visibility */
+  z-index: 1000; /* Ensures it stays on top of other content */
+}
+
 .select-header {
   margin-top: -2%;
 }
