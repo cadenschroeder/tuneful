@@ -271,6 +271,8 @@ const Card = ({ songs, appRef }: CardProps) => {
             width: "100%",
             height: "auto",
             filter: `${isPlaying ? "none" : "brightness(0.9)"}`,
+            borderBottom: isDesktop ? "" : "2px solid #bdb6b6",
+            marginBottom: isDesktop ? "" : "1em",
           }}
         />
       </div>

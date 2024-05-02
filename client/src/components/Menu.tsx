@@ -61,9 +61,7 @@ const Menu = ({ authProps, pageProps }: MenuProps) => {
         {isIncognito ? "Leave Incognito" : "Logout"}
       </button>
       <button onClick={handleBackClick}>{"back"}</button>
-      {page !== Page.FINISH && (
-        <button onClick={handleFinishClick}>Finish</button>
-      )}
+      <button onClick={handleFinishClick}>Finish</button>
     </div>
   );
 };

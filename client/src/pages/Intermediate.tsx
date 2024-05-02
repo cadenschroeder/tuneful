@@ -215,12 +215,6 @@ const Intermediate = ({ pageProps, setIsAuthenticated }: IntermediateProps) => {
         Continue without signing into Spotify
       </button>
       <button onClick={handleLogout}>Logout</button>
-      <button
-        onClick={handleLogout}
-        style={{ marginLeft: "10px", marginRight: "10px" }}
-      >
-        Logout
-      </button>
     </div>
   );
 };
