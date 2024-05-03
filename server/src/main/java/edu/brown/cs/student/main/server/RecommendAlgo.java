@@ -147,27 +147,48 @@ public class RecommendAlgo {
 
     public Map<String, Map<String, Double>> rankAttributes (Map<String, List<Double>> likeAttributes, Map<String, List<Double>> dislikeAttributes){
         Map<String, Map<String, Double>> rankings = new HashMap<>();
-        for (String attribute : likeAttributes.keySet()) {
-            Double rawLikeMedian = findMedian(likeAttributes.get(attribute));
-            Double rawLikeStdDev = calculateStandardDeviation(likeAttributes.get(attribute));
-            if (!(getMax(attribute) == 1.0 && getMin(attribute) == 0.0)){
-                likeAttributes.put(attribute, normalizeList(likeAttributes.get(attribute), getMin(attribute), getMax(attribute)));
-                dislikeAttributes.put(attribute, normalizeList(dislikeAttributes.get(attribute), getMin(attribute), getMax(attribute)));
+        if(likeAttributes.get("acousticness").isEmpty()){
+            if(dislikeAttributes.get("acousticness").isEmpty()){
+                for (String attribute: likeAttributes.keySet()){
+                    Double min = getMin(attribute);
+                    Double max = getMax(attribute);
+                    Map<String, Double> tempMap= new HashMap<>();
+                    tempMap.put("ranking", 1.0);
+                    tempMap.put("target", min + (max - min) * Math.random());
+                    tempMap.put("minimum", min);
+                    tempMap.put("maximum", max);
+                    rankings.put(attribute, tempMap);
+                }
+                return rankings;
+            }else{
+                return rankings;
             }
-            Double normalizedLikeMedian = findMedian(likeAttributes.get(attribute));
-            Double normalizedDislikeMedian = findMedian(dislikeAttributes.get(attribute));
-            Double difference = Math.abs(normalizedLikeMedian - normalizedDislikeMedian);
-            Double likeStdDev = calculateStandardDeviation(likeAttributes.get(attribute));
-            Double dislikeStdDev = calculateStandardDeviation(dislikeAttributes.get(attribute));
-            Double ranking = 3.0 * difference + 2.0 * likeStdDev + dislikeStdDev;
-            Map<String, Double> tempMap= new HashMap<>();
-            tempMap.put("ranking", ranking);
-            tempMap.put("target", rawLikeMedian);
-            tempMap.put("minimum", rawLikeMedian - rawLikeStdDev);
-            tempMap.put("maximum", rawLikeMedian + rawLikeStdDev);
-            rankings.put(attribute, tempMap);
+        }else if (dislikeAttributes.isEmpty()){
+
+            return rankings;
+        }else{
+            for (String attribute : likeAttributes.keySet()) {
+                Double rawLikeMedian = findMedian(likeAttributes.get(attribute));
+                Double rawLikeStdDev = calculateStandardDeviation(likeAttributes.get(attribute));
+                if (!(getMax(attribute) == 1.0 || getMin(attribute) == 0.0)){
+                    likeAttributes.put(attribute, normalizeList(likeAttributes.get(attribute), getMin(attribute), getMax(attribute)));
+                    dislikeAttributes.put(attribute, normalizeList(dislikeAttributes.get(attribute), getMin(attribute), getMax(attribute)));
+                }
+                Double normalizedLikeMedian = findMedian(likeAttributes.get(attribute));
+                Double normalizedDislikeMedian = findMedian(dislikeAttributes.get(attribute));
+                Double difference = Math.abs(normalizedLikeMedian - normalizedDislikeMedian);
+                Double likeStdDev = calculateStandardDeviation(likeAttributes.get(attribute));
+                Double dislikeStdDev = calculateStandardDeviation(dislikeAttributes.get(attribute));
+                Double ranking = 3.0 * difference + 2.0 * likeStdDev + dislikeStdDev;
+                Map<String, Double> tempMap= new HashMap<>();
+                tempMap.put("ranking", ranking);
+                tempMap.put("target", rawLikeMedian);
+                tempMap.put("minimum", rawLikeMedian - rawLikeStdDev);
+                tempMap.put("maximum", rawLikeMedian + rawLikeStdDev);
+                rankings.put(attribute, tempMap);
+            }
+            return rankings;
         }
-        return rankings;
     }
 
     private Map<String, Object> reduceMap(Map<String, Object> features){
