@@ -37,7 +37,7 @@ public class AddWordHandler implements Route {
       System.out.println("adding word: " + word + " for user: " + uid);
 
       // get the current word count to make a unique word_id by index.
-      int wordCount = this.storageHandler.getCollection(uid, "words").size();
+      int wordCount = this.storageHandler.getCollection(uid, "words", false).size();
       String wordId = "word-" + wordCount;
 
       // use the storage handler to add the document to the database

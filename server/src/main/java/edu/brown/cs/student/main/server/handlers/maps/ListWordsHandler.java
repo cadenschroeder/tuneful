@@ -33,7 +33,7 @@ public class ListWordsHandler implements Route {
       System.out.println("listing words for user: " + uid);
 
       // get all the words for the user
-      List<Map<String, Object>> vals = this.storageHandler.getCollection(uid, "words");
+      List<Map<String, Object>> vals = this.storageHandler.getCollection(uid, "words", false);
 
       // convert the key,value map to just a list of the words.
       List<String> words = vals.stream().map(word -> word.get("word").toString()).toList();

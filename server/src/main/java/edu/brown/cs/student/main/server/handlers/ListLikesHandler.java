@@ -33,7 +33,7 @@ public class ListLikesHandler implements Route {
             System.out.println("listing liked songs for user: " + uid);
 
             // get all the song names for the user
-            List<Map<String, Object>> vals = this.storageHandler.getCollection(uid, "likedSongs");
+            List<Map<String, Object>> vals = this.storageHandler.getCollection(uid, "likedSongs", true);
 
             // convert the key,value map to just a list of the song names.
             List<String> likedSongs = vals.stream().map(song -> song.get("songName").toString()).toList();
