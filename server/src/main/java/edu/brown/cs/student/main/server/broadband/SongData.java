@@ -11,15 +11,14 @@ public record SongData(
     List<String> artists,
     String album,
     String imageUrl) {
-    public Map<String, Object> toMap() {
-        return Map.of(
-                "trackID", trackID,
-                "name", name,
-                "snippetURL", snippetURL,
-                "explicit", explicit,
-                "artists", artists,
-                "album", album,
-                "images", imageUrl
-        );
-    }
+  public Map<String, Object> toMap() {
+    return Map.of(
+        "trackID", trackID,
+        "name", name,
+        "snippetURL", snippetURL,
+        "explicit", explicit,
+        "artists", artists,
+        "album", album,
+        "images", imageUrl);
+  }
 }

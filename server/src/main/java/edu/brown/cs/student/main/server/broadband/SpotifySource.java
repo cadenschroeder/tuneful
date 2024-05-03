@@ -104,7 +104,6 @@ public class SpotifySource implements MusicSource {
     String id = track.get("id").toString();
     String name = track.get("name").toString();
 
-
     return new SongData(id, name, snippetURL, explicit, artistNames, albumName, imageUrl);
   }
 
@@ -118,9 +117,9 @@ public class SpotifySource implements MusicSource {
     featuresHttpConn.setRequestMethod("GET");
     featuresHttpConn.setRequestProperty("Authorization", "Bearer " + accessToken);
     InputStream featuresResponseStream =
-            featuresHttpConn.getResponseCode() / 100 == 2
-                    ? featuresHttpConn.getInputStream()
-                    : featuresHttpConn.getErrorStream();
+        featuresHttpConn.getResponseCode() / 100 == 2
+            ? featuresHttpConn.getInputStream()
+            : featuresHttpConn.getErrorStream();
     Scanner featuresS = new Scanner(featuresResponseStream).useDelimiter("\\A");
     String featuresResponse = featuresS.hasNext() ? featuresS.next() : "";
     featuresS.close();
@@ -143,12 +142,12 @@ public class SpotifySource implements MusicSource {
   }
 
   @Override
-  public List<Map<String,Object>> getRecommendation(Map<String, String> inputs, String uid)
+  public List<Map<String, Object>> getRecommendation(Map<String, String> inputs, String uid)
       throws IOException, DatasourceException {
     String accessToken = getAccessToken();
     // List of recommended song Ids
-    //List<String> songIDs = new ArrayList<>();
-    List<Map<String,Object>> songList = new ArrayList<>();
+    // List<String> songIDs = new ArrayList<>();
+    List<Map<String, Object>> songList = new ArrayList<>();
     // Create url from attribute map
     String params = this.convertMapToString(inputs);
     // Todo: should there be any params we always want to add?
@@ -176,8 +175,8 @@ public class SpotifySource implements MusicSource {
     for (Map<String, Object> track : tracks) {
       try {
         songList.add(this.trackToSongData(track).toMap());
-      } catch (DatasourceException e){
-        //don't do anything rn just continue to next song
+      } catch (DatasourceException e) {
+        // don't do anything rn just continue to next song
       }
     }
 
@@ -185,15 +184,15 @@ public class SpotifySource implements MusicSource {
   }
 
   private SongData trackToSongData(Map<String, Object> track) throws DatasourceException {
-    //TODO error handle ?? These don't have great runtime since they repeat every time to error check rn
+    // TODO error handle ?? These don't have great runtime since they repeat every time to error
+    // check rn
 
-    if(track.get("preview_url") == null ||
-            track.get("explicit") == null ||
-            track.get("album") == null ||
-            track.get("artists") == null ||
-            track.get("id") == null ||
-            track.get("name") == null
-    ){
+    if (track.get("preview_url") == null
+        || track.get("explicit") == null
+        || track.get("album") == null
+        || track.get("artists") == null
+        || track.get("id") == null
+        || track.get("name") == null) {
       throw new DatasourceException("Missing required aspects");
     }
 
@@ -203,20 +202,20 @@ public class SpotifySource implements MusicSource {
     String explicit = track.get("explicit").toString();
     Map<String, Object> albumInfo = (Map<String, Object>) track.get("album");
 
-    if(albumInfo.get("name") == null || albumInfo.get("images") == null){
+    if (albumInfo.get("name") == null || albumInfo.get("images") == null) {
       throw new DatasourceException("Missing required aspects");
     }
     String albumName = albumInfo.get("name").toString();
     ArrayList<Map<String, Object>> images =
-            (ArrayList<Map<String, Object>>) albumInfo.get("images");
+        (ArrayList<Map<String, Object>>) albumInfo.get("images");
     String imageUrl = images.get(0).get("url").toString();
 
     ArrayList<Map<String, Object>> artists =
-            (ArrayList<Map<String, Object>>) track.get("artists"); // check this cast
+        (ArrayList<Map<String, Object>>) track.get("artists"); // check this cast
 
     ArrayList<String> artistNames = new ArrayList<>();
     for (Map<String, Object> artist : artists) {
-      if(artist.get("name") == null){
+      if (artist.get("name") == null) {
         throw new DatasourceException("Missing required aspects");
       }
       artistNames.add(artist.get("name").toString());

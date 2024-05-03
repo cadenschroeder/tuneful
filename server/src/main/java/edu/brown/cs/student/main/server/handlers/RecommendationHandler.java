@@ -1,24 +1,17 @@
 package edu.brown.cs.student.main.server.handlers;
 
-import com.google.cloud.firestore.FieldValue;
 import com.squareup.moshi.JsonAdapter;
 import com.squareup.moshi.Moshi;
 import com.squareup.moshi.Types;
-
 import edu.brown.cs.student.main.server.RecommendAlgo;
 import edu.brown.cs.student.main.server.broadband.MusicSource;
-
 import edu.brown.cs.student.main.server.storage.StorageInterface;
-
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import edu.brown.cs.student.main.server.broadband.SongData;
-import edu.brown.cs.student.main.server.storage.StorageInterface;
 import spark.Request;
 import spark.Response;
 import spark.Route;
@@ -28,8 +21,10 @@ public class RecommendationHandler implements Route {
   private StorageInterface storageHandler;
   private RecommendAlgo algorithm;
 
-
-  public RecommendationHandler(MusicSource datasource, StorageInterface storageHandler, RecommendAlgo algorithm) { // also pass in algorithm class
+  public RecommendationHandler(
+      MusicSource datasource,
+      StorageInterface storageHandler,
+      RecommendAlgo algorithm) { // also pass in algorithm class
     this.datasource = datasource;
     this.storageHandler = storageHandler;
     this.algorithm = algorithm;
@@ -42,7 +37,7 @@ public class RecommendationHandler implements Route {
     String first = request.queryParams("first"); // indicates if it is the first time called or not
     String uid = request.queryParams("uid");
 
-    if (liked == null || trackIDs == null || first ==  null || uid == null) {
+    if (liked == null || trackIDs == null || first == null || uid == null) {
       return new RecommendationHandler.RecommendationFailureResponse(
               "Missing one or more parameters")
           .serialize();
@@ -59,9 +54,9 @@ public class RecommendationHandler implements Route {
     boolean firstBool = false;
 
     // convert liked and first into booleans
-    if (liked.equals("true")){
+    if (liked.equals("true")) {
       likedBool = true;
-    } else if (liked.equals("false")){
+    } else if (liked.equals("false")) {
       likedBool = false;
     } else {
       return new RecommendationHandler.RecommendationFailureResponse(
@@ -69,10 +64,10 @@ public class RecommendationHandler implements Route {
           .serialize();
     }
 
-    //beautiful :)
-    if (first.equals("true")){
+    // beautiful :)
+    if (first.equals("true")) {
       firstBool = true;
-    } else if (first.equals("false")){
+    } else if (first.equals("false")) {
       firstBool = false;
     } else {
       return new RecommendationHandler.RecommendationFailureResponse(
@@ -81,21 +76,21 @@ public class RecommendationHandler implements Route {
     }
 
     // deserialize the track ids list
-    //List<String> idList = deserializeTracks(trackIDs);
-    
-    List<String> songIDsList = Arrays.asList(trackIDs.replaceAll("[\\[\\]\"]","").split(","));
+    // List<String> idList = deserializeTracks(trackIDs);
+
+    List<String> songIDsList = Arrays.asList(trackIDs.replaceAll("[\\[\\]\"]", "").split(","));
 
     // create session stats if first time call
-    try{
-      if (firstBool){
+    try {
+      if (firstBool) {
         this.algorithm.instantiateProfile(songIDsList, uid);
       } else {
-        this.algorithm.updateProfile(true, songIDsList.get(0) , uid);
+        this.algorithm.updateProfile(true, songIDsList.get(0), uid);
       }
     } catch (Exception e) {
       System.out.println(e.getMessage());
     }
-    
+
     // add params to run algorithm
 
     // mocked map for now :
@@ -107,14 +102,16 @@ public class RecommendationHandler implements Route {
     // params.put("target_acousticness", "0.5");
     params.put("limit", "5");
 
-    List<Map<String,Object>> recSongs = new ArrayList<>();
+    List<Map<String, Object>> recSongs = new ArrayList<>();
 
     int tries = 0;
-    while(recSongs.isEmpty()){
+    while (recSongs.isEmpty()) {
       recSongs = this.datasource.getRecommendation(params, uid);
       tries++;
-      if(tries > 5){
-        return new RecommendationHandler.RecommendationFailureResponse("Could not fetch more recommendations. Attempts exceeded").serialize();
+      if (tries > 5) {
+        return new RecommendationHandler.RecommendationFailureResponse(
+                "Could not fetch more recommendations. Attempts exceeded")
+            .serialize();
       }
     }
 
@@ -123,19 +120,19 @@ public class RecommendationHandler implements Route {
     try {
       Map<String, Object> firebaseData = new HashMap<>();
 
-      for(Map<String,Object> song : recSongs){
-        //TODO : Make session based
+      for (Map<String, Object> song : recSongs) {
+        // TODO : Make session based
         firebaseData.put("song", song);
         // use the storage handler to add the document to the database
         this.storageHandler.addDocument(uid, "songs", song.get("trackID").toString(), firebaseData);
       }
-      // TODO: what to do with incognito users?? can we have a designated user id for them that gets cleared?
-    } catch(Exception e){
-      //TODO take out
+      // TODO: what to do with incognito users?? can we have a designated user id for them that gets
+      // cleared?
+    } catch (Exception e) {
+      // TODO take out
       e.printStackTrace();
       return new RecommendationHandler.RecommendationFailureResponse(e.getMessage()).serialize();
     }
-
 
     return new RecommendationHandler.RecommendationSuccessResponse(responseMap).serialize();
   }
