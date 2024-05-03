@@ -7,12 +7,13 @@ import edu.brown.cs.student.main.server.RecommendAlgo;
 import edu.brown.cs.student.main.server.broadband.MusicSource;
 import edu.brown.cs.student.main.server.storage.StorageInterface;
 import java.io.IOException;
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.PriorityQueue;
 import spark.Request;
 import spark.Response;
 import spark.Route;
@@ -33,122 +34,173 @@ public class RecommendationHandler implements Route {
 
   @Override
   public Object handle(Request request, Response response) throws Exception {
-    String liked = request.queryParams("liked");
-    String trackIDs = request.queryParams("trackIDs"); // array of track ids
-    String first = request.queryParams("first"); // indicates if it is the first time called or not
-    String uid = request.queryParams("uid");
-
-    if (liked == null || trackIDs == null || first == null || uid == null) {
-      return new RecommendationHandler.RecommendationFailureResponse(
-              "Missing one or more parameters")
-          .serialize();
-    }
-    if (liked.isEmpty() || trackIDs.isEmpty() || first.isEmpty() || uid.isEmpty()) {
-      return new RecommendationHandler.RecommendationFailureResponse("Empty parameter(s)")
-          .serialize();
-    }
-
-    // Creates a hashmap to store the results of the request
-    Map<String, Object> responseMap = new HashMap<>();
-
-    boolean likedBool = false;
-    boolean firstBool = false;
-
-    // convert liked and first into booleans
-    if (liked.equals("true")) {
-      likedBool = true;
-    } else if (liked.equals("false")) {
-      likedBool = false;
-    } else {
-      return new RecommendationHandler.RecommendationFailureResponse(
-              "Unexpected parameter value for liked")
-          .serialize();
-    }
-
-    // beautiful :)
-    if (first.equals("true")) {
-      firstBool = true;
-    } else if (first.equals("false")) {
-      firstBool = false;
-    } else {
-      return new RecommendationHandler.RecommendationFailureResponse(
-              "Unexpected parameter value for first")
-          .serialize();
-    }
-
-    // deserialize the track ids list
-    // List<String> idList = deserializeTracks(trackIDs);
-
-    List<String> songIDsList = Arrays.asList(trackIDs.replaceAll("[\\[\\]\"]", "").split(","));
-
-    // create session stats if first time call
     try {
-      if (firstBool) {
-        this.algorithm.instantiateProfile(songIDsList, uid);
-      } else if (!firstBool) {
-        this.algorithm.updateProfile(likedBool, songIDsList.get(0), uid);
-      }
-    } catch (Exception e) {
-      System.out.println(e.getMessage());
-    }
+      String liked = request.queryParams("liked");
+      String trackIDs = request.queryParams("trackIDs"); // array of track ids
+      String first =
+          request.queryParams("first"); // indicates if it is the first time called or not
+      String uid = request.queryParams("uid");
 
-    // add params to run algorithm
-
-    List<Map<String, Object>> collection = this.storageHandler.getCollection(uid, "attributes");
-    Map<String, Object> likes =  collection.get(0);
-
-    // nasty cast to Map<String, ArrayList<Double>>
-
-    Map<String, Object> dislikes = collection.get(1);
-
-    
-    ArrayList<Double> casted = (ArrayList<Double>) likes.get("acousticness");
-    
-
-    this.algorithm.rankAttributes(null, null);
-
-    // mocked map for now :
-
-    Map<String, String> params = new HashMap<>();
-    params.put("seed_genres", "new-release%2Cpop");
-    // params.put("seed_artists", "4NHQUGzhtTLFvgF5SZesLK");
-    // params.put("seed_tracks", "0c6xIDDpzE81m2q797ordA");
-    // params.put("target_acousticness", "0.5");
-    params.put("limit", "5");
-
-    List<Map<String, Object>> recSongs = new ArrayList<>();
-
-    int tries = 0;
-    while (recSongs.isEmpty()) {
-      recSongs = this.datasource.getRecommendation(params, uid);
-      tries++;
-      if (tries > 5) {
+      if (liked == null || trackIDs == null || first == null || uid == null) {
         return new RecommendationHandler.RecommendationFailureResponse(
-                "Could not fetch more recommendations. Attempts exceeded")
+                "Missing one or more parameters")
             .serialize();
       }
-    }
-
-    responseMap.put("songs", recSongs);
-
-    try {
-      Map<String, Object> firebaseData = new HashMap<>();
-
-      for (Map<String, Object> song : recSongs) {
-        // TODO : Make session based
-        firebaseData.put("song", song);
-        // use the storage handler to add the document to the database
-        this.storageHandler.addDocument(uid, "songs", song.get("trackID").toString(), firebaseData);
+      if (liked.isEmpty() || trackIDs.isEmpty() || first.isEmpty() || uid.isEmpty()) {
+        return new RecommendationHandler.RecommendationFailureResponse("Empty parameter(s)")
+            .serialize();
       }
-      // TODO: what to do with incognito users?? can we have a designated user id for them that gets
-      // cleared?
+
+      // Creates a hashmap to store the results of the request
+      Map<String, Object> responseMap = new HashMap<>();
+
+      boolean likedBool = false;
+      boolean firstBool = false;
+
+      // convert liked and first into booleans
+      if (liked.equals("true")) {
+        likedBool = true;
+      } else if (liked.equals("false")) {
+        likedBool = false;
+      } else {
+        return new RecommendationHandler.RecommendationFailureResponse(
+                "Unexpected parameter value for liked")
+            .serialize();
+      }
+
+      // beautiful :)
+      if (first.equals("true")) {
+        firstBool = true;
+      } else if (first.equals("false")) {
+        firstBool = false;
+      } else {
+        return new RecommendationHandler.RecommendationFailureResponse(
+                "Unexpected parameter value for first")
+            .serialize();
+      }
+
+      // deserialize the track ids list
+      // List<String> idList = deserializeTracks(trackIDs);
+
+      List<String> songIDsList = Arrays.asList(trackIDs.replaceAll("[\\[\\]\"]", "").split(","));
+
+      // create session stats if first time call
+      try {
+        if (firstBool) {
+          this.algorithm.instantiateProfile(songIDsList, uid);
+        } else if (!firstBool) {
+          this.algorithm.updateProfile(likedBool, songIDsList.get(0), uid);
+        }
+      } catch (Exception e) {
+        System.out.println(e.getMessage());
+      }
+
+      // add params to run algorithm
+
+      List<Map<String, Object>> collection = this.storageHandler.getCollection(uid, "attributes");
+      Map<String, Object> likes = collection.get(0);
+
+      Map<String, List<Double>> likesCasted = new HashMap<>();
+      // nasty cast to Map<String, ArrayList<Double>>
+      for (String attribute : likes.keySet()) {
+        // for each value
+        List<Double> valuesData = (List<Double>) likes.get(attribute);
+        likesCasted.put(attribute, valuesData);
+      }
+
+      Map<String, Object> dislikes = collection.get(1);
+
+      Map<String, List<Double>> dislikesCasted = new HashMap<>();
+      // nasty cast to Map<String, ArrayList<Double>>
+      for (String attribute : dislikes.keySet()) {
+        // for each value
+        List<Double> valuesData = (List<Double>) dislikes.get(attribute);
+        dislikesCasted.put(attribute, valuesData);
+      }
+
+      Map<String, Map<String, Double>> rankings =
+          this.algorithm.rankAttributes(likesCasted, dislikesCasted);
+
+      Map<String, String> params = this.getParams(rankings);
+
+      List<Map<String, Object>> recSongs = new ArrayList<>();
+
+      int tries = 0;
+      while (recSongs.isEmpty()) {
+        recSongs = this.datasource.getRecommendation(params, uid);
+        tries++;
+        if (tries > 5) {
+          return new RecommendationHandler.RecommendationFailureResponse(
+                  "Could not fetch more recommendations. Attempts exceeded")
+              .serialize();
+        }
+      }
+
+      System.out.println("somehow making it out");
+      responseMap.put("songs", recSongs);
+
+      try {
+        Map<String, Object> firebaseData = new HashMap<>();
+
+        for (Map<String, Object> song : recSongs) {
+          // TODO : Make session based
+          firebaseData.put("song", song);
+          // use the storage handler to add the document to the database
+          this.storageHandler.addDocument(
+              uid, "songs", song.get("trackID").toString(), firebaseData);
+        }
+        // TODO: what to do with incognito users?? can we have a designated user id for them that
+        // gets
+        // cleared?
+      } catch (Exception e) {
+        // TODO take out
+        e.printStackTrace();
+        return new RecommendationHandler.RecommendationFailureResponse(e.getMessage()).serialize();
+      }
+
+      return new RecommendationHandler.RecommendationSuccessResponse(responseMap).serialize();
     } catch (Exception e) {
-      // TODO take out
       e.printStackTrace();
       return new RecommendationHandler.RecommendationFailureResponse(e.getMessage()).serialize();
     }
+  }
 
-    return new RecommendationHandler.RecommendationSuccessResponse(responseMap).serialize();
+  public Map<String, String> getParams(Map<String, Map<String, Double>> attributeVals) {
+    ArrayList<String> topAttributes = new ArrayList<>();
+
+    // create map from the ranking value to the attribute name
+    Map<Double, String> rankToAttribute = new HashMap<>();
+    // create a priority queue holding all the ranks
+    PriorityQueue<Double> rankQueue = new PriorityQueue<>(Comparator.reverseOrder());
+    for (String attribute :
+        attributeVals.keySet()) { // for each attribute stored, put its rank value -> name in map
+      // find the ranking value
+      Double rankVal =
+          attributeVals.get(attribute).get("ranking"); // gets the rank value for the curr attribute
+      rankToAttribute.put(rankVal, attribute);
+      rankQueue.add(rankVal); // add rank to the queue
+    }
+
+    // take three values from queue (highest rank values), find corresponding attribute, add to top
+    // attributes list
+    for (int i = 0; i < 3; i++) {
+      Double currRank = rankQueue.poll();
+      String attribute = rankToAttribute.get(currRank);
+      topAttributes.add(attribute);
+    }
+
+    // make a parameters map for the top attributes
+    Map<String, String> params = new HashMap<>(); // by caden
+    params.put("seed_genres", "pop"); // by caden
+    // params.put("seed_artists", "4NHQUGzhtTLFvgF5SZesLK");
+    // params.put("seed_tracks", "0c6xIDDpzE81m2q797ordA");
+    params.put("limit", "5"); // by caden
+
+    for (String attribute : topAttributes) {
+      params.put("target_" + attribute, attributeVals.get(attribute).get("target").toString());
+    }
+
+    return params;
   }
 
   public static List<String> deserializeTracks(String jsonSongList) throws IOException {

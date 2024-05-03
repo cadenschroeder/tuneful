@@ -150,6 +150,7 @@ public class SpotifySource implements MusicSource {
     List<Map<String, Object>> songList = new ArrayList<>();
     // Create url from attribute map
     String params = this.convertMapToString(inputs);
+    System.out.println(params);
     // Todo: should there be any params we always want to add?
 
     // fetch from Spotify;
@@ -176,6 +177,7 @@ public class SpotifySource implements MusicSource {
       try {
         songList.add(this.trackToSongData(track).toMap());
       } catch (DatasourceException e) {
+        System.out.println(e.getMessage());
         // don't do anything rn just continue to next song
       }
     }
@@ -193,7 +195,12 @@ public class SpotifySource implements MusicSource {
         || track.get("artists") == null
         || track.get("id") == null
         || track.get("name") == null) {
-      throw new DatasourceException("Missing required aspects");
+      for (String key : track.keySet()) {
+        System.out.println(track.get(key));
+      }
+      System.out.println(track.toString());
+      throw new DatasourceException(
+          "Missing required aspects: preview, explicit, album, id, or name");
     }
 
     String id = track.get("id").toString();
@@ -203,7 +210,7 @@ public class SpotifySource implements MusicSource {
     Map<String, Object> albumInfo = (Map<String, Object>) track.get("album");
 
     if (albumInfo.get("name") == null || albumInfo.get("images") == null) {
-      throw new DatasourceException("Missing required aspects");
+      throw new DatasourceException("Missing name or images");
     }
     String albumName = albumInfo.get("name").toString();
     ArrayList<Map<String, Object>> images =
