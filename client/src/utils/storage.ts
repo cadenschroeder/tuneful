@@ -50,7 +50,6 @@ async function updateSongsQueue() {
   isQueing = false;
   let items = getFromLocalStorage("songs");
   if (items.length >= 3) return items;
-  console.log(items, batch, [...items, ...batch]);
   items = [...items, ...batch];
   localStorage.setItem("songs", JSON.stringify(items));
 }
@@ -58,7 +57,7 @@ async function updateSongsQueue() {
 function fetchSongsQueue(): Item[] {
   let items = getFromLocalStorage("songs");
   items.shift();
-  if (items.length < 3) updateSongsQueue();
+  if (items.length < 3 && !isQueing) updateSongsQueue();
   localStorage.setItem("songs", JSON.stringify(items));
   return items;
 }
