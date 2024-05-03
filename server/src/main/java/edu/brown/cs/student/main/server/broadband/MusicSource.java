@@ -16,6 +16,7 @@ public interface MusicSource {
    * @return SongData for the song
    */
   SongData getSongData(String songID) throws IOException, DatasourceException;
+
   Map<String, Object> getFeatures(String songID) throws IOException;
 
   /**
