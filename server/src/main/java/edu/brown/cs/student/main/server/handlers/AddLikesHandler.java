@@ -5,8 +5,11 @@ import spark.Request;
 import spark.Response;
 import spark.Route;
 
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.zip.DataFormatException;
 
 public class AddLikesHandler implements Route {
 
@@ -17,10 +20,13 @@ public class AddLikesHandler implements Route {
     }
 
     /**
-     * Invoked when a request is made on this route's corresponding path e.g. '/hello'
+     * Invoked when a request is made on this route's corresponding path e.g.
+     * '/hello'
      *
-     * @param request The request object providing information about the HTTP request
-     * @param response The response object providing functionality for modifying the response
+     * @param request  The request object providing information about the HTTP
+     *                 request
+     * @param response The response object providing functionality for modifying the
+     *                 response
      * @return The content to be set in the response
      */
     @Override
@@ -29,23 +35,25 @@ public class AddLikesHandler implements Route {
         try {
             // collect parameters from the request
             String uid = request.queryParams("uid");
-            String songName = request.queryParams("songName");
+            String songNames = request.queryParams("songNames");
             // TODO: should we save these in session ids?
 
+            List<String> songsList = Arrays.asList(songNames.replaceAll("[\\[\\]\"]", "").split(","));
             Map<String, Object> data = new HashMap<>();
-            data.put("songName", songName);
+            data.put("songName", songsList);
 
-            System.out.println("adding song: " + songName + " for user: " + uid);
+            // System.out.println("adding song: " + songNames + " for user: " + uid);
 
             // get the current song count to make a unique song_id by index.
-            int songCount = this.storageHandler.getCollection(uid, "likedSongs").size();
-            String songId = "songName-" + songCount;
+            int songCount = this.storageHandler.getCollection(uid, "likedSongs", false).size();
+
+            String songId = "songNames-" + songCount;
 
             // use the storage handler to add the document to the database
             this.storageHandler.addDocument(uid, "likedSongs", songId, data);
 
             responseMap.put("response_type", "success");
-            responseMap.put("songName", songName);
+            responseMap.put("songNames", songsList);
         } catch (Exception e) {
             // error likely occurred in the storage handler
             e.printStackTrace();

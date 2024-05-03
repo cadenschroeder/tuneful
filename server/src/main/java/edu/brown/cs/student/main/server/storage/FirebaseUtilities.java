@@ -14,6 +14,7 @@
  import java.util.List;
  import java.util.Map;
  import java.util.concurrent.ExecutionException;
+ import java.util.zip.DataFormatException;
 
  public class FirebaseUtilities implements StorageInterface {
 
@@ -29,7 +30,6 @@
      // try printing workingDirectory and messing around with this path.
        // System.out.println(workingDirectory);
 
-     System.out.println(firebaseConfigPath.toString());
      FileInputStream serviceAccount = new FileInputStream(firebaseConfigPath.toString());
 
      FirebaseOptions options =
@@ -41,12 +41,11 @@
    }
 
    @Override
-   public List<Map<String, Object>> getCollection(String uid, String collection_id)
-       throws InterruptedException, ExecutionException, IllegalArgumentException {
+   public List<Map<String, Object>> getCollection(String uid, String collection_id, Boolean chronological)
+           throws InterruptedException, ExecutionException, IllegalArgumentException, DataFormatException {
      if (uid == null || collection_id == null) {
        throw new IllegalArgumentException("getCollection: uid and/or collection_id cannot be null");
      }
-     // QUESTION TO TIM: should we make this an exercise too?
 
      // gets all documents in the collection 'collection_id' for user 'uid'
 
@@ -55,7 +54,19 @@
      CollectionReference dataRef = db.collection("users").document(uid).collection(collection_id);
 
      // 2: Get pin documents
-     QuerySnapshot dataQuery = dataRef.get().get();
+       QuerySnapshot dataQuery;
+     if(chronological){
+         // Order by timestamp
+         // Note: the data must have a timestamp field
+         dataQuery = dataRef.orderBy("timestamp", Query.Direction.ASCENDING).get().get();
+         if (dataQuery.isEmpty()){
+             throw new DataFormatException("Data queried has no timestamp field");
+         }
+     }
+     else{
+         dataQuery = dataRef.get().get();
+     }
+
 
      // 3: Get data from document queries
      List<Map<String, Object>> data = new ArrayList<>();
@@ -139,7 +150,26 @@
      }
    }
 
-   private void deleteDocument(DocumentReference doc) {
+     @Override
+     public void incrementField(String uid, String collection_id, String doc_id) {
+
+         if (uid == null || collection_id == null || doc_id == null) {
+             throw new IllegalArgumentException(
+                     "addTOList: uid, collection_id, doc_id, or data cannot be null");
+         }
+         Firestore db = FirestoreClient.getFirestore();
+         // 1: Get a ref to the collection that you created
+         CollectionReference collectionRef =
+                 db.collection("users").document(uid).collection(collection_id);
+
+         // 2: Add the data element to the array by reference to the list id
+
+         DocumentReference doc = collectionRef.document(doc_id);
+
+         doc.update("readIndex", FieldValue.increment(1));
+     }
+
+     private void deleteDocument(DocumentReference doc) {
      // for each subcollection, run deleteCollection()
      Iterable<CollectionReference> collections = doc.listCollections();
      for (CollectionReference collection : collections) {

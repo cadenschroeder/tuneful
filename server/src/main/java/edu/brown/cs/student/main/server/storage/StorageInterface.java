@@ -3,6 +3,7 @@ package edu.brown.cs.student.main.server.storage;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
+import java.util.zip.DataFormatException;
 
 public interface StorageInterface {
 
@@ -11,10 +12,12 @@ public interface StorageInterface {
 
   void updateDocument(String uid, String collection_id, String doc_id, Map<String, Object> data);
 
-  List<Map<String, Object>> getCollection(String uid, String collection_id)
-      throws InterruptedException, ExecutionException;
+  List<Map<String, Object>> getCollection(String uid, String collection_id, Boolean chronological)
+          throws InterruptedException, ExecutionException, DataFormatException;
 
   void clearUser(String uid) throws InterruptedException, ExecutionException;
+
+  void incrementField(String uid, String collection_id, String doc_id);
 
   // SPRINT 5 - ADDITIONAL FUNCTIONALITY
   // Add methods to your StorageInterface to handle updating and deleting
