@@ -2,12 +2,11 @@ import React, { useState, useEffect, useRef, useCallback } from "react";
 
 import { AudioVisualizer } from "react-audio-visualize";
 import dragElement from "./drag";
-import { songs as mocked } from "../utils/consts";
 import {
   addToLocalStorage,
-  clearLocalStorage,
   getFromLocalStorage,
   getThemeFromLocalStorage,
+  fetchSongsQueue,
 } from "../utils/storage";
 
 interface ActionsProps {
@@ -142,13 +141,16 @@ export interface Song {
   spotify: string;
 }
 
-interface CardProps {
-  songs: Song[];
-}
-
-
-const Card = ({ songs }: CardProps) => {
-  const [song, setSong] = useState(songs[0]);
+const Card = () => {
+  const [song, setSong] = useState(
+    getFromLocalStorage("songs")[0] || {
+      name: "Loading...",
+      cover: "img/loading.gif",
+      artist: "Loading...",
+      blob: "song1.wav",
+      spotify: "",
+    }
+  );
   const [blob, setBlob] = useState<Blob>();
   const [playTime, setPlayTime] = useState(0);
   const [isPlaying, setIsPlaying] = useState(false);
@@ -181,7 +183,7 @@ const Card = ({ songs }: CardProps) => {
       setPlayTime(0);
     });
 
-    if (isDesktop) {
+    if (isDesktop && song.name !== "Loading...") {
       document.getElementById(
         "App"
       )!.style.backgroundImage = `url(${song.cover})`;
@@ -191,6 +193,11 @@ const Card = ({ songs }: CardProps) => {
 
   useEffect(() => {
     const audioElement = audioRef.current;
+
+    const queueSong = getFromLocalStorage("songs")[0];
+    if (queueSong && queueSong.name !== song.name) {
+      setSong(queueSong);
+    }
     if (audioElement) {
       setIsPlaying(!audioElement.paused);
       const updatePlayTime = () => setPlayTime(audioElement.currentTime);
@@ -199,7 +206,7 @@ const Card = ({ songs }: CardProps) => {
       return () =>
         audioElement.removeEventListener("timeupdate", updatePlayTime);
     }
-  }, [blob, playTime]);
+  }, [blob, playTime, song.name]);
 
   const togglePlay = () => {
     const audioElement = audioRef.current;
@@ -217,13 +224,18 @@ const Card = ({ songs }: CardProps) => {
       } else {
         addToLocalStorage("dislikes", song);
       }
-      let randomIndex = -1;
-      while (randomIndex < 0 || songs[randomIndex] === song) {
-        randomIndex = Math.floor(Math.random() * songs.length);
-      }
-      setSong(songs[randomIndex]);
+
+      setSong(
+        fetchSongsQueue()[0] || {
+          name: "Loading...",
+          cover: "img/loading.gif",
+          artist: "Loading...",
+          blob: "song1.wav",
+          spotify: "",
+        }
+      );
     },
-    [song, songs]
+    [song]
   );
 
   const theme = getThemeFromLocalStorage();
@@ -313,20 +325,10 @@ const Card = ({ songs }: CardProps) => {
   );
 };
 
-interface MusicProps {
-  songs: Song[]; // Placeholder, replace or remove as needed
-}
-
-export function Music(props : MusicProps) {
-  let toUse = mocked
-  console.log(props.songs.length)
-  if(props.songs.length > 0){
-    toUse = props.songs
-  }
-  console.log(props.songs)
+export function Music() {
   return (
     <div id="music">
-      <Card songs={toUse} />
+      <Card />
     </div>
   );
 }

@@ -30,13 +30,11 @@ const Intermediate = ({ pageProps, setIsAuthenticated }: IntermediateProps) => {
   const { setPage } = pageProps;
   const [signedInWithSpotify, setSignedInWithSpotify] = useState(false);
   const [signedInWithoutSpotify, setSignedInWithoutSpotify] = useState(false);
-  const [genreChoice, setGenreChoice] = useState("");
   const [playlistChoice, setPlaylistChoice] = useState<{
     name: string;
     tracks: { href: string };
   }>();
   const [selectedItem, setSelectedItem] = useState({ type: "", name: "" });
-
 
   const getPlaylists = useCallback(() => {
     console.log("token: " + token);
@@ -244,7 +242,6 @@ const Intermediate = ({ pageProps, setIsAuthenticated }: IntermediateProps) => {
           ))}
         </div>
         <p>{playlistChoice?.name}</p>
-        <p>{genreChoice}</p>
 
         <div className="flex">
           <button onClick={handleContinue}>Continue</button>
