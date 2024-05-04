@@ -49,14 +49,14 @@ const Menu = ({ authProps, pageProps }: MenuProps) => {
           >
             Profile
           </button>
-          <button
-            className={page === Page.MUSIC ? "selected" : ""}
-            onClick={handleMusicClick}
-          >
-            Music
-          </button>
         </>
       )}
+      <button
+        className={page === Page.MUSIC ? "selected" : ""}
+        onClick={handleMusicClick}
+      >
+        Music
+      </button>
       <button onClick={handleLogoutClick}>
         {isIncognito ? "Leave Incognito" : "Logout"}
       </button>
