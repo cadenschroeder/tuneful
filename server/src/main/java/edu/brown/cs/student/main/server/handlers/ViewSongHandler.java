@@ -24,6 +24,7 @@ public class ViewSongHandler implements Route {
   public Object handle(Request request, Response response) throws Exception {
     Map<String, Object> responseMap = new HashMap<>();
     try {
+      System.out.println("view song handler called.");
       String uid = request.queryParams("uid");
       // boolean to ask for eiher just new songs or all the songs
       String isAllSongs = request.queryParams("isAllSongs");
@@ -49,7 +50,7 @@ public class ViewSongHandler implements Route {
 
 
       //get all songs for user
-      List<Map<String, Object>> vals = this.storageHandler.getCollection(uid, "songs", true);
+      List<Map<String, Object>> vals = this.storageHandler.getCollection(uid, "songs", true); //TODO: change back to true
       List<Object> songs = vals.stream().map(song -> song.get("song")).toList();
       // convert to a songData
       //      System.out.println(songs);

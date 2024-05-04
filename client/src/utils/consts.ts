@@ -4,6 +4,7 @@ export interface Song {
   artist: string;
   blob: string;
   spotify: string;
+  songId: string;
 }
 
 export const songs: Song[] = [
@@ -14,6 +15,7 @@ export const songs: Song[] = [
     artist: "Lizzo",
     blob: "song1.wav",
     spotify: "https://open.spotify.com/track/3Z2y6rX1dZCfLJ9yZGzQw5",
+    songId: "1",
   },
   {
     name: "Time After Time",
@@ -22,6 +24,7 @@ export const songs: Song[] = [
     artist: "Cyndi Lauper",
     blob: "song2.wav",
     spotify: "https://open.spotify.com/track/3Z2y6rX1dZCfLJ9yZGzQw5",
+    songId: "2",
   },
   {
     name: "Stronger",
@@ -30,6 +33,7 @@ export const songs: Song[] = [
     artist: "Kanye West",
     blob: "song3.wav",
     spotify: "https://open.spotify.com/track/3Z2y6rX1dZCfLJ9yZGzQw5",
+    songId: "3",
   },
   {
     name: "So What",
@@ -38,6 +42,7 @@ export const songs: Song[] = [
     artist: "Miles Davis",
     blob: "song4.wav",
     spotify: "https://open.spotify.com/track/3Z2y6rX1dZCfLJ9yZGzQw5",
+    songId: "4",
   },
   {
     name: "Cannonball",
@@ -46,6 +51,7 @@ export const songs: Song[] = [
     artist: "The Breeders",
     blob: "song5.wav",
     spotify: "https://open.spotify.com/track/3Z2y6rX1dZCfLJ9yZGzQw5",
+    songId: "4",
   },
 ];
 

@@ -4,6 +4,7 @@ import { removeLoginCookie } from "../utils/cookie";
 import AccountLogin from "./AccountLogin";
 import axios from "axios";
 import { setThemeToLocalStorage } from "../utils/storage";
+import { addLikes, getRecommendations } from "../utils/api";
 
 const PLAYLIST_ENDPOINT = "https://api.spotify.com/v1/me/playlists";
 const GENRES = [
@@ -131,9 +132,9 @@ const Intermediate = ({ pageProps, setIsAuthenticated }: IntermediateProps) => {
           trackIDs.push(track.track.id);
         });
 
-        // make an api call from the tracks link and stringify the result of that
-
         const trackIDsString = JSON.stringify(trackIDs);
+
+        getRecommendations(trackIDsString, "true", "true"); // call handler with the track ids array
 
         console.log(trackIDsString);
       });

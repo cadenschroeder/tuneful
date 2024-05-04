@@ -18,10 +18,10 @@ async function queryAPI(
   return response.json();
 }
 
-export async function addWord(word: string) {
-  return await queryAPI("add-word", {
+export async function addLikes(songNames: string) {
+  return await queryAPI("addLikes", {
     uid: getLoginCookie() || "",
-    word: word,
+    songNames: songNames,
   });
 }
 
@@ -37,19 +37,24 @@ export async function clearUser(uid: string = getLoginCookie() || "") {
   });
 }
 
-export async function viewSongs() {
+export async function viewSongs(isAllSongs: boolean) {
   console.log("hitting api");
   return await queryAPI("viewSongs", {
-    uid: "fakeCaden", //getLoginCookie() || "",
-    isAllSongs: "true",
+    uid: getLoginCookie() || "",
+    isAllSongs: isAllSongs.toString(),
   });
 }
 
-export async function getRecommendations(songID: string, liked: string) {
+export async function getRecommendations(
+  trackIDs: string,
+  liked: string,
+  first: string
+) {
   return await queryAPI("recommendation", {
-    uid: "fakeCaden", // getLoginCookie() || "",
-    songID: songID,
+    uid: getLoginCookie() || "",
+    trackIDs: trackIDs,
     liked: liked,
+    first: first,
   });
 }
 
@@ -59,7 +64,10 @@ export async function fetchSongBatch(mocked?: boolean): Promise<Song[]> {
     return mockedSongs;
   }
 
-  const result = await viewSongs();
+  const result = await viewSongs(false);
+  console.log("result from view songs: ");
+  console.log(result);
+  console.log("==========");
   return result.responseMap.songs.map((mapSong: { [key: string]: any }) => {
     console.log(mapSong);
     const name: string = mapSong.name?.toString() || "";
@@ -68,13 +76,14 @@ export async function fetchSongBatch(mocked?: boolean): Promise<Song[]> {
     const blob: string = mapSong.snippetURL?.toString() || "";
     const spotify: string =
       "https://open.spotify.com/track/3Z2y6rX1dZCfLJ9yZGzQw5"; // TODO: ask and fix what this does
-
+    const songId: string = mapSong.trackID?.toString() || "";
     return {
       name: name,
       cover: cover,
       artist: artist,
       blob: blob,
       spotify: spotify,
+      songId: songId,
     };
   });
 }

@@ -195,10 +195,10 @@ public class SpotifySource implements MusicSource {
         || track.get("artists") == null
         || track.get("id") == null
         || track.get("name") == null) {
-      for (String key : track.keySet()) {
-        System.out.println(track.get(key));
-      }
-      System.out.println(track.toString());
+      // for (String key : track.keySet()) {
+      //   System.out.println(track.get(key));
+      // }
+      // System.out.println(track.toString());
       throw new DatasourceException(
           "Missing required aspects: preview, explicit, album, id, or name");
     }

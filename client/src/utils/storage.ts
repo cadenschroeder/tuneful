@@ -44,9 +44,10 @@ function clearLocalStorage(key: "likes" | "dislikes" | "songs"): void {
 var isQueing = false;
 
 async function updateSongsQueue() {
+  console.log("updateSongsQueue");
   if (isQueing) return;
   isQueing = true;
-  let batch = await fetchSongBatch(true);
+  let batch = await fetchSongBatch(false);
   isQueing = false;
   let items = getFromLocalStorage("songs");
   if (items.length >= 3) return items;

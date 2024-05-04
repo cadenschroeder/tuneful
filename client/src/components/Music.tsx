@@ -8,6 +8,7 @@ import {
   getThemeFromLocalStorage,
   fetchSongsQueue,
 } from "../utils/storage";
+import { getRecommendations } from "../utils/api";
 
 interface ActionsProps {
   nextSong: (liked: boolean) => void;
@@ -139,6 +140,7 @@ export interface Song {
   artist: string;
   blob: string;
   spotify: string;
+  songId: string;
 }
 
 const Card = () => {
@@ -149,6 +151,7 @@ const Card = () => {
       artist: "Loading...",
       blob: "song1.wav",
       spotify: "",
+      songId: "",
     }
   );
   const [blob, setBlob] = useState<Blob>();
@@ -224,6 +227,9 @@ const Card = () => {
       } else {
         addToLocalStorage("dislikes", song);
       }
+
+      const songString = '["' + song.songId + '"]';
+      getRecommendations(songString, liked.toString(), "false");
 
       setSong(
         fetchSongsQueue()[0] || {
