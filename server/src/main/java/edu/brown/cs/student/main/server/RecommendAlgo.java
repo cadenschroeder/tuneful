@@ -185,7 +185,7 @@ public class RecommendAlgo {
                         dislikeAttributes.put(attribute, normalizeList(dislikeAttributes.get(attribute), getMin(attribute), getMax(attribute)));
                     }
                     Double dislikeStdDev = calculateStandardDeviation(dislikeAttributes.get(attribute));
-                    Double ranking = dislikeStdDev;
+                    Double ranking = 1 - dislikeStdDev;
                     Double[] targetList = likeEmptyFindTarget(rawDislikeMedian, min, max);
                     if(Math.abs(targetList[2] - targetList[1]) <= 0.1){
                         if(Math.abs(targetList[2] - targetList[0]) <=0.1){
@@ -219,7 +219,7 @@ public class RecommendAlgo {
                     likeAttributes.put(attribute, normalizeList(likeAttributes.get(attribute), getMin(attribute), getMax(attribute)));
                 }
                 Double likeStdDev = calculateStandardDeviation(likeAttributes.get(attribute));
-                Double ranking = likeStdDev;
+                Double ranking = 1 - likeStdDev;
                 Map<String, Double> tempMap= new HashMap<>();
                 tempMap.put("ranking", ranking);
                 tempMap.put("target", rawLikeMedian);
@@ -246,7 +246,7 @@ public class RecommendAlgo {
                 Double difference = Math.abs(normalizedLikeMedian - normalizedDislikeMedian);
                 Double likeStdDev = calculateStandardDeviation(likeAttributes.get(attribute));
                 Double dislikeStdDev = calculateStandardDeviation(dislikeAttributes.get(attribute));
-                Double ranking = 3.0 * difference + 2.0 * likeStdDev + dislikeStdDev;
+                Double ranking = 3.0 * difference + 2.0 * (1 - likeStdDev) + (1 - dislikeStdDev);
                 Map<String, Double> tempMap= new HashMap<>();
                 tempMap.put("ranking", ranking);
                 tempMap.put("target", rawLikeMedian);
