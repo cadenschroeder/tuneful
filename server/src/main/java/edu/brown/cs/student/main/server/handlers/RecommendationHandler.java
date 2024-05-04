@@ -106,6 +106,7 @@ public class RecommendationHandler implements Route {
         // for each value
         List<Double> valuesData = (List<Double>) likes.get(attribute);
         likesCasted.put(attribute, valuesData);
+
       }
 
       Map<String, Object> dislikes = collection.get(1);
@@ -161,6 +162,7 @@ public class RecommendationHandler implements Route {
       return new RecommendationHandler.RecommendationSuccessResponse(responseMap).serialize();
     } catch (Exception e) {
       e.printStackTrace();
+
       return new RecommendationHandler.RecommendationFailureResponse(e.getMessage()).serialize();
     }
   }
@@ -208,8 +210,7 @@ public class RecommendationHandler implements Route {
     Moshi moshi = new Moshi.Builder().build();
 
     // Initializes an adapter to a Broadband class then uses it to parse the JSON.
-    JsonAdapter<List<String>> adapter =
-        moshi.adapter(Types.newParameterizedType(String.class, List.class));
+    JsonAdapter<List<String>> adapter = moshi.adapter(Types.newParameterizedType(String.class, List.class));
 
     List<String> trackList = adapter.fromJson(jsonSongList);
 
@@ -217,7 +218,8 @@ public class RecommendationHandler implements Route {
   }
 
   /**
-   * Record that represents a succesful response. Returned to querier in handle(). Stores a response
+   * Record that represents a succesful response. Returned to querier in handle().
+   * Stores a response
    * map and has serializing capabilities
    *
    * @param response_type
@@ -228,14 +230,15 @@ public class RecommendationHandler implements Route {
     public RecommendationSuccessResponse(Map<String, Object> responseMap) {
       this("success", responseMap);
     }
+
     /**
      * @return this response, serialized as Json
      */
     String serialize() {
       try {
         Moshi moshi = new Moshi.Builder().build();
-        JsonAdapter<RecommendationHandler.RecommendationSuccessResponse> adapter =
-            moshi.adapter(RecommendationHandler.RecommendationSuccessResponse.class);
+        JsonAdapter<RecommendationHandler.RecommendationSuccessResponse> adapter = moshi
+            .adapter(RecommendationHandler.RecommendationSuccessResponse.class);
         return adapter.toJson(this);
       } catch (Exception e) {
         e.printStackTrace();
