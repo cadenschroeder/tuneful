@@ -19,7 +19,6 @@ public class ViewSongHandler implements Route {
   public ViewSongHandler(StorageInterface storageHandler) {
 
     this.storageHandler = storageHandler;
-    this.songsIndex = 0;
   }
 
   @Override
@@ -47,21 +46,35 @@ public class ViewSongHandler implements Route {
       }
 
       //get all songs for user
-      List<Map<String, Object>> vals = this.storageHandler.getCollection(uid, "songs");
+      List<Map<String, Object>> vals = this.storageHandler.getCollection(uid, "songs", true);
       List<Object> songs = vals.stream().map(song -> song.get("song")).toList();
       //convert to a songData
 //      System.out.println(songs);
 //      System.out.println(songs.get(0).getClass());
       //System.out.println((vals.stream().map(song -> song.get("songData").getClass())));
 
+
     if (!boolAllSongs){
       // TODO: make this songsIndex stored in firebase so its user specific
-      List<Object> sublist = songs.subList(this.songsIndex, songs.size());
+
+      int songsIndex = 0;
+      List<Map<String, Object>> collection = this.storageHandler.getCollection(uid, "songsIndex", false);
+      if(!collection.isEmpty()){
+        songsIndex = ((Long) collection.get(0).get("index")).intValue();;
+      }
+      List<Object> sublist = songs.subList(songsIndex, songs.size());
       // TODO: should this error happen before or after the songsIndex gets updated?
       if (sublist.isEmpty()) {
         return new ViewSongHandler.ViewSongFailureResponse("No new songs found").serialize();
       }
-      this.songsIndex = songs.size();
+      Map<String, Object> newIndex = new HashMap<>();
+      newIndex.put("index", songs.size());
+      this.storageHandler.addDocument(uid, "songsIndex", "index", newIndex);
+
+      //return the sub list
+      responseMap.put("response_type", "success");
+      responseMap.put("songs", sublist);
+      return new ViewSongSuccessResponse(responseMap).serialize();
     }
 
       responseMap.put("response_type", "success");
@@ -69,9 +82,6 @@ public class ViewSongHandler implements Route {
       return new ViewSongSuccessResponse(responseMap).serialize();
     } catch (Exception e) {
       // error likely occurred in the storage handler
-//      e.printStackTrace(); // TODO: remove before final push
-//      responseMap.put("response_type", "failure");
-//      responseMap.put("error", e.getMessage());
       return new ViewSongFailureResponse(e.getMessage()).serialize();
     }
   }
