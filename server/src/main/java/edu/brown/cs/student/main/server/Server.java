@@ -5,15 +5,11 @@ import static spark.Spark.after;
 import com.google.common.cache.CacheBuilder;
 import edu.brown.cs.student.main.csv.ParserState;
 import edu.brown.cs.student.main.server.broadband.SpotifySource;
-
 import edu.brown.cs.student.main.server.handlers.*;
-
-import java.io.IOException;
-
-import java.util.concurrent.TimeUnit;
-
 import edu.brown.cs.student.main.server.storage.FirebaseUtilities;
 import edu.brown.cs.student.main.server.storage.StorageInterface;
+import java.io.IOException;
+import java.util.concurrent.TimeUnit;
 import spark.Spark;
 
 /**
@@ -42,9 +38,11 @@ public class Server {
     try {
       storageInterface = new FirebaseUtilities();
       RecommendAlgo algorithm = new RecommendAlgo(spotifySource, storageInterface);
-      Spark.get("songData", new SongDataHandler(spotifySource, storageInterface)); //todo clean this up
+      Spark.get(
+          "songData", new SongDataHandler(spotifySource, storageInterface)); // todo clean this up
       Spark.get("viewSongs", new ViewSongHandler(storageInterface));
-      Spark.get("recommendation", new RecommendationHandler(spotifySource, storageInterface, algorithm));
+      Spark.get(
+          "recommendation", new RecommendationHandler(spotifySource, storageInterface, algorithm));
       Spark.get("addLikes", new AddLikesHandler(storageInterface));
       Spark.get("listLikes", new ListLikesHandler(storageInterface));
 
@@ -52,10 +50,10 @@ public class Server {
       Spark.awaitInitialization();
 
       System.out.println("Server started at http://localhost:" + port);
-    } catch (IOException e){
+    } catch (IOException e) {
       e.printStackTrace();
       System.err.println(
-              "Error: Could not initialize Firebase. Likely due to firebase_config.json not being found. Exiting.");
+          "Error: Could not initialize Firebase. Likely due to firebase_config.json not being found. Exiting.");
       System.exit(1);
     }
   }

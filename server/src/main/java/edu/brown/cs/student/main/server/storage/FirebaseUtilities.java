@@ -201,7 +201,8 @@
    }
 
   @Override
-  public void updateDocument(String uid, String collection_id, String doc_id, Map<String, Object> data) {
+  public void updateDocument(
+      String uid, String collection_id, String doc_id, Map<String, Object> data) {
 
     if (uid == null || collection_id == null || doc_id == null || data == null) {
       throw new IllegalArgumentException(
@@ -209,8 +210,8 @@
     }
 
     Firestore db = FirestoreClient.getFirestore();
-    CollectionReference collectionRef = db.collection("users").document(uid).collection(collection_id);
+    CollectionReference collectionRef =
+        db.collection("users").document(uid).collection(collection_id);
     collectionRef.document(doc_id).update(data);
-    
   }
- }
+}
