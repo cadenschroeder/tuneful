@@ -33,6 +33,8 @@ const Finish = () => {
         )}
       </ul>
       <button>save</button>
+      <button>export: add to playlist</button>
+      <button>export: as new playlist</button>
     </div>
   );
 };
