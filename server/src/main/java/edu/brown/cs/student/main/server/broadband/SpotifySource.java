@@ -154,7 +154,7 @@ public class SpotifySource implements MusicSource {
 
     // fetch from Spotify;
     URL url = new URL("https://api.spotify.com/v1/recommendations?" + params + "&market=US");
-    
+
     HttpURLConnection httpConn = (HttpURLConnection) url.openConnection();
     httpConn.setRequestMethod("GET");
 

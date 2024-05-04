@@ -47,8 +47,7 @@ public class ViewSongHandler implements Route {
             .serialize();
       }
 
-
-      //get all songs for user
+      // get all songs for user
       List<Map<String, Object>> vals = this.storageHandler.getCollection(uid, "songs", true);
       List<Object> songs = vals.stream().map(song -> song.get("song")).toList();
       // convert to a songData
@@ -56,30 +55,30 @@ public class ViewSongHandler implements Route {
       //      System.out.println(songs.get(0).getClass());
       // System.out.println((vals.stream().map(song -> song.get("songData").getClass())));
 
+      if (!boolAllSongs) {
+        // TODO: make this songsIndex stored in firebase so its user specific
 
+        int songsIndex = 0;
+        List<Map<String, Object>> collection =
+            this.storageHandler.getCollection(uid, "songsIndex", false);
+        if (!collection.isEmpty()) {
+          songsIndex = ((Long) collection.get(0).get("index")).intValue();
+          ;
+        }
+        List<Object> sublist = songs.subList(songsIndex, songs.size());
+        // TODO: should this error happen before or after the songsIndex gets updated?
+        if (sublist.isEmpty()) {
+          return new ViewSongHandler.ViewSongFailureResponse("No new songs found").serialize();
+        }
+        Map<String, Object> newIndex = new HashMap<>();
+        newIndex.put("index", songs.size());
+        this.storageHandler.addDocument(uid, "songsIndex", "index", newIndex);
 
-    if (!boolAllSongs){
-      // TODO: make this songsIndex stored in firebase so its user specific
-
-      int songsIndex = 0;
-      List<Map<String, Object>> collection = this.storageHandler.getCollection(uid, "songsIndex", false);
-      if(!collection.isEmpty()){
-        songsIndex = ((Long) collection.get(0).get("index")).intValue();;
+        // return the sub list
+        responseMap.put("response_type", "success");
+        responseMap.put("songs", sublist);
+        return new ViewSongSuccessResponse(responseMap).serialize();
       }
-      List<Object> sublist = songs.subList(songsIndex, songs.size());
-      // TODO: should this error happen before or after the songsIndex gets updated?
-      if (sublist.isEmpty()) {
-        return new ViewSongHandler.ViewSongFailureResponse("No new songs found").serialize();
-      }
-      Map<String, Object> newIndex = new HashMap<>();
-      newIndex.put("index", songs.size());
-      this.storageHandler.addDocument(uid, "songsIndex", "index", newIndex);
-
-      //return the sub list
-      responseMap.put("response_type", "success");
-      responseMap.put("songs", sublist);
-      return new ViewSongSuccessResponse(responseMap).serialize();
-    }
 
       responseMap.put("response_type", "success");
       responseMap.put("songs", songs);

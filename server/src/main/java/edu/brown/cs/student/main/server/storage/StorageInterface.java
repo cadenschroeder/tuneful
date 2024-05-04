@@ -14,7 +14,7 @@ public interface StorageInterface {
   void updateDocument(String uid, String collection_id, String doc_id, Map<String, Object> data);
 
   List<Map<String, Object>> getCollection(String uid, String collection_id, Boolean chronological)
-          throws InterruptedException, ExecutionException, DataFormatException;
+      throws InterruptedException, ExecutionException, DataFormatException;
 
   void clearUser(String uid) throws InterruptedException, ExecutionException;
 
