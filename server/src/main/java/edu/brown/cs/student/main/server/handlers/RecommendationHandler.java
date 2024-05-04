@@ -97,7 +97,7 @@ public class RecommendationHandler implements Route {
 
       // add params to run algorithm
 
-      List<Map<String, Object>> collection = this.storageHandler.getCollection(uid, "attributes");
+      List<Map<String, Object>> collection = this.storageHandler.getCollection(uid, "attributes", false); //TODO: check false
       Map<String, Object> likes = collection.get(0);
 
       Map<String, List<Double>> likesCasted = new HashMap<>();
