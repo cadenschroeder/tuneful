@@ -129,6 +129,7 @@ public class RecommendationHandler implements Route {
       int tries = 0;
       while (recSongs.isEmpty()) {
         recSongs = this.datasource.getRecommendation(params, uid);
+        
         tries++;
         if (tries > 5) {
           return new RecommendationHandler.RecommendationFailureResponse(

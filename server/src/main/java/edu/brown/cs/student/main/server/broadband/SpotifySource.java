@@ -150,11 +150,11 @@ public class SpotifySource implements MusicSource {
     List<Map<String, Object>> songList = new ArrayList<>();
     // Create url from attribute map
     String params = this.convertMapToString(inputs);
-    System.out.println(params);
     // Todo: should there be any params we always want to add?
 
     // fetch from Spotify;
-    URL url = new URL("https://api.spotify.com/v1/recommendations?" + params + "?market=SE");
+    URL url = new URL("https://api.spotify.com/v1/recommendations?" + params + "&market=US");
+    
     HttpURLConnection httpConn = (HttpURLConnection) url.openConnection();
     httpConn.setRequestMethod("GET");
 
