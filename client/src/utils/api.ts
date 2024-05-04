@@ -1,3 +1,4 @@
+import { Song, songs as mockedSongs } from "./consts";
 import { getLoginCookie } from "./cookie";
 
 const HOST = "http://localhost:3232";
@@ -37,17 +38,43 @@ export async function clearUser(uid: string = getLoginCookie() || "") {
 }
 
 export async function viewSongs() {
-  console.log("hitting api")
+  console.log("hitting api");
   return await queryAPI("viewSongs", {
-    uid: "fakeCaden",//getLoginCookie() || "",
-    isAllSongs: "true"
+    uid: "fakeCaden", //getLoginCookie() || "",
+    isAllSongs: "true",
   });
 }
 
 export async function getRecommendations(songID: string, liked: string) {
   return await queryAPI("recommendation", {
-    uid:  "fakeCaden", // getLoginCookie() || "",
+    uid: "fakeCaden", // getLoginCookie() || "",
     songID: songID,
-    liked: liked
+    liked: liked,
+  });
+}
+
+export async function fetchSongBatch(mocked?: boolean): Promise<Song[]> {
+  if (mocked) {
+    await new Promise((resolve) => setTimeout(resolve, 1000));
+    return mockedSongs;
+  }
+
+  const result = await viewSongs();
+  return result.responseMap.songs.map((mapSong: { [key: string]: any }) => {
+    console.log(mapSong);
+    const name: string = mapSong.name?.toString() || "";
+    const cover: string = mapSong.images?.toString() || "";
+    const artist: string = mapSong.artists?.toString() || "";
+    const blob: string = mapSong.snippetURL?.toString() || "";
+    const spotify: string =
+      "https://open.spotify.com/track/3Z2y6rX1dZCfLJ9yZGzQw5"; // TODO: ask and fix what this does
+
+    return {
+      name: name,
+      cover: cover,
+      artist: artist,
+      blob: blob,
+      spotify: spotify,
+    };
   });
 }

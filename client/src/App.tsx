@@ -48,6 +48,7 @@ function App() {
     if (page === Page.INTERMEDIATE) {
       clearLocalStorage("likes");
       clearLocalStorage("dislikes");
+      clearLocalStorage("songs");
     }
   }, [page]);
 
