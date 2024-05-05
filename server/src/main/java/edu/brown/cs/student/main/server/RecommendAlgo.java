@@ -153,6 +153,7 @@ public class RecommendAlgo {
     }    
 
     private static Double findMedian(List<Double> list) {
+        //System.out.println("find median list: " + list);
         Collections.sort(list); // Sort the ArrayList
         int n = list.size();
         if (n % 2 != 0) {

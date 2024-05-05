@@ -31,12 +31,6 @@ export async function getWords() {
   });
 }
 
-export async function clearUser(uid: string = getLoginCookie() || "") {
-  return await queryAPI("clear-user", {
-    uid: uid,
-  });
-}
-
 export async function viewSongs(isAllSongs: boolean) {
   console.log("hitting api");
   return await queryAPI("viewSongs", {
@@ -45,16 +39,24 @@ export async function viewSongs(isAllSongs: boolean) {
   });
 }
 
+export async function clearUserSession() {
+  return await queryAPI("clear", {
+    uid: getLoginCookie() || ""
+  });
+}
+
 export async function getRecommendations(
   trackIDs: string,
   liked: string,
-  first: string
+  first: string,
+  genre: string
 ) {
   return await queryAPI("recommendation", {
     uid: getLoginCookie() || "",
     trackIDs: trackIDs,
     liked: liked,
     first: first,
+    genre: genre
   });
 }
 

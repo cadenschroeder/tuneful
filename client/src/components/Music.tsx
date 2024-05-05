@@ -8,7 +8,7 @@ import {
   getThemeFromLocalStorage,
   fetchSongsQueue,
 } from "../utils/storage";
-import { getRecommendations } from "../utils/api";
+import { getRecommendations, clearUserSession } from "../utils/api";
 
 interface ActionsProps {
   nextSong: (liked: boolean) => void;
@@ -229,8 +229,7 @@ const Card = () => {
       }
 
       const songString = '["' + song.songId + '"]';
-      getRecommendations(songString, liked.toString(), "false");
-
+      getRecommendations(songString, liked.toString(), "false", "");
       setSong(
         fetchSongsQueue()[0] || {
           name: "Loading...",
@@ -261,7 +260,9 @@ const Card = () => {
         <button>
           👍: {likes.length} 👎: {dislikes.length}
         </button>
-        <button>clear session</button>
+        <button
+        onClick={handleClearClick}>
+          clear session</button>
       </div>
       <div
         id="card"
@@ -337,6 +338,11 @@ export function Music() {
       <Card />
     </div>
   );
+}
+
+const handleClearClick = () => {
+  console.log("clearing session data")
+  clearUserSession();
 }
 
 export default Music;

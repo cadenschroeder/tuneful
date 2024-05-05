@@ -4,7 +4,7 @@ import { removeLoginCookie } from "../utils/cookie";
 import AccountLogin from "./AccountLogin";
 import axios from "axios";
 import { setThemeToLocalStorage } from "../utils/storage";
-import { addLikes, getRecommendations } from "../utils/api";
+import { addLikes, clearUserSession, getRecommendations } from "../utils/api";
 
 const PLAYLIST_ENDPOINT = "https://api.spotify.com/v1/me/playlists";
 const GENRES = [
@@ -28,6 +28,7 @@ const Intermediate = ({ pageProps, setIsAuthenticated }: IntermediateProps) => {
   const [token, setToken] = useState("");
   const [, setData] = useState<JSON>();
   const [playlists, setPlaylists] = useState([]);
+  const [genreSelection, setGenreSelection] = useState("");
   const { setPage } = pageProps;
   const [signedInWithSpotify, setSignedInWithSpotify] = useState(false);
   const [signedInWithoutSpotify, setSignedInWithoutSpotify] = useState(false);
@@ -118,6 +119,7 @@ const Intermediate = ({ pageProps, setIsAuthenticated }: IntermediateProps) => {
   }
 
   const handleContinue = () => {
+    clearUserSession();
     let playlist: Playlist[] = [];
     // TODO: somehow send playlist / genre information to backend
     if (playlistChoice) {
@@ -133,15 +135,28 @@ const Intermediate = ({ pageProps, setIsAuthenticated }: IntermediateProps) => {
         });
 
         const trackIDsString = JSON.stringify(trackIDs);
-
-        getRecommendations(trackIDsString, "true", "true"); // call handler with the track ids array
+        clearUserSession().then(() => {
+          getRecommendations(trackIDsString, "true", "true", ""); 
+          setThemeToLocalStorage(selectedItem.name);
+          setPage("music");
+        });
+        // call handler with the track ids array
 
         console.log(trackIDsString);
       });
+    } else if (genreSelection){
+      clearUserSession().then(() => {
+       const recommendation = getRecommendations("[]", "true", "true", genreSelection);
+       recommendation.then(() => {
+        console.log("Genre given recommendations " +  recommendation)
+        setThemeToLocalStorage(selectedItem.name);
+        setPage("music");
+       })
+      });
     }
 
-    setThemeToLocalStorage(selectedItem.name);
-    setPage("music");
+    // setThemeToLocalStorage(selectedItem.name);
+    // setPage("music");
   };
 
   if (signedInWithSpotify) {
@@ -189,7 +204,9 @@ const Intermediate = ({ pageProps, setIsAuthenticated }: IntermediateProps) => {
                 id={genre}
                 name="selection"
                 value={genre}
-                onChange={() => handleSelection("genre", genre)}
+                onChange={() => 
+                  {setGenreSelection(genre)
+                  handleSelection("genre", genre)}}
               />
               <label htmlFor={genre}>{genre}</label>
             </div>
