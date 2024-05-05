@@ -29,10 +29,10 @@ public class SpotifySource implements MusicSource {
   private final JsonAdapter<List<List<String>>> listJsonAdapter = this.moshi.adapter(this.listType);
 
   public SpotifySource() {
-    this.clientID = "59435ce694fa4eb099fcf66d1a6ac313";
-    this.clientSecret = "ea8f091fd3b44b039c41d6d14a6f0f8c";
-    // this.clientID = "12f6f43b0e464dd0b0a5e1f6c4a18386";
-    // this.clientSecret = "ac4ea3fd4d1146e19a9e13ec5a381037";
+    // this.clientID = "59435ce694fa4eb099fcf66d1a6ac313";
+    // this.clientSecret = "ea8f091fd3b44b039c41d6d14a6f0f8c";
+    this.clientID = "12f6f43b0e464dd0b0a5e1f6c4a18386";
+    this.clientSecret = "ac4ea3fd4d1146e19a9e13ec5a381037";
   }
 
   private String getAccessToken() throws IOException {
@@ -166,8 +166,8 @@ public class SpotifySource implements MusicSource {
     String response = s.hasNext() ? s.next() : "";
 
     // TODO: Error handle
-    //System.out.println("Response: " + response);
-    //System.out.println("Access token: " + accessToken);
+    // System.out.println("Response: " + response);
+    // System.out.println("Access token: " + accessToken);
     Map<String, Object> recommendations = deserializeRecommendations(response);
 
     // Extracting the song IDs
