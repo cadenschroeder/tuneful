@@ -167,7 +167,7 @@ public class RecommendAlgo {
   private static Double[] likeEmptyFindTarget(Double rawDislikeMedian, Double min, Double max) {
     Double minDistance = Math.abs(rawDislikeMedian - min);
     Double maxDistance = Math.abs(max - rawDislikeMedian);
-    Double generalDistance = min + ((max - min) / 5.0);
+    Double generalDistance = ((max - min) / 5.0);
     Double target;
     if (minDistance < maxDistance) {
       target = min + (rawDislikeMedian - min) * Math.random();
