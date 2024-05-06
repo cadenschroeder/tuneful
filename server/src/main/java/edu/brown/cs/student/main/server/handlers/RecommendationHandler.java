@@ -105,6 +105,8 @@ public class RecommendationHandler implements Route {
       // beautiful :)
       if (first.equals("true")) {
         firstBool = true;
+        // Reset the lastLikedTracks list
+        this.lastLikedTracks.clear();
       } else if (first.equals("false")) {
         firstBool = false;
       } else {
