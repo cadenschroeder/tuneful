@@ -181,10 +181,22 @@ public class RecommendAlgo {
         return toReturn;
     }
 
+    private static boolean isEmptyHashmap(Map<String, List<Double>> myMap){
+      return (myMap.get("acousticness").isEmpty()
+              || myMap.get("danceability").isEmpty()
+              || myMap.get("energy").isEmpty()
+              || myMap.get("instrumentalness").isEmpty()
+              || myMap.get("liveness").isEmpty()
+              || myMap.get("loudness").isEmpty()
+              || myMap.get("speechiness").isEmpty()
+              || myMap.get("valence").isEmpty()
+              || myMap.get("tempo").isEmpty());
+    }
+
     public Map<String, Map<String, Double>> rankAttributes (Map<String, List<Double>> likeAttributes, Map<String, List<Double>> dislikeAttributes){
         Map<String, Map<String, Double>> rankings = new HashMap<>();
-        if(likeAttributes.get("acousticness").isEmpty()){
-            if(dislikeAttributes.get("acousticness").isEmpty()){
+        if(isEmptyHashmap(likeAttributes)){
+            if(isEmptyHashmap(dislikeAttributes)){
                 for (String attribute: likeAttributes.keySet()){
                     Double min = getMin(attribute);
                     Double max = getMax(attribute);
@@ -226,7 +238,7 @@ public class RecommendAlgo {
                 }
                 return rankings;
             }
-        }else if (dislikeAttributes.isEmpty()){
+        }else if (isEmptyHashmap(dislikeAttributes)){
             for (String attribute : likeAttributes.keySet()) {
                 Double rawLikeMedian = findMedian(likeAttributes.get(attribute));
                 Double rawLikeStdDev = calculateStandardDeviation(likeAttributes.get(attribute));
