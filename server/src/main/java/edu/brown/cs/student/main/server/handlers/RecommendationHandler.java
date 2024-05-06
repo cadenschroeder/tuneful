@@ -108,7 +108,8 @@ public class RecommendationHandler implements Route {
         // add params to run algorithm
         List<Map<String, Object>> collection = this.storageHandler.getCollection(uid, "attributes", false); // TODO: check
         // false
-        Map<String, Object> likes = collection.get(0);
+        Map<String, Object> likes = collection.get(1);
+        System.out.println(likes);
 
         Map<String, List<Double>> likesCasted = new HashMap<>();
         // nasty cast to Map<String, ArrayList<Double>>
@@ -119,7 +120,7 @@ public class RecommendationHandler implements Route {
 
         }
 
-        Map<String, Object> dislikes = collection.get(1);
+        Map<String, Object> dislikes = collection.get(0);
 
         Map<String, List<Double>> dislikesCasted = new HashMap<>();
         // nasty cast to Map<String, ArrayList<Double>>
