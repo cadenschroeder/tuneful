@@ -4,7 +4,7 @@ import { removeLoginCookie } from "../utils/cookie";
 import AccountLogin from "./AccountLogin";
 import axios from "axios";
 import { setThemeToLocalStorage } from "../utils/storage";
-import { addLikes, clearUserSession, getRecommendations } from "../utils/api";
+import { clearUserSession, getRecommendations } from "../utils/api";
 
 const PLAYLIST_ENDPOINT = "https://api.spotify.com/v1/me/playlists";
 const GENRES = [
@@ -136,7 +136,7 @@ const Intermediate = ({ pageProps, setIsAuthenticated }: IntermediateProps) => {
 
         const trackIDsString = JSON.stringify(trackIDs);
         clearUserSession().then(() => {
-          getRecommendations(trackIDsString, "true", "true", ""); 
+          getRecommendations(trackIDsString, "true", "true", "", "10"); 
           setThemeToLocalStorage(selectedItem.name);
           setPage("music");
         });
@@ -146,7 +146,7 @@ const Intermediate = ({ pageProps, setIsAuthenticated }: IntermediateProps) => {
       });
     } else if (genreSelection){
       clearUserSession().then(() => {
-       const recommendation = getRecommendations("[]", "true", "true", genreSelection);
+       const recommendation = getRecommendations("[]", "true", "true", genreSelection, "10");
        recommendation.then(() => {
         console.log("Genre given recommendations " +  recommendation)
         setThemeToLocalStorage(selectedItem.name);

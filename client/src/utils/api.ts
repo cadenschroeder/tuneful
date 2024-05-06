@@ -49,14 +49,16 @@ export async function getRecommendations(
   trackIDs: string,
   liked: string,
   first: string,
-  genre: string
+  genre: string,
+  numSongs: string
 ) {
   return await queryAPI("recommendation", {
     uid: getLoginCookie() || "",
     trackIDs: trackIDs,
     liked: liked,
     first: first,
-    genre: genre
+    genre: genre,
+    numSongs: numSongs
   });
 }
 
@@ -69,6 +71,17 @@ export async function fetchSongBatch(mocked?: boolean): Promise<Song[]> {
   const result = await viewSongs(false);
   console.log("result from view songs: ");
   console.log(result);
+
+  if(result.response_type == "error"){
+    // error handling for no new songs found
+    // the aim here is to let it fail this time but hopefully next swipe will make it succeed
+    if(result.response_type.error_message == "No new songs found"){
+      // Return an empty list to add to the que.
+      const empty_songs : Song[] = [];
+      return Promise.resolve(empty_songs)
+    }
+    console.log("ERROR: Unhandled view song response error: " + result.response_type.error_message);
+  }
   console.log("==========");
   return result.responseMap.songs.map((mapSong: { [key: string]: any }) => {
     console.log(mapSong);

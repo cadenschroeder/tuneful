@@ -229,7 +229,10 @@ const Card = () => {
       }
 
       const songString = '["' + song.songId + '"]';
-      getRecommendations(songString, liked.toString(), "false", "");
+
+      // Defines how many songs to recommend. Based on how many already in que
+      const numWanted = Math.max(0, 7 - getFromLocalStorage("songs").length);
+      getRecommendations(songString, liked.toString(), "false", "", numWanted.toString());
       setSong(
         fetchSongsQueue()[0] || {
           name: "Loading...",
