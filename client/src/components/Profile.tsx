@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import { mockData } from "../utils/consts";
 import { getLoginCookie } from "../utils/cookie";
 
 interface ProfileProps {
@@ -7,39 +6,47 @@ interface ProfileProps {
 }
 
 const Profile = ({ props }: ProfileProps) => {
-  const [sessions, setSessions] = useState<
-    { session: string; songs: string[] }[]
-  >([]);
+  const [sessions, setSessions] = useState<any>(undefined);
 
   useEffect(() => {
-    const fetchSessions = async () => {
-      // Fetch user's profile data
-      let endpoint = `http://localhost:3232/listLikes?uid=${getLoginCookie()}`;
-      const sessions = await fetch(endpoint);
-      console.log(endpoint, sessions);
-      setSessions(mockData); // TODO: Replace with actual data
-    };
-
-    fetchSessions();
+    let endpoint = `http://localhost:3232/listLikes?uid=${getLoginCookie()}`;
+    fetch(endpoint).then((res) => {
+      res.json().then((data) => {
+        console.log(data.likedSongs);
+        setSessions(data.likedSongs);
+      });
+    });
   }, []);
+
+  const longEnUSFormatter = new Intl.DateTimeFormat("en-US", {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+    hour: "numeric",
+    minute: "numeric",
+  });
 
   return (
     <div id="profile">
       <h2>Your Profile</h2>
       <ul>
-        {sessions.map((data, index) => {
-          const { session, songs } = data;
-          return (
-            <li key={index}>
-              <div className="profile-title">{session}</div>
-              <ul>
-                {songs.map((song, index) => {
-                  return <li key={index}>{song}</li>;
-                })}
-              </ul>
-            </li>
-          );
-        })}
+        {sessions &&
+          sessions.length > 0 &&
+          sessions.map((data: string[], index: number) => {
+            return (
+              <li key={index}>
+                <div className="profile-title">
+                  {longEnUSFormatter.format(new Date(data[0]))}
+                </div>
+                <ul>
+                  {data.map((song, index) => {
+                    if (index === 0) return <></>;
+                    return <li key={index}>{song}</li>;
+                  })}
+                </ul>
+              </li>
+            );
+          })}
       </ul>
     </div>
   );
