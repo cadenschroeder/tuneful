@@ -45,6 +45,7 @@ public class Server {
           "recommendation", new RecommendationHandler(spotifySource, storageInterface, algorithm));
       Spark.get("addLikes", new AddLikesHandler(storageInterface));
       Spark.get("listLikes", new ListLikesHandler(storageInterface));
+      Spark.get("clear", new ClearUserHandler(storageInterface));
 
       Spark.init();
       Spark.awaitInitialization();

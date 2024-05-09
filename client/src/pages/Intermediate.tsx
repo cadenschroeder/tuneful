@@ -4,10 +4,10 @@ import { removeLoginCookie } from "../utils/cookie";
 import AccountLogin from "./AccountLogin";
 import axios from "axios";
 import { setThemeToLocalStorage } from "../utils/storage";
+import { clearUserSession, getRecommendations } from "../utils/api";
 
 const PLAYLIST_ENDPOINT = "https://api.spotify.com/v1/me/playlists";
 const GENRES = [
-  "",
   "Pop",
   "Hip Hop",
   "Rock",
@@ -27,6 +27,7 @@ const Intermediate = ({ pageProps, setIsAuthenticated }: IntermediateProps) => {
   const [token, setToken] = useState("");
   const [, setData] = useState<JSON>();
   const [playlists, setPlaylists] = useState([]);
+  const [genreSelection, setGenreSelection] = useState("");
   const { setPage } = pageProps;
   const [signedInWithSpotify, setSignedInWithSpotify] = useState(false);
   const [signedInWithoutSpotify, setSignedInWithoutSpotify] = useState(false);
@@ -117,6 +118,7 @@ const Intermediate = ({ pageProps, setIsAuthenticated }: IntermediateProps) => {
   }
 
   const handleContinue = () => {
+    clearUserSession();
     let playlist: Playlist[] = [];
     // TODO: somehow send playlist / genre information to backend
     if (playlistChoice) {
@@ -131,16 +133,29 @@ const Intermediate = ({ pageProps, setIsAuthenticated }: IntermediateProps) => {
           trackIDs.push(track.track.id);
         });
 
-        // make an api call from the tracks link and stringify the result of that
-
         const trackIDsString = JSON.stringify(trackIDs);
+        clearUserSession().then(() => {
+          getRecommendations(trackIDsString, "true", "true", "", "10"); 
+          setThemeToLocalStorage(selectedItem.name);
+          setPage("music");
+        });
+        // call handler with the track ids array
 
         console.log(trackIDsString);
       });
+    } else if (genreSelection){
+      clearUserSession().then(() => {
+       const recommendation = getRecommendations("[]", "true", "true", genreSelection, "10");
+       recommendation.then(() => {
+        console.log("Genre given recommendations " +  recommendation)
+        setThemeToLocalStorage(selectedItem.name);
+        setPage("music");
+       })
+      });
     }
 
-    setThemeToLocalStorage(selectedItem.name);
-    setPage("music");
+    // setThemeToLocalStorage(selectedItem.name);
+    // setPage("music");
   };
 
   if (signedInWithSpotify) {
@@ -172,17 +187,26 @@ const Intermediate = ({ pageProps, setIsAuthenticated }: IntermediateProps) => {
                       onChange={() => { setPlaylistChoice(playlist); handleSelection("playlist", playlist.name); }} />
                 <label htmlFor={playlist.name}>{playlist.name}</label>
               </div>
-            ))}
-          </div>
-          <div className="radio-group" style={{ maxHeight: '20vh' }}>
-            {GENRES.map((genre) => (
-              <div key={genre}>
-                <input type="radio" id={genre} name="selection" value={genre}
-                       onChange={() => handleSelection("genre", genre)} />
-                <label htmlFor={genre}>{genre}</label>
-              </div>
-            ))}
-          </div>
+            )
+          )}
+        </div>
+
+        <div className="radio-group" style={{ maxHeight: '20vh' }}>
+          {GENRES.map((genre) => (
+            <div key={genre}>
+              <input
+                type="radio"
+                id={genre}
+                name="selection"
+                value={genre}
+                onChange={() => 
+                  {setGenreSelection(genre)
+                  handleSelection("genre", genre)}}
+              />
+              <label htmlFor={genre}>{genre}</label>
+            </div>
+          ))}
+
         </div>
         <div className="flex">
           <button onClick={handleContinue}>Continue</button>
@@ -226,7 +250,6 @@ const Intermediate = ({ pageProps, setIsAuthenticated }: IntermediateProps) => {
             </div>
           ))}
         </div>
-        <p>{playlistChoice?.name}</p>
 
         <div className="flex">
           <button onClick={handleContinue}>Continue</button>

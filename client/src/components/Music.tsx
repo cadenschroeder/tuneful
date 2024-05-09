@@ -8,6 +8,7 @@ import {
   getThemeFromLocalStorage,
   fetchSongsQueue,
 } from "../utils/storage";
+import { getRecommendations, clearUserSession } from "../utils/api";
 
 interface ActionsProps {
   nextSong: (liked: boolean) => void;
@@ -139,6 +140,7 @@ export interface Song {
   artist: string;
   blob: string;
   spotify: string;
+  songId: string;
 }
 
 const Card = () => {
@@ -149,6 +151,7 @@ const Card = () => {
       artist: "Loading...",
       blob: "song1.wav",
       spotify: "",
+      songId: "",
     }
   );
   const [blob, setBlob] = useState<Blob>();
@@ -225,6 +228,11 @@ const Card = () => {
         addToLocalStorage("dislikes", song);
       }
 
+      const songString = '["' + song.songId + '"]';
+
+      // Defines how many songs to recommend. Based on how many already in que
+      const numWanted = Math.max(0, 7 - getFromLocalStorage("songs").length);
+      getRecommendations(songString, liked.toString(), "false", "", numWanted.toString());
       setSong(
         fetchSongsQueue()[0] || {
           name: "Loading...",
@@ -255,7 +263,9 @@ const Card = () => {
         <button>
           👍: {likes.length} 👎: {dislikes.length}
         </button>
-        <button>clear session</button>
+        <button
+        onClick={handleClearClick}>
+          clear session</button>
       </div>
       <div
         id="card"
@@ -331,6 +341,11 @@ export function Music() {
       <Card />
     </div>
   );
+}
+
+const handleClearClick = () => {
+  console.log("clearing session data")
+  clearUserSession();
 }
 
 export default Music;

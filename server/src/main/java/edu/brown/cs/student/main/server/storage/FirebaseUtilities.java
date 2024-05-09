@@ -11,6 +11,8 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.HashMap;
+
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
@@ -24,27 +26,26 @@ public class FirebaseUtilities implements StorageInterface {
     // add your admin SDK from Firebase. see:
     // https://docs.google.com/document/d/10HuDtBWjkUoCaVj_A53IFm5torB_ws06fW3KYFZqKjc/edit?usp=sharing
     String workingDirectory = System.getProperty("user.dir");
-    Path firebaseConfigPath =
-        Paths.get(workingDirectory, "src", "main", "resources", "firebase_config.json");
+    Path firebaseConfigPath = Paths.get(workingDirectory, "src", "main", "resources", "firebase_config.json");
+
     // ^-- if your /resources/firebase_config.json exists but is not found,
     // try printing workingDirectory and messing around with this path.
     // System.out.println(workingDirectory);
 
     FileInputStream serviceAccount = new FileInputStream(firebaseConfigPath.toString());
 
-    FirebaseOptions options =
-        new FirebaseOptions.Builder()
-            .setCredentials(GoogleCredentials.fromStream(serviceAccount))
-            .build();
+    FirebaseOptions options = new FirebaseOptions.Builder()
+        .setCredentials(GoogleCredentials.fromStream(serviceAccount))
+        .build();
+
 
     FirebaseApp.initializeApp(options);
   }
 
   @Override
-  public List<Map<String, Object>> getCollection(
-      String uid, String collection_id, Boolean chronological)
-      throws InterruptedException, ExecutionException, IllegalArgumentException,
-          DataFormatException {
+  public List<Map<String, Object>> getCollection(String uid, String collection_id, Boolean chronological)
+      throws InterruptedException, ExecutionException, IllegalArgumentException, DataFormatException {
+
     if (uid == null || collection_id == null) {
       throw new IllegalArgumentException("getCollection: uid and/or collection_id cannot be null");
     }
@@ -93,8 +94,8 @@ public class FirebaseUtilities implements StorageInterface {
 
     Firestore db = FirestoreClient.getFirestore();
     // 1: Get a ref to the collection that you created
-    CollectionReference collectionRef =
-        db.collection("users").document(uid).collection(collection_id);
+    CollectionReference collectionRef = db.collection("users").document(uid).collection(collection_id);
+
 
     // 2: Write data to the collection ref
     collectionRef.document(doc_id).set(data);
@@ -102,16 +103,16 @@ public class FirebaseUtilities implements StorageInterface {
 
   /**
    * Adds an element to the end of a user's list
-   *
+   * 
    * @param uid
    * @param collection_id
    * @param doc_id
-   * @param list_id --> indicates which list in a set to add to
-   * @param data --> data to be added to the list
+   * @param list_id       --> indicates which list in a set to add to
+   * @param data          --> data to be added to the list
    */
   @Override
-  public void addToList(
-      String uid, String collection_id, String doc_id, String list_id, Object data)
+  public void addToList(String uid, String collection_id, String doc_id, String list_id, Object data)
+
       throws IllegalArgumentException {
     if (uid == null || collection_id == null || doc_id == null || data == null) {
       throw new IllegalArgumentException(
@@ -119,8 +120,8 @@ public class FirebaseUtilities implements StorageInterface {
     }
     Firestore db = FirestoreClient.getFirestore();
     // 1: Get a ref to the collection that you created
-    CollectionReference collectionRef =
-        db.collection("users").document(uid).collection(collection_id);
+    CollectionReference collectionRef = db.collection("users").document(uid).collection(collection_id);
+
 
     // 2: Add the data element to the array by reference to the list id
 
@@ -142,10 +143,84 @@ public class FirebaseUtilities implements StorageInterface {
       // 1: Get a ref to the user document
       DocumentReference userDoc = db.collection("users").document(uid);
       // 2: Delete the user document
-      deleteDocument(userDoc);
+      // deleteDocument(userDoc);
+      // // Update specific fields to null to delete them
+      // Map<String, Object> updates = new HashMap<>();
+      // updates.put("attributes", FieldValue.delete()); // Replace "field1" with the
+      // field you want to delete
+      // updates.put("songs", FieldValue.delete()); // Replace "field2" with another
+      // field you want to delete
+      // updates.put("songsIndex", FieldValue.delete());
+      // // Perform the update
+      // userDoc.update(updates).get();
+
+      CollectionReference collectionRefAttributes = userDoc.collection("attributes");
+
+      // delete the whole colection
+      deleteCollection(collectionRefAttributes, 5);
+
+      // TODO: If we don't want to fully delete but just set to empty
+      // Map<String, List<Double>> emptyttributes = new HashMap<>();
+
+      // emptyttributes.put("acousticness", new ArrayList<Double>());
+      // emptyttributes.put("danceability", new ArrayList<Double>());
+      // emptyttributes.put("energy", new ArrayList<Double>());
+      // emptyttributes.put("instrumentalness", new ArrayList<Double>());
+      // emptyttributes.put("liveness", new ArrayList<Double>());
+      // emptyttributes.put("loudness", new ArrayList<Double>());
+      // emptyttributes.put("speechiness", new ArrayList<Double>());
+      // emptyttributes.put("valence", new ArrayList<Double>());
+      // emptyttributes.put("tempo", new ArrayList<Double>());
+
+      // collectionRefAttributes.document("likes").set(emptyttributes);
+      // collectionRefAttributes.document("dislikes").set(emptyttributes);
+
+      CollectionReference collectionRefSongs = userDoc.collection("songs");
+
+      // deletes the collection of song ids
+      deleteCollection(collectionRefSongs, 5); // Todo change batch size?
+
+      CollectionReference collectionRefIndex = userDoc.collection("songsIndex");
+
+      // deletes the collection of the index
+      // deleteCollection(collectionRefIndex, 5);
+
+      // initialize index to zero
+      Map<String, Object> songIndex = new HashMap<>();
+      songIndex.put("index", 0);
+      collectionRefIndex.document("index").set(songIndex);
+
+      System.out.println("Finished deleting user session");
     } catch (Exception e) {
+      e.printStackTrace();
+
       System.err.println("Error removing user : " + uid);
       System.err.println(e.getMessage());
+    }
+  }
+
+  /**
+   * Delete a collection in batches to avoid out-of-memory errors. Batch size may
+   * be tuned based on
+   * document size (atmost 1MB) and application requirements.
+   */
+  private void deleteCollection(CollectionReference collection, int batchSize) {
+    try {
+      // retrieve a small batch of documents to avoid out-of-memory errors
+      ApiFuture<QuerySnapshot> future = collection.limit(batchSize).get();
+      int deleted = 0;
+      // future.get() blocks on document retrieval
+      List<QueryDocumentSnapshot> documents = future.get().getDocuments();
+      for (QueryDocumentSnapshot document : documents) {
+        document.getReference().delete();
+        ++deleted;
+      }
+      if (deleted >= batchSize) {
+        // retrieve and delete another batch
+        deleteCollection(collection, batchSize);
+      }
+    } catch (Exception e) {
+      System.err.println("Error deleting collection : " + e.getMessage());
     }
   }
 
@@ -158,8 +233,8 @@ public class FirebaseUtilities implements StorageInterface {
     }
     Firestore db = FirestoreClient.getFirestore();
     // 1: Get a ref to the collection that you created
-    CollectionReference collectionRef =
-        db.collection("users").document(uid).collection(collection_id);
+    CollectionReference collectionRef = db.collection("users").document(uid).collection(collection_id);
+
 
     // 2: Add the data element to the array by reference to the list id
 
@@ -209,8 +284,7 @@ public class FirebaseUtilities implements StorageInterface {
     }
 
     Firestore db = FirestoreClient.getFirestore();
-    CollectionReference collectionRef =
-        db.collection("users").document(uid).collection(collection_id);
+    CollectionReference collectionRef = db.collection("users").document(uid).collection(collection_id);
     collectionRef.document(doc_id).update(data);
   }
 }
