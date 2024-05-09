@@ -24,6 +24,7 @@ public class ListLikesHandler implements Route {
    *                 request
    * @param response The response object providing functionality for modifying the
    *                 response
+
    * @return The content to be set in the response
    */
   @Override
@@ -31,7 +32,6 @@ public class ListLikesHandler implements Route {
     Map<String, Object> responseMap = new HashMap<>();
     try {
       String uid = request.queryParams("uid");
-
       // get all the song names for the user
       List<Map<String, Object>> vals = this.storageHandler.getCollection(uid, "likedSongs", true);
 

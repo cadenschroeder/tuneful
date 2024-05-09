@@ -52,11 +52,13 @@ public class ViewSongHandler implements Route {
                                                                                               // true
       List<Object> songs = vals.stream().map(song -> song.get("song")).toList();
 
+
       if (!boolAllSongs) {
         // TODO: make this songsIndex stored in firebase so its user specific
 
         int songsIndex = 0;
         List<Map<String, Object>> collection = this.storageHandler.getCollection(uid, "songsIndex", false);
+
         if (!collection.isEmpty()) {
           songsIndex = ((Long) collection.get(0).get("index")).intValue();
           ;

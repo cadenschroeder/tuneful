@@ -150,7 +150,7 @@ public class RecommendAlgo {
         max = Constants.GENERAL_MAX;
     }
     return max;
-    }    
+  }
 
     private static Double findMedian(List<Double> list) {
         //System.out.println("find median list: " + list);
@@ -163,23 +163,25 @@ public class RecommendAlgo {
             // If the number of elements is even, return the average of the two middle elements
             return (list.get((n - 1) / 2) + list.get(n / 2)) / 2.0;
         }
-    }
 
-    private static Double[] likeEmptyFindTarget(Double rawDislikeMedian, Double min, Double max){
-        Double minDistance = Math.abs(rawDislikeMedian - min);
-        Double maxDistance = Math.abs(max - rawDislikeMedian);
-        Double generalDistance = min + ((max - min) / 5.0);
-        Double target;
-        if(minDistance < maxDistance){
-            target = min + (rawDislikeMedian - min) * Math.random();
-        } else if (maxDistance < minDistance){
-            target = min + (rawDislikeMedian - min) * Math.random();
-        }else{
-            target = min + generalDistance;
-        }
-        Double[] toReturn = {target, (target - generalDistance), (target + generalDistance)};
-        return toReturn;
     }
+  }
+
+  private static Double[] likeEmptyFindTarget(Double rawDislikeMedian, Double min, Double max) {
+    Double minDistance = Math.abs(rawDislikeMedian - min);
+    Double maxDistance = Math.abs(max - rawDislikeMedian);
+    Double generalDistance = ((max - min) / 5.0);
+    Double target;
+    if (minDistance < maxDistance) {
+      target = min + (rawDislikeMedian - min) * Math.random();
+    } else if (maxDistance < minDistance) {
+      target = min + (rawDislikeMedian - min) * Math.random();
+    } else {
+      target = min + generalDistance;
+    }
+    Double[] toReturn = {target, (target - generalDistance), (target + generalDistance)};
+    return toReturn;
+  }
 
     private static boolean isEmptyHashmap(Map<String, List<Double>> myMap){
       return (myMap.get("acousticness").isEmpty()
@@ -286,9 +288,74 @@ public class RecommendAlgo {
                 tempMap.put("maximum", rawLikeMedian + rawLikeStdDev);
                 rankings.put(attribute, tempMap);
             }
-            return rankings;
+          }
+          Map<String, Double> tempMap = new HashMap<>();
+          tempMap.put("ranking", ranking);
+          tempMap.put("target", targetList[0]);
+          tempMap.put("minimum", targetList[1]);
+          tempMap.put("maximum", targetList[2]);
+          rankings.put(attribute, tempMap);
         }
+        return rankings;
+      }
+    } else if (dislikeAttributes.isEmpty()) {
+      for (String attribute : likeAttributes.keySet()) {
+        Double rawLikeMedian = findMedian(likeAttributes.get(attribute));
+        Double rawLikeStdDev = calculateStandardDeviation(likeAttributes.get(attribute));
+        Double max = getMax(attribute);
+        Double min = getMin(attribute);
+        if (rawLikeStdDev <= ((max - min) / 10.0)) {
+          rawLikeStdDev = (max - min) / 5.0;
+        }
+        if (!(max == 1.0 && min == 0.0)) {
+          likeAttributes.put(
+              attribute,
+              normalizeList(likeAttributes.get(attribute), getMin(attribute), getMax(attribute)));
+        }
+        Double likeStdDev = calculateStandardDeviation(likeAttributes.get(attribute));
+        Double ranking = 1 - likeStdDev;
+        Map<String, Double> tempMap = new HashMap<>();
+        tempMap.put("ranking", ranking);
+        tempMap.put("target", rawLikeMedian);
+        tempMap.put("minimum", rawLikeMedian - rawLikeStdDev);
+        tempMap.put("maximum", rawLikeMedian + rawLikeStdDev);
+        rankings.put(attribute, tempMap);
+      }
+      return rankings;
+    } else {
+      for (String attribute : likeAttributes.keySet()) {
+        Double rawLikeMedian = findMedian(likeAttributes.get(attribute));
+        Double rawLikeStdDev = calculateStandardDeviation(likeAttributes.get(attribute));
+        Double min = getMin(attribute);
+        Double max = getMax(attribute);
+        if (rawLikeStdDev <= ((max - min) / 10.0)) {
+          rawLikeStdDev = (max - min) / 5.0;
+        }
+        if (!(max == 1.0 && min == 0.0)) {
+          likeAttributes.put(
+              attribute,
+              normalizeList(likeAttributes.get(attribute), getMin(attribute), getMax(attribute)));
+          dislikeAttributes.put(
+              attribute,
+              normalizeList(
+                  dislikeAttributes.get(attribute), getMin(attribute), getMax(attribute)));
+        }
+        Double normalizedLikeMedian = findMedian(likeAttributes.get(attribute));
+        Double normalizedDislikeMedian = findMedian(dislikeAttributes.get(attribute));
+        Double difference = Math.abs(normalizedLikeMedian - normalizedDislikeMedian);
+        Double likeStdDev = calculateStandardDeviation(likeAttributes.get(attribute));
+        Double dislikeStdDev = calculateStandardDeviation(dislikeAttributes.get(attribute));
+        Double ranking = 3.0 * difference + 2.0 * (1 - likeStdDev) + (1 - dislikeStdDev);
+        Map<String, Double> tempMap = new HashMap<>();
+        tempMap.put("ranking", ranking);
+        tempMap.put("target", rawLikeMedian);
+        tempMap.put("minimum", rawLikeMedian - rawLikeStdDev);
+        tempMap.put("maximum", rawLikeMedian + rawLikeStdDev);
+        rankings.put(attribute, tempMap);
+      }
+      return rankings;
     }
+  }
 
   private Map<String, Object> reduceMap(Map<String, Object> features) {
     Map<String, Object> attributes = new HashMap<>();
