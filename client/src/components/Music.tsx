@@ -149,7 +149,7 @@ const Card = () => {
       name: "Loading...",
       cover: "img/loading.gif",
       artist: "Loading...",
-      blob: "song1.wav",
+      blob: "wait.mp3",
       spotify: "",
       songId: "",
     }
@@ -232,16 +232,26 @@ const Card = () => {
 
       // Defines how many songs to recommend. Based on how many already in que
       const numWanted = Math.max(0, 7 - getFromLocalStorage("songs").length);
-      getRecommendations(songString, liked.toString(), "false", "", numWanted.toString());
-      setSong(
-        fetchSongsQueue()[0] || {
-          name: "Loading...",
-          cover: "img/loading.gif",
-          artist: "Loading...",
-          blob: "song1.wav",
-          spotify: "",
-        }
+      getRecommendations(
+        songString,
+        liked.toString(),
+        "false",
+        "",
+        numWanted.toString()
       );
+
+      let songs = fetchSongsQueue();
+
+      songs &&
+        setSong(
+          songs[0] || {
+            name: "Loading...",
+            cover: "img/loading.gif",
+            artist: "Loading...",
+            blob: "wait.mp3",
+            spotify: "",
+          }
+        );
     },
     [song]
   );
@@ -263,9 +273,7 @@ const Card = () => {
         <button>
           👍: {likes.length} 👎: {dislikes.length}
         </button>
-        <button
-        onClick={handleClearClick}>
-          clear session</button>
+        <button onClick={handleClearClick}>clear session</button>
       </div>
       <div
         id="card"
@@ -344,8 +352,8 @@ export function Music() {
 }
 
 const handleClearClick = () => {
-  console.log("clearing session data")
+  console.log("clearing session data");
   clearUserSession();
-}
+};
 
 export default Music;

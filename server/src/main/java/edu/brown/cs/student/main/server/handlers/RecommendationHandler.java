@@ -1,6 +1,5 @@
 package edu.brown.cs.student.main.server.handlers;
 
-import com.google.cloud.Timestamp;
 import com.squareup.moshi.JsonAdapter;
 import com.squareup.moshi.Moshi;
 import com.squareup.moshi.Types;
@@ -41,23 +40,42 @@ public class RecommendationHandler implements Route {
     try {
       String liked = request.queryParams("liked");
       String trackIDs = request.queryParams("trackIDs"); // array of track ids
-      String first = request.queryParams("first"); // indicates if it is the first time called or not
+      String first =
+          request.queryParams("first"); // indicates if it is the first time called or not
       String uid = request.queryParams("uid");
       String genre = request.queryParams("genre");
       String numSongs = request.queryParams("numSongs");
 
-      if (liked == null || trackIDs == null || first == null || uid == null || genre == null || numSongs == null) {
+      if (liked == null
+          || trackIDs == null
+          || first == null
+          || uid == null
+          || genre == null
+          || numSongs == null) {
         return new RecommendationHandler.RecommendationFailureResponse(
-            "Missing one or more parameters")
+                "Missing one or more parameters")
             .serialize();
       }
-      if (liked.isEmpty() || trackIDs.isEmpty() || first.isEmpty() || uid.isEmpty() || numSongs.isEmpty()) {
+      if (liked.isEmpty()
+          || trackIDs.isEmpty()
+          || first.isEmpty()
+          || uid.isEmpty()
+          || numSongs.isEmpty()) {
         return new RecommendationHandler.RecommendationFailureResponse("Empty parameter(s)")
             .serialize();
       }
 
-      System.out.println("Rec handler endpoint hit. Params: " + liked + " | " + trackIDs + " | " + first + " | "
-          + genre + " | " + numSongs);
+      System.out.println(
+          "Rec handler endpoint hit. Params: "
+              + liked
+              + " | "
+              + trackIDs
+              + " | "
+              + first
+              + " | "
+              + genre
+              + " | "
+              + numSongs);
 
       // Creates a hashmap to store the results of the request
       Map<String, Object> responseMap = new HashMap<>();
@@ -83,7 +101,7 @@ public class RecommendationHandler implements Route {
         firstBool = false;
       } else {
         return new RecommendationHandler.RecommendationFailureResponse(
-            "Unexpected parameter value for first")
+                "Unexpected parameter value for first")
             .serialize();
       }
 
@@ -111,7 +129,7 @@ public class RecommendationHandler implements Route {
         likedBool = false;
       } else {
         return new RecommendationHandler.RecommendationFailureResponse(
-            "Unexpected parameter value for liked")
+                "Unexpected parameter value for liked")
             .serialize();
       }
 
@@ -120,7 +138,8 @@ public class RecommendationHandler implements Route {
       try {
         numSongsInt = Integer.parseInt(numSongs);
       } catch (NumberFormatException e) {
-        return new RecommendationHandler.RecommendationFailureResponse("Error: numSongs must be in integer form")
+        return new RecommendationHandler.RecommendationFailureResponse(
+                "Error: numSongs must be in integer form")
             .serialize();
       }
 
@@ -145,8 +164,9 @@ public class RecommendationHandler implements Route {
       Map<String, String> params;
       if (genre.isEmpty()) {
         // add params to run algorithm
-        List<Map<String, Object>> collection = this.storageHandler.getCollection(uid, "attributes", false); // TODO:
-                                                                                                            // check
+        List<Map<String, Object>> collection =
+            this.storageHandler.getCollection(uid, "attributes", false); // TODO:
+        // check
         // false
         Map<String, Object> likes = collection.get(1);
 
@@ -156,7 +176,6 @@ public class RecommendationHandler implements Route {
           // for each value
           List<Double> valuesData = (List<Double>) likes.get(attribute);
           likesCasted.put(attribute, valuesData);
-
         }
 
         Map<String, Object> dislikes = collection.get(0);
@@ -171,7 +190,8 @@ public class RecommendationHandler implements Route {
 
         // System.out.println("likes casted: " + likesCasted);
         // System.out.println("dislikes casted: " + dislikesCasted);
-        Map<String, Map<String, Double>> rankings = this.algorithm.rankAttributes(likesCasted, dislikesCasted);
+        Map<String, Map<String, Double>> rankings =
+            this.algorithm.rankAttributes(likesCasted, dislikesCasted);
 
         params = this.getParams(rankings, numSongsInt);
       } else {
@@ -188,7 +208,7 @@ public class RecommendationHandler implements Route {
         tries++;
         if (tries > 5) {
           return new RecommendationHandler.RecommendationFailureResponse(
-              "Could not fetch more recommendations. Attempts exceeded")
+                  "Could not fetch more recommendations. Attempts exceeded")
               .serialize();
         }
       }
@@ -224,16 +244,19 @@ public class RecommendationHandler implements Route {
     }
   }
 
-  public Map<String, String> getParams(Map<String, Map<String, Double>> attributeVals, int numSongs) {
+  public Map<String, String> getParams(
+      Map<String, Map<String, Double>> attributeVals, int numSongs) {
     ArrayList<String> topAttributes = new ArrayList<>();
 
     // create map from the ranking value to the attribute name
     Map<Double, String> rankToAttribute = new HashMap<>();
     // create a priority queue holding all the ranks
     PriorityQueue<Double> rankQueue = new PriorityQueue<>(Comparator.reverseOrder());
-    for (String attribute : attributeVals.keySet()) { // for each attribute stored, put its rank value -> name in map
+    for (String attribute :
+        attributeVals.keySet()) { // for each attribute stored, put its rank value -> name in map
       // find the ranking value
-      Double rankVal = attributeVals.get(attribute).get("ranking"); // gets the rank value for the curr attribute
+      Double rankVal =
+          attributeVals.get(attribute).get("ranking"); // gets the rank value for the curr attribute
       rankToAttribute.put(rankVal, attribute);
       rankQueue.add(rankVal); // add rank to the queue
     }
@@ -261,7 +284,8 @@ public class RecommendationHandler implements Route {
       String seed_genres = "pop%2Cnew-release%2Calternative%2Chip-hop%2country";
       params.put("seed_genres", seed_genres);
     } else {
-      String seed_tracks = this.lastLikedTracks.toString().replaceAll("[\\[\\]\"]", "").replace(", ", "%2C");
+      String seed_tracks =
+          this.lastLikedTracks.toString().replaceAll("[\\[\\]\"]", "").replace(", ", "%2C");
       params.put("seed_tracks", seed_tracks);
     }
 

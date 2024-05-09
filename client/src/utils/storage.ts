@@ -60,7 +60,7 @@ function fetchSongsQueue(): Item[] {
   items.shift();
   if (items.length < 3 && !isQueing) updateSongsQueue();
   localStorage.setItem("songs", JSON.stringify(items));
-  return items;
+  return items || [];
 }
 
 export {
