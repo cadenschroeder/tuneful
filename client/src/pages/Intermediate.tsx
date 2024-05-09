@@ -135,7 +135,7 @@ const Intermediate = ({ pageProps, setIsAuthenticated }: IntermediateProps) => {
 
         const trackIDsString = JSON.stringify(trackIDs);
         clearUserSession().then(() => {
-          getRecommendations(trackIDsString, "true", "true", "", "10"); 
+          getRecommendations(trackIDsString, "true", "true", "", "10");
           setThemeToLocalStorage(selectedItem.name);
           setPage("music");
         });
@@ -143,14 +143,20 @@ const Intermediate = ({ pageProps, setIsAuthenticated }: IntermediateProps) => {
 
         console.log(trackIDsString);
       });
-    } else if (genreSelection){
+    } else if (genreSelection) {
       clearUserSession().then(() => {
-       const recommendation = getRecommendations("[]", "true", "true", genreSelection, "10");
-       recommendation.then(() => {
-        console.log("Genre given recommendations " +  recommendation)
-        setThemeToLocalStorage(selectedItem.name);
-        setPage("music");
-       })
+        const recommendation = getRecommendations(
+          "[]",
+          "true",
+          "true",
+          genreSelection,
+          "10"
+        );
+        recommendation.then(() => {
+          console.log("Genre given recommendations " + recommendation);
+          setThemeToLocalStorage(selectedItem.name);
+          setPage("music");
+        });
       });
     }
 
@@ -160,58 +166,83 @@ const Intermediate = ({ pageProps, setIsAuthenticated }: IntermediateProps) => {
 
   if (signedInWithSpotify) {
     return (
-      <div style={{
-        height: "100vh",
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "center",
-        justifyContent: "center",
-      }}>
+      <div
+        style={{
+          height: "100vh",
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          justifyContent: "center",
+        }}
+      >
         <h1 className="intermediate">Select to Start</h1>
         <h2 id="select-header">
-          {selectedItem.name ? `Chosen: ${selectedItem.name}` : "Select a Playlist or a Genre"}
+          {selectedItem.name
+            ? `Chosen: ${selectedItem.name}`
+            : "Select a Playlist or a Genre"}
         </h2>
-        <div style={{ display: 'flex', flexDirection: 'column', width: '100%', alignItems: 'center' }}>
-        <div className="radio-group" style={{ maxHeight: '30vh' }}>
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            width: "100%",
+            alignItems: "center",
+          }}
+        >
+          <div className="radio-group" style={{ maxHeight: "30vh" }}>
             {/* Render empty radio buttons */}
             {Array.from({ length: 35 }).map((_, index) => (
               <div className="radio-element" key={`empty-${index}`}>
-                <input type="radio" style={{ visibility: 'hidden' }} />
-                <label style={{ visibility: 'hidden' }}>Empty Space</label>
+                <input type="radio" style={{ visibility: "hidden" }} />
+                <label style={{ visibility: "hidden" }}>Empty Space</label>
               </div>
             ))}
             {/* Map over playlists to render actual radio buttons */}
-            {playlists.map((playlist: { name: string; tracks: { href: string } }) => (
-              <div className="radio-element" key={playlist.name}>
-                <input type="radio" id={playlist.name} name="playlist" value={playlist.name}
-                      onChange={() => { setPlaylistChoice(playlist); handleSelection("playlist", playlist.name); }} />
-                <label htmlFor={playlist.name}>{playlist.name}</label>
+            {playlists.map(
+              (playlist: { name: string; tracks: { href: string } }) => (
+                <div className="radio-element" key={playlist.name}>
+                  <input
+                    type="radio"
+                    id={playlist.name}
+                    name="playlist"
+                    value={playlist.name}
+                    onChange={() => {
+                      setPlaylistChoice(playlist);
+                      handleSelection("playlist", playlist.name);
+                    }}
+                  />
+                  <label htmlFor={playlist.name}>{playlist.name}</label>
+                </div>
+              )
+            )}
+          </div>
+
+          <div className="radio-group" style={{ maxHeight: "20vh" }}>
+            {GENRES.map((genre) => (
+              <div key={genre}>
+                <input
+                  type="radio"
+                  id={genre}
+                  name="selection"
+                  value={genre}
+                  onChange={() => {
+                    setGenreSelection(genre);
+                    handleSelection("genre", genre);
+                  }}
+                />
+                <label htmlFor={genre}>{genre}</label>
               </div>
-            )
-          )}
-        </div>
-
-        <div className="radio-group" style={{ maxHeight: '20vh' }}>
-          {GENRES.map((genre) => (
-            <div key={genre}>
-              <input
-                type="radio"
-                id={genre}
-                name="selection"
-                value={genre}
-                onChange={() => 
-                  {setGenreSelection(genre)
-                  handleSelection("genre", genre)}}
-              />
-              <label htmlFor={genre}>{genre}</label>
-            </div>
-          ))}
-
-        </div>
-        <div className="flex">
-          <button onClick={handleContinue}>Continue</button>
-          <button onClick={handleBackClick} style={{ marginTop: "20px" }}>{"back"}</button>
-          <button onClick={handleLogout} style={{ marginTop: "20px" }}>Logout</button>
+            ))}
+          </div>
+          <div className="flex">
+            <button onClick={handleContinue}>Continue</button>
+            <button onClick={handleBackClick} style={{ marginTop: "20px" }}>
+              {"back"}
+            </button>
+            <button onClick={handleLogout} style={{ marginTop: "20px" }}>
+              Logout
+            </button>
+          </div>
         </div>
       </div>
     );
