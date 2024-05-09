@@ -74,6 +74,19 @@ public class RecommendationHandler implements Route {
         songIDsList = Arrays.asList(trackIDs.replaceAll("[\\[\\]\"]", "").split(","));
       }
 
+      // beautiful :)
+      if (first.equals("true")) {
+        firstBool = true;
+        // Reset the lastLikedTracks list
+        this.lastLikedTracks = new ArrayList<>();
+      } else if (first.equals("false")) {
+        firstBool = false;
+      } else {
+        return new RecommendationHandler.RecommendationFailureResponse(
+                "Unexpected parameter value for first")
+                .serialize();
+      }
+
       // convert liked and first into booleans
       if (liked.equals("true")) {
         likedBool = true;
@@ -99,19 +112,6 @@ public class RecommendationHandler implements Route {
       } else {
         return new RecommendationHandler.RecommendationFailureResponse(
             "Unexpected parameter value for liked")
-            .serialize();
-      }
-
-      // beautiful :)
-      if (first.equals("true")) {
-        firstBool = true;
-        // Reset the lastLikedTracks list
-        this.lastLikedTracks.clear();
-      } else if (first.equals("false")) {
-        firstBool = false;
-      } else {
-        return new RecommendationHandler.RecommendationFailureResponse(
-            "Unexpected parameter value for first")
             .serialize();
       }
 
