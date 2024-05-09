@@ -18,10 +18,13 @@ public class AddLikesHandler implements Route {
   }
 
   /**
-   * Invoked when a request is made on this route's corresponding path e.g. '/hello'
+   * Invoked when a request is made on this route's corresponding path e.g.
+   * '/hello'
    *
-   * @param request The request object providing information about the HTTP request
-   * @param response The response object providing functionality for modifying the response
+   * @param request  The request object providing information about the HTTP
+   *                 request
+   * @param response The response object providing functionality for modifying the
+   *                 response
    * @return The content to be set in the response
    */
   @Override
@@ -35,7 +38,8 @@ public class AddLikesHandler implements Route {
 
       List<String> songsList = Arrays.asList(songNames.replaceAll("[\\[\\]\"]", "").split(","));
       Map<String, Object> data = new HashMap<>();
-      data.put("songName", songsList);
+      data.put("songNames", songsList);
+      data.put("timestamp", com.google.cloud.Timestamp.now());
 
       // System.out.println("adding song: " + songNames + " for user: " + uid);
 
