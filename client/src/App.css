@@ -45,6 +45,7 @@ body {
 .radio-group {
   display: flex;
   flex-direction: column;
+  justify-content: flex-start;
   align-items: baseline;
   padding: 20px;
   background-color: #00000090; /* Slight transparency */
@@ -54,7 +55,6 @@ body {
   min-width: 30%;
   overflow-y: scroll;
   margin-bottom: 5%;
-  justify-content: center;
   width: 100%;
 }
 

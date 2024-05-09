@@ -8,7 +8,6 @@ import { addLikes, clearUserSession, getRecommendations } from "../utils/api";
 
 const PLAYLIST_ENDPOINT = "https://api.spotify.com/v1/me/playlists";
 const GENRES = [
-  "",
   "Pop",
   "Hip Hop",
   "Rock",
@@ -259,7 +258,6 @@ const Intermediate = ({ pageProps, setIsAuthenticated }: IntermediateProps) => {
             </div>
           ))}
         </div>
-        <p>{playlistChoice?.name}</p>
 
         <div className="flex">
           <button onClick={handleContinue}>Continue</button>
