@@ -83,8 +83,8 @@ public class RecommendationHandler implements Route {
         firstBool = false;
       } else {
         return new RecommendationHandler.RecommendationFailureResponse(
-                "Unexpected parameter value for first")
-                .serialize();
+            "Unexpected parameter value for first")
+            .serialize();
       }
 
       // convert liked and first into booleans
@@ -160,7 +160,6 @@ public class RecommendationHandler implements Route {
         }
 
         Map<String, Object> dislikes = collection.get(0);
-
 
         Map<String, List<Double>> dislikesCasted = new HashMap<>();
         // nasty cast to Map<String, ArrayList<Double>>
@@ -286,8 +285,7 @@ public class RecommendationHandler implements Route {
     Moshi moshi = new Moshi.Builder().build();
 
     // Initializes an adapter to a Broadband class then uses it to parse the JSON.
-    JsonAdapter<List<String>> adapter =
-        moshi.adapter(Types.newParameterizedType(String.class, List.class));
+    JsonAdapter<List<String>> adapter = moshi.adapter(Types.newParameterizedType(String.class, List.class));
 
     List<String> trackList = adapter.fromJson(jsonSongList);
 
@@ -295,7 +293,8 @@ public class RecommendationHandler implements Route {
   }
 
   /**
-   * Record that represents a succesful response. Returned to querier in handle(). Stores a response
+   * Record that represents a succesful response. Returned to querier in handle().
+   * Stores a response
    * map and has serializing capabilities
    *
    * @param response_type
@@ -313,8 +312,8 @@ public class RecommendationHandler implements Route {
     String serialize() {
       try {
         Moshi moshi = new Moshi.Builder().build();
-        JsonAdapter<RecommendationHandler.RecommendationSuccessResponse> adapter =
-            moshi.adapter(RecommendationHandler.RecommendationSuccessResponse.class);
+        JsonAdapter<RecommendationHandler.RecommendationSuccessResponse> adapter = moshi
+            .adapter(RecommendationHandler.RecommendationSuccessResponse.class);
         return adapter.toJson(this);
       } catch (Exception e) {
         e.printStackTrace();

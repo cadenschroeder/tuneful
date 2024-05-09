@@ -4,6 +4,8 @@ import edu.brown.cs.student.main.server.storage.StorageInterface;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
+
 import spark.Request;
 import spark.Response;
 import spark.Route;
@@ -24,7 +26,7 @@ public class ListLikesHandler implements Route {
    *                 request
    * @param response The response object providing functionality for modifying the
    *                 response
-
+   * 
    * @return The content to be set in the response
    */
   @Override
@@ -36,10 +38,12 @@ public class ListLikesHandler implements Route {
       List<Map<String, Object>> vals = this.storageHandler.getCollection(uid, "likedSongs", true);
 
       // convert the key,value map to just a list of the song names.
-      List<String> likedSongs = vals.stream().map(song -> song.get("songName").toString()).toList();
+      Map<String, Object> likedSongsMap = vals.stream()
+          .collect(Collectors.toMap(song -> song.get("timestamp").toString(),
+              song -> song.get("songNames")));
 
       responseMap.put("response_type", "success");
-      responseMap.put("likedSongs", likedSongs);
+      responseMap.put("likedSongs", likedSongsMap);
     } catch (Exception e) {
       // error likely occurred in the storage handler
       e.printStackTrace();
