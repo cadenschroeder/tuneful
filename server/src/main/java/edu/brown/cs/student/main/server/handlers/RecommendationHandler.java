@@ -24,6 +24,8 @@ public class RecommendationHandler implements Route {
   private StorageInterface storageHandler;
   private RecommendAlgo algorithm;
 
+  private List<String> lastLikedTracks;
+
   public RecommendationHandler(
       MusicSource datasource,
       StorageInterface storageHandler,
@@ -31,6 +33,7 @@ public class RecommendationHandler implements Route {
     this.datasource = datasource;
     this.storageHandler = storageHandler;
     this.algorithm = algorithm;
+    this.lastLikedTracks = new ArrayList<>();
   }
 
   @Override
@@ -41,19 +44,20 @@ public class RecommendationHandler implements Route {
       String first = request.queryParams("first"); // indicates if it is the first time called or not
       String uid = request.queryParams("uid");
       String genre = request.queryParams("genre");
+      String numSongs = request.queryParams("numSongs");
 
-      if (liked == null || trackIDs == null || first == null || uid == null || genre == null) {
+      if (liked == null || trackIDs == null || first == null || uid == null || genre == null || numSongs == null) {
         return new RecommendationHandler.RecommendationFailureResponse(
             "Missing one or more parameters")
             .serialize();
       }
-      if (liked.isEmpty() || trackIDs.isEmpty() || first.isEmpty() || uid.isEmpty()) {
+      if (liked.isEmpty() || trackIDs.isEmpty() || first.isEmpty() || uid.isEmpty() || numSongs.isEmpty()) {
         return new RecommendationHandler.RecommendationFailureResponse("Empty parameter(s)")
             .serialize();
       }
 
       System.out.println("Rec handler endpoint hit. Params: " + liked + " | " + trackIDs + " | " + first + " | "
-      + genre);
+          + genre + " | " + numSongs);
 
       // Creates a hashmap to store the results of the request
       Map<String, Object> responseMap = new HashMap<>();
@@ -61,9 +65,48 @@ public class RecommendationHandler implements Route {
       boolean likedBool = false;
       boolean firstBool = false;
 
+      // deserialize the track ids list
+      // List<String> idList = deserializeTracks(trackIDs);
+      List<String> songIDsList;
+      if (trackIDs.equals("[]")) {
+        songIDsList = new ArrayList<>();
+      } else {
+        songIDsList = Arrays.asList(trackIDs.replaceAll("[\\[\\]\"]", "").split(","));
+      }
+
+      // beautiful :)
+      if (first.equals("true")) {
+        firstBool = true;
+        // Reset the lastLikedTracks list
+        this.lastLikedTracks = new ArrayList<>();
+      } else if (first.equals("false")) {
+        firstBool = false;
+      } else {
+        return new RecommendationHandler.RecommendationFailureResponse(
+                "Unexpected parameter value for first")
+                .serialize();
+      }
+
       // convert liked and first into booleans
       if (liked.equals("true")) {
         likedBool = true;
+        // TODO: make in firebase
+        // add song to a list of 5 last liked songs to use for seed_tracks
+        if (songIDsList.size() > 5) {
+          // deque called lastLikedTracks now should have the first five songs from
+          // songIDsList
+          this.lastLikedTracks = songIDsList.subList(0, 5);
+        } else {
+          for (String id : songIDsList) {
+            // add the id to last likes
+            this.lastLikedTracks.add(id);
+            // remove the oldest id if greater than 5
+            if (this.lastLikedTracks.size() > 5) {
+              this.lastLikedTracks.remove(0);
+            }
+          }
+        }
+
       } else if (liked.equals("false")) {
         likedBool = false;
       } else {
@@ -72,24 +115,13 @@ public class RecommendationHandler implements Route {
             .serialize();
       }
 
-      // beautiful :)
-      if (first.equals("true")) {
-        firstBool = true;
-      } else if (first.equals("false")) {
-        firstBool = false;
-      } else {
-        return new RecommendationHandler.RecommendationFailureResponse(
-            "Unexpected parameter value for first")
+      // convert numSongs to an int
+      int numSongsInt;
+      try {
+        numSongsInt = Integer.parseInt(numSongs);
+      } catch (NumberFormatException e) {
+        return new RecommendationHandler.RecommendationFailureResponse("Error: numSongs must be in integer form")
             .serialize();
-      }
-
-      // deserialize the track ids list
-      // List<String> idList = deserializeTracks(trackIDs);
-      List<String> songIDsList;
-      if(trackIDs.equals("[]")){
-        songIDsList = new ArrayList<>();
-      } else {
-        songIDsList = Arrays.asList(trackIDs.replaceAll("[\\[\\]\"]", "").split(","));
       }
 
       // create session stats if first time call
@@ -103,13 +135,20 @@ public class RecommendationHandler implements Route {
         System.out.println(e.getMessage());
       }
 
+      // If zero songs requested just we want to just update the attributes and return
+      // an empty list
+      if (numSongsInt == 0) {
+        responseMap.put("songs", new ArrayList<>());
+        return new RecommendationHandler.RecommendationSuccessResponse(responseMap).serialize();
+      }
+
       Map<String, String> params;
-      if(genre.isEmpty()) {
+      if (genre.isEmpty()) {
         // add params to run algorithm
-        List<Map<String, Object>> collection = this.storageHandler.getCollection(uid, "attributes", false); // TODO: check
+        List<Map<String, Object>> collection = this.storageHandler.getCollection(uid, "attributes", false); // TODO:
+                                                                                                            // check
         // false
         Map<String, Object> likes = collection.get(1);
-        System.out.println(likes);
 
         Map<String, List<Double>> likesCasted = new HashMap<>();
         // nasty cast to Map<String, ArrayList<Double>>
@@ -130,15 +169,15 @@ public class RecommendationHandler implements Route {
           dislikesCasted.put(attribute, valuesData);
         }
 
-        System.out.println("likes casted: " + likesCasted);
-        System.out.println("dislikes casted: " + dislikesCasted);
+        // System.out.println("likes casted: " + likesCasted);
+        // System.out.println("dislikes casted: " + dislikesCasted);
         Map<String, Map<String, Double>> rankings = this.algorithm.rankAttributes(likesCasted, dislikesCasted);
 
-        params = this.getParams(rankings, firstBool);
+        params = this.getParams(rankings, numSongsInt);
       } else {
-        params = this.getGenreParams(genre); //TODO: error handle genres
+        params = this.getGenreParams(genre, numSongsInt); // TODO: error handle genres
       }
-      System.out.println("Params: " + params);
+      System.out.println("Spotify params: " + params);
 
       List<Map<String, Object>> recSongs = new ArrayList<>();
 
@@ -185,7 +224,7 @@ public class RecommendationHandler implements Route {
     }
   }
 
-  public Map<String, String> getParams(Map<String, Map<String, Double>> attributeVals, Boolean firstBool) {
+  public Map<String, String> getParams(Map<String, Map<String, Double>> attributeVals, int numSongs) {
     ArrayList<String> topAttributes = new ArrayList<>();
 
     // create map from the ranking value to the attribute name
@@ -214,12 +253,17 @@ public class RecommendationHandler implements Route {
     // params.put("seed_tracks", "0c6xIDDpzE81m2q797ordA");
 
     // fetch a larger batch of songs to begin with
-    if(firstBool){
-      params.put("limit", "10");
+
+    params.put("limit", String.valueOf(numSongs));
+
+    if (this.lastLikedTracks.isEmpty()) {
+      // if they haven't liked any songs yet choose from any of these genres
+      String seed_genres = "pop%2Cnew-release%2Calternative%2Chip-hop%2country";
+      params.put("seed_genres", seed_genres);
     } else {
-      params.put("limit", "5");
+      String seed_tracks = this.lastLikedTracks.toString().replaceAll("[\\[\\]\"]", "").replace(", ", "%2C");
+      params.put("seed_tracks", seed_tracks);
     }
-    params.put("seed_genres", "pop"); //TODO change this to be a list of song ids they liked
 
     for (String attribute : topAttributes) {
       params.put("target_" + attribute, attributeVals.get(attribute).get("target").toString());
@@ -228,9 +272,9 @@ public class RecommendationHandler implements Route {
     return params;
   }
 
-  private Map<String, String> getGenreParams(String genre){
+  private Map<String, String> getGenreParams(String genre, int numSongs) {
     Map<String, String> params = new HashMap<>(); // by caden
-    params.put("limit", "10");
+    params.put("limit", String.valueOf(numSongs));
     params.put("seed_genres", genre.toLowerCase());
     System.out.println("Finding recommendations for genre: " + genre);
     return params;
