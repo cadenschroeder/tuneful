@@ -239,15 +239,19 @@ const Card = () => {
         "",
         numWanted.toString()
       );
-      setSong(
-        fetchSongsQueue()[0] || {
-          name: "Loading...",
-          cover: "img/loading.gif",
-          artist: "Loading...",
-          blob: "wait.mp3",
-          spotify: "",
-        }
-      );
+
+      let songs = fetchSongsQueue();
+
+      songs &&
+        setSong(
+          songs[0] || {
+            name: "Loading...",
+            cover: "img/loading.gif",
+            artist: "Loading...",
+            blob: "wait.mp3",
+            spotify: "",
+          }
+        );
     },
     [song]
   );

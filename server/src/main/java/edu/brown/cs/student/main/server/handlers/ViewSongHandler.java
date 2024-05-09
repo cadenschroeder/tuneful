@@ -43,21 +43,22 @@ public class ViewSongHandler implements Route {
         boolAllSongs = false;
       } else {
         return new ViewSongHandler.ViewSongFailureResponse(
-            "isAllSongs parameter must be either 'true' or 'false'")
+                "isAllSongs parameter must be either 'true' or 'false'")
             .serialize();
       }
 
       // get all songs for user
-      List<Map<String, Object>> vals = this.storageHandler.getCollection(uid, "songs", true); // TODO: change back to
-                                                                                              // true
+      List<Map<String, Object>> vals =
+          this.storageHandler.getCollection(uid, "songs", true); // TODO: change back to
+      // true
       List<Object> songs = vals.stream().map(song -> song.get("song")).toList();
-
 
       if (!boolAllSongs) {
         // TODO: make this songsIndex stored in firebase so its user specific
 
         int songsIndex = 0;
-        List<Map<String, Object>> collection = this.storageHandler.getCollection(uid, "songsIndex", false);
+        List<Map<String, Object>> collection =
+            this.storageHandler.getCollection(uid, "songsIndex", false);
 
         if (!collection.isEmpty()) {
           songsIndex = ((Long) collection.get(0).get("index")).intValue();
@@ -88,8 +89,7 @@ public class ViewSongHandler implements Route {
   }
 
   /**
-   * Record that represents a succesful response. Returned to querier in handle().
-   * Stores a response
+   * Record that represents a succesful response. Returned to querier in handle(). Stores a response
    * map and has serializing capabilities
    *
    * @param response_type
@@ -106,8 +106,8 @@ public class ViewSongHandler implements Route {
     String serialize() {
       try {
         Moshi moshi = new Moshi.Builder().build();
-        JsonAdapter<ViewSongHandler.ViewSongSuccessResponse> adapter = moshi
-            .adapter(ViewSongHandler.ViewSongSuccessResponse.class);
+        JsonAdapter<ViewSongHandler.ViewSongSuccessResponse> adapter =
+            moshi.adapter(ViewSongHandler.ViewSongSuccessResponse.class);
         return adapter.toJson(this);
       } catch (Exception e) {
         e.printStackTrace();

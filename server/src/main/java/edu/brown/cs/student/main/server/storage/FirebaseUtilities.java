@@ -12,7 +12,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
-
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
@@ -26,7 +25,8 @@ public class FirebaseUtilities implements StorageInterface {
     // add your admin SDK from Firebase. see:
     // https://docs.google.com/document/d/10HuDtBWjkUoCaVj_A53IFm5torB_ws06fW3KYFZqKjc/edit?usp=sharing
     String workingDirectory = System.getProperty("user.dir");
-    Path firebaseConfigPath = Paths.get(workingDirectory, "src", "main", "resources", "firebase_config.json");
+    Path firebaseConfigPath =
+        Paths.get(workingDirectory, "src", "main", "resources", "firebase_config.json");
 
     // ^-- if your /resources/firebase_config.json exists but is not found,
     // try printing workingDirectory and messing around with this path.
@@ -34,17 +34,19 @@ public class FirebaseUtilities implements StorageInterface {
 
     FileInputStream serviceAccount = new FileInputStream(firebaseConfigPath.toString());
 
-    FirebaseOptions options = new FirebaseOptions.Builder()
-        .setCredentials(GoogleCredentials.fromStream(serviceAccount))
-        .build();
-
+    FirebaseOptions options =
+        new FirebaseOptions.Builder()
+            .setCredentials(GoogleCredentials.fromStream(serviceAccount))
+            .build();
 
     FirebaseApp.initializeApp(options);
   }
 
   @Override
-  public List<Map<String, Object>> getCollection(String uid, String collection_id, Boolean chronological)
-      throws InterruptedException, ExecutionException, IllegalArgumentException, DataFormatException {
+  public List<Map<String, Object>> getCollection(
+      String uid, String collection_id, Boolean chronological)
+      throws InterruptedException, ExecutionException, IllegalArgumentException,
+          DataFormatException {
 
     if (uid == null || collection_id == null) {
       throw new IllegalArgumentException("getCollection: uid and/or collection_id cannot be null");
@@ -94,8 +96,8 @@ public class FirebaseUtilities implements StorageInterface {
 
     Firestore db = FirestoreClient.getFirestore();
     // 1: Get a ref to the collection that you created
-    CollectionReference collectionRef = db.collection("users").document(uid).collection(collection_id);
-
+    CollectionReference collectionRef =
+        db.collection("users").document(uid).collection(collection_id);
 
     // 2: Write data to the collection ref
     collectionRef.document(doc_id).set(data);
@@ -103,16 +105,16 @@ public class FirebaseUtilities implements StorageInterface {
 
   /**
    * Adds an element to the end of a user's list
-   * 
+   *
    * @param uid
    * @param collection_id
    * @param doc_id
-   * @param list_id       --> indicates which list in a set to add to
-   * @param data          --> data to be added to the list
+   * @param list_id --> indicates which list in a set to add to
+   * @param data --> data to be added to the list
    */
   @Override
-  public void addToList(String uid, String collection_id, String doc_id, String list_id, Object data)
-
+  public void addToList(
+      String uid, String collection_id, String doc_id, String list_id, Object data)
       throws IllegalArgumentException {
     if (uid == null || collection_id == null || doc_id == null || data == null) {
       throw new IllegalArgumentException(
@@ -120,8 +122,8 @@ public class FirebaseUtilities implements StorageInterface {
     }
     Firestore db = FirestoreClient.getFirestore();
     // 1: Get a ref to the collection that you created
-    CollectionReference collectionRef = db.collection("users").document(uid).collection(collection_id);
-
+    CollectionReference collectionRef =
+        db.collection("users").document(uid).collection(collection_id);
 
     // 2: Add the data element to the array by reference to the list id
 
@@ -200,8 +202,7 @@ public class FirebaseUtilities implements StorageInterface {
   }
 
   /**
-   * Delete a collection in batches to avoid out-of-memory errors. Batch size may
-   * be tuned based on
+   * Delete a collection in batches to avoid out-of-memory errors. Batch size may be tuned based on
    * document size (atmost 1MB) and application requirements.
    */
   private void deleteCollection(CollectionReference collection, int batchSize) {
@@ -233,8 +234,8 @@ public class FirebaseUtilities implements StorageInterface {
     }
     Firestore db = FirestoreClient.getFirestore();
     // 1: Get a ref to the collection that you created
-    CollectionReference collectionRef = db.collection("users").document(uid).collection(collection_id);
-
+    CollectionReference collectionRef =
+        db.collection("users").document(uid).collection(collection_id);
 
     // 2: Add the data element to the array by reference to the list id
 
@@ -284,7 +285,8 @@ public class FirebaseUtilities implements StorageInterface {
     }
 
     Firestore db = FirestoreClient.getFirestore();
-    CollectionReference collectionRef = db.collection("users").document(uid).collection(collection_id);
+    CollectionReference collectionRef =
+        db.collection("users").document(uid).collection(collection_id);
     collectionRef.document(doc_id).update(data);
   }
 }
