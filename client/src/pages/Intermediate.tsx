@@ -173,13 +173,6 @@ const Intermediate = ({ pageProps, setIsAuthenticated }: IntermediateProps) => {
         </h2>
         <div style={{ display: 'flex', flexDirection: 'column', width: '100%', alignItems: 'center' }}>
         <div className="radio-group" style={{ maxHeight: '30vh' }}>
-            {/* Render empty radio buttons */}
-            {Array.from({ length: 35 }).map((_, index) => (
-              <div className="radio-element" key={`empty-${index}`}>
-                <input type="radio" style={{ visibility: 'hidden' }} />
-                <label style={{ visibility: 'hidden' }}>Empty Space</label>
-              </div>
-            ))}
             {/* Map over playlists to render actual radio buttons */}
             {playlists.map((playlist: { name: string; tracks: { href: string } }) => (
               <div className="radio-element" key={playlist.name}>
@@ -213,6 +206,7 @@ const Intermediate = ({ pageProps, setIsAuthenticated }: IntermediateProps) => {
           <button onClick={handleBackClick} style={{ marginTop: "20px" }}>{"back"}</button>
           <button onClick={handleLogout} style={{ marginTop: "20px" }}>Logout</button>
         </div>
+      </div>
       </div>
     );
   }
