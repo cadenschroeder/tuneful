@@ -17,9 +17,8 @@ const Finish = () => {
       const likes = getFromLocalStorage("likes");
       // const dislikes = getFromLocalStorage("dislikes");
       const uid = getLoginCookie();
-      const endpoint = `http://localhost:3232/addLikes?uid=${uid}&likes=${JSON.stringify(
-        likes
-      )}`;
+      const toStringLikes = () => likes.map((song) => song.name).join(", ");
+      const endpoint = `http://localhost:3232/addLikes?uid=${uid}&songNames=${toStringLikes()}`;
 
       const response = await fetch(endpoint);
       console.log(response);
