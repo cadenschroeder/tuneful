@@ -25,7 +25,7 @@ interface IntermediateProps {
 }
 
 const Intermediate = ({ pageProps, setIsAuthenticated }: IntermediateProps) => {
-  const { token, setToken, signedInWithSpotify, setSignedInWithSpotify } = useSpotifyAuth();
+  const { token, setToken, signedInWithSpotify, setSignedInWithSpotify, playlistChoice, setPlaylistChoice } = useSpotifyAuth();
   // const [token, setToken] = useState("");
   const [, setData] = useState<JSON>();
   const [playlists, setPlaylists] = useState([]);
@@ -33,10 +33,10 @@ const Intermediate = ({ pageProps, setIsAuthenticated }: IntermediateProps) => {
   const { setPage } = pageProps;
   // const [signedInWithSpotify, setSignedInWithSpotify] = useState(false);
   const [signedInWithoutSpotify, setSignedInWithoutSpotify] = useState(false);
-  const [playlistChoice, setPlaylistChoice] = useState<{
-    name: string;
-    tracks: { href: string };
-  }>();
+  // const [playlistChoice, setPlaylistChoice] = useState<{
+  //   name: string;
+  //   tracks: { href: string };
+  // }>();
   const [selectedItem, setSelectedItem] = useState({ type: "", name: "" });
 
   const getPlaylists = useCallback(() => {

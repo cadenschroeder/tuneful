@@ -8,7 +8,7 @@ import axios from "axios";
 const PLAYLIST_ENDPOINT = "https://api.spotify.com/v1/me/playlists";
 
 const Finish = () => {
-  const { token, setToken, signedInWithSpotify, setSignedInWithSpotify } = useSpotifyAuth();
+  const { token, setToken, signedInWithSpotify, setSignedInWithSpotify, playlistChoice } = useSpotifyAuth();
   const [likes, setLikes] = useState<Song[]>([]);
   const [dislikes, setDislikes] = useState<Song[]>([]);
 

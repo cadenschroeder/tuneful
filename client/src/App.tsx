@@ -8,6 +8,7 @@ import { initializeApp } from "firebase/app";
 import { getLoginCookie } from "./utils/cookie";
 import Footer from "./components/Footer";
 import { clearLocalStorage } from "./utils/storage";
+import { SpotifyAuthProvider } from './contexts/SpotifyAuthContext';
 
 const firebaseConfig = {
   apiKey: process.env.REACT_APP_API_KEY,
@@ -53,19 +54,21 @@ function App() {
   }, [page]);
 
   return (
-    <div className="App" id="App">
-      {showLogin ? (
-        <Login authProps={authProps} pageProps={pageProps} />
-      ) : page === Page.INTERMEDIATE ? (
-        <Intermediate
-          pageProps={pageProps}
-          setIsAuthenticated={setIsAuthenticated}
-        />
-      ) : (
-        <Application authProps={authProps} pageProps={pageProps} />
-      )}
-      <Footer />
-    </div>
+    <SpotifyAuthProvider>
+      <div className="App" id="App">
+        {showLogin ? (
+          <Login authProps={authProps} pageProps={pageProps} />
+        ) : page === Page.INTERMEDIATE ? (
+          <Intermediate
+            pageProps={pageProps}
+            setIsAuthenticated={setIsAuthenticated}
+          />
+        ) : (
+          <Application authProps={authProps} pageProps={pageProps} />
+        )}
+        <Footer />
+      </div>
+    </SpotifyAuthProvider>
   );
 }
 
