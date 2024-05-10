@@ -135,9 +135,10 @@ const Intermediate = ({ pageProps, setIsAuthenticated }: IntermediateProps) => {
 
         const trackIDsString = JSON.stringify(trackIDs);
         clearUserSession().then(() => {
-          getRecommendations(trackIDsString, "true", "true", "", "10"); 
-          setThemeToLocalStorage(selectedItem.name);
-          setPage("music");
+          getRecommendations(trackIDsString, "true", "true", "", "10").then(() => {
+            setThemeToLocalStorage(selectedItem.name);
+            setPage("music");
+          }); 
         });
         // call handler with the track ids array
 
