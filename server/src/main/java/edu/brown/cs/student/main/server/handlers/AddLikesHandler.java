@@ -18,10 +18,13 @@ public class AddLikesHandler implements Route {
   }
 
   /**
-   * Invoked when a request is made on this route's corresponding path e.g. '/hello'
+   * Invoked when a request is made on this route's corresponding path e.g.
+   * '/hello'
    *
-   * @param request The request object providing information about the HTTP request
-   * @param response The response object providing functionality for modifying the response
+   * @param request  The request object providing information about the HTTP
+   *                 request
+   * @param response The response object providing functionality for modifying the
+   *                 response
    * @return The content to be set in the response
    */
   @Override
@@ -46,7 +49,7 @@ public class AddLikesHandler implements Route {
       String songId = "songNames-" + songCount;
 
       // use the storage handler to add the document to the database
-      this.storageHandler.addDocument(uid, "likedSongs", songId, data);
+      this.storageHandler.addDocument(uid, "likedSongs", songId, data, false);
 
       responseMap.put("response_type", "success");
       responseMap.put("songNames", songsList);

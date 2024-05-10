@@ -40,8 +40,7 @@ public class RecommendationHandler implements Route {
     try {
       String liked = request.queryParams("liked");
       String trackIDs = request.queryParams("trackIDs"); // array of track ids
-      String first =
-          request.queryParams("first"); // indicates if it is the first time called or not
+      String first = request.queryParams("first"); // indicates if it is the first time called or not
       String uid = request.queryParams("uid");
       String genre = request.queryParams("genre");
       String numSongs = request.queryParams("numSongs");
@@ -53,7 +52,7 @@ public class RecommendationHandler implements Route {
           || genre == null
           || numSongs == null) {
         return new RecommendationHandler.RecommendationFailureResponse(
-                "Missing one or more parameters")
+            "Missing one or more parameters")
             .serialize();
       }
       if (liked.isEmpty()
@@ -101,7 +100,7 @@ public class RecommendationHandler implements Route {
         firstBool = false;
       } else {
         return new RecommendationHandler.RecommendationFailureResponse(
-                "Unexpected parameter value for first")
+            "Unexpected parameter value for first")
             .serialize();
       }
 
@@ -129,7 +128,7 @@ public class RecommendationHandler implements Route {
         likedBool = false;
       } else {
         return new RecommendationHandler.RecommendationFailureResponse(
-                "Unexpected parameter value for liked")
+            "Unexpected parameter value for liked")
             .serialize();
       }
 
@@ -139,7 +138,7 @@ public class RecommendationHandler implements Route {
         numSongsInt = Integer.parseInt(numSongs);
       } catch (NumberFormatException e) {
         return new RecommendationHandler.RecommendationFailureResponse(
-                "Error: numSongs must be in integer form")
+            "Error: numSongs must be in integer form")
             .serialize();
       }
 
@@ -164,8 +163,7 @@ public class RecommendationHandler implements Route {
       Map<String, String> params;
       if (genre.isEmpty()) {
         // add params to run algorithm
-        List<Map<String, Object>> collection =
-            this.storageHandler.getCollection(uid, "attributes", false); // TODO:
+        List<Map<String, Object>> collection = this.storageHandler.getCollection(uid, "attributes", false); // TODO:
         // check
         // false
         Map<String, Object> likes = collection.get(1);
@@ -190,8 +188,7 @@ public class RecommendationHandler implements Route {
 
         // System.out.println("likes casted: " + likesCasted);
         // System.out.println("dislikes casted: " + dislikesCasted);
-        Map<String, Map<String, Double>> rankings =
-            this.algorithm.rankAttributes(likesCasted, dislikesCasted);
+        Map<String, Map<String, Double>> rankings = this.algorithm.rankAttributes(likesCasted, dislikesCasted);
 
         params = this.getParams(rankings, numSongsInt);
       } else {
@@ -208,7 +205,7 @@ public class RecommendationHandler implements Route {
         tries++;
         if (tries > 5) {
           return new RecommendationHandler.RecommendationFailureResponse(
-                  "Could not fetch more recommendations. Attempts exceeded")
+              "Could not fetch more recommendations. Attempts exceeded")
               .serialize();
         }
       }
@@ -224,7 +221,7 @@ public class RecommendationHandler implements Route {
           firebaseData.put("timestamp", com.google.cloud.Timestamp.now());
           // use the storage handler to add the document to the database
           this.storageHandler.addDocument(
-              uid, "songs", song.get("trackID").toString(), firebaseData);
+              uid, "songs", song.get("trackID").toString(), firebaseData, true);
         }
         // TODO: what to do with incognito users?? can we have a designated user id for
         // them that
@@ -252,11 +249,9 @@ public class RecommendationHandler implements Route {
     Map<Double, String> rankToAttribute = new HashMap<>();
     // create a priority queue holding all the ranks
     PriorityQueue<Double> rankQueue = new PriorityQueue<>(Comparator.reverseOrder());
-    for (String attribute :
-        attributeVals.keySet()) { // for each attribute stored, put its rank value -> name in map
+    for (String attribute : attributeVals.keySet()) { // for each attribute stored, put its rank value -> name in map
       // find the ranking value
-      Double rankVal =
-          attributeVals.get(attribute).get("ranking"); // gets the rank value for the curr attribute
+      Double rankVal = attributeVals.get(attribute).get("ranking"); // gets the rank value for the curr attribute
       rankToAttribute.put(rankVal, attribute);
       rankQueue.add(rankVal); // add rank to the queue
     }
@@ -284,8 +279,7 @@ public class RecommendationHandler implements Route {
       String seed_genres = "pop%2Cnew-release%2Calternative%2Chip-hop%2country";
       params.put("seed_genres", seed_genres);
     } else {
-      String seed_tracks =
-          this.lastLikedTracks.toString().replaceAll("[\\[\\]\"]", "").replace(", ", "%2C");
+      String seed_tracks = this.lastLikedTracks.toString().replaceAll("[\\[\\]\"]", "").replace(", ", "%2C");
       params.put("seed_tracks", seed_tracks);
     }
 
@@ -309,8 +303,7 @@ public class RecommendationHandler implements Route {
     Moshi moshi = new Moshi.Builder().build();
 
     // Initializes an adapter to a Broadband class then uses it to parse the JSON.
-    JsonAdapter<List<String>> adapter =
-        moshi.adapter(Types.newParameterizedType(String.class, List.class));
+    JsonAdapter<List<String>> adapter = moshi.adapter(Types.newParameterizedType(String.class, List.class));
 
     List<String> trackList = adapter.fromJson(jsonSongList);
 
@@ -318,7 +311,8 @@ public class RecommendationHandler implements Route {
   }
 
   /**
-   * Record that represents a succesful response. Returned to querier in handle(). Stores a response
+   * Record that represents a succesful response. Returned to querier in handle().
+   * Stores a response
    * map and has serializing capabilities
    *
    * @param response_type
@@ -336,8 +330,8 @@ public class RecommendationHandler implements Route {
     String serialize() {
       try {
         Moshi moshi = new Moshi.Builder().build();
-        JsonAdapter<RecommendationHandler.RecommendationSuccessResponse> adapter =
-            moshi.adapter(RecommendationHandler.RecommendationSuccessResponse.class);
+        JsonAdapter<RecommendationHandler.RecommendationSuccessResponse> adapter = moshi
+            .adapter(RecommendationHandler.RecommendationSuccessResponse.class);
         return adapter.toJson(this);
       } catch (Exception e) {
         e.printStackTrace();

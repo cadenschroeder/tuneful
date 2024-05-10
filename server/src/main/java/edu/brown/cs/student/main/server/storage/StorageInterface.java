@@ -7,7 +7,7 @@ import java.util.zip.DataFormatException;
 
 public interface StorageInterface {
 
-  void addDocument(String uid, String collection_id, String doc_id, Map<String, Object> data);
+  void addDocument(String uid, String collection_id, String doc_id, Map<String, Object> data, boolean noOverwrites);
 
   void addToList(String uid, String collection_id, String doc_id, String list_id, Object data);
 
