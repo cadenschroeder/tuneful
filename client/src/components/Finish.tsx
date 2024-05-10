@@ -4,28 +4,41 @@ import { Song } from "../utils/consts";
 import { useSpotifyAuth } from '../contexts/SpotifyAuthContext';
 import axios from "axios";
 
-
-const PLAYLIST_ENDPOINT = "https://api.spotify.com/v1/me/playlists";
-
 const Finish = () => {
-  const { token, setToken, signedInWithSpotify, setSignedInWithSpotify, playlistChoice } = useSpotifyAuth();
+  const { token, playlistChoice } = useSpotifyAuth();
   const [likes, setLikes] = useState<Song[]>([]);
   const [dislikes, setDislikes] = useState<Song[]>([]);
 
+  // Constructing the endpoint dynamically based on selected playlist
+  const playlistEndpoint = playlistChoice ? `https://api.spotify.com/v1/playlists/${playlistChoice.tracks.href}/tracks` : "";
 
-  const handleExportNew = () => {
-    axios
-      .get(PLAYLIST_ENDPOINT, {
-        headers: {
-          Authorization: "Bearer " + token,
-        },
-      })
-      .then((response: any) => {
-        
-      })
-      .catch((error: any) => {
-        console.log(error);
-      });
+  // Generate track URIs from likes
+  const trackUris = likes.map(song => `spotify:track:${song.songId}`);
+
+  const handleExportAdd = () => {
+    if (playlistEndpoint && trackUris.length > 0) {
+      axios
+        .post(playlistEndpoint, 
+          {
+            'uris': trackUris,
+            'position': 0
+          },
+          {
+            headers: {
+              'Authorization': "Bearer " + token,
+              'Content-Type': 'application/json'
+            }
+          }
+        )
+        .then((response: any) => {
+          console.log("Tracks added to playlist successfully.");
+        })
+        .catch((error: any) => {
+          console.error("Error adding tracks to playlist:", error);
+        });
+    } else {
+      console.error("Playlist endpoint or track URIs are undefined.");
+    }
   };
 
   useEffect(() => {
@@ -39,12 +52,12 @@ const Finish = () => {
       <ul>
         {likes.length > 0 || dislikes.length > 0 ? (
           <>
-            {likes.map((song: any, index: any) => (
+            {likes.map((song, index) => (
               <li key={index}>
                 <a href={song.spotify}>{song.name}: 👍</a>
               </li>
             ))}
-            {dislikes.map((song: any, index: any) => (
+            {dislikes.map((song, index) => (
               <li key={index}>
                 <a href={song.spotify}>{song.name}: 👎</a>
               </li>
@@ -54,8 +67,7 @@ const Finish = () => {
           <li>No songs liked or disliked :(</li>
         )}
       </ul>
-      <button>save</button>
-      <button>export: add to playlist</button>
+      <button onClick={handleExportAdd}>export: add to playlist</button>
       <button>export: as new playlist</button>
     </div>
   );

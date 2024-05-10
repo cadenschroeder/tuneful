@@ -30,8 +30,12 @@ public class SpotifySource implements MusicSource {
   public SpotifySource() {
     // this.clientID = "59435ce694fa4eb099fcf66d1a6ac313";
     // this.clientSecret = "ea8f091fd3b44b039c41d6d14a6f0f8c";
-    this.clientID = "12f6f43b0e464dd0b0a5e1f6c4a18386";
-    this.clientSecret = "ac4ea3fd4d1146e19a9e13ec5a381037";
+    // this.clientID = "12f6f43b0e464dd0b0a5e1f6c4a18386";
+    // this.clientSecret = "ac4ea3fd4d1146e19a9e13ec5a381037";
+    // this.clientID = "57e8a11a507245378588d106e1e1c308";
+    // this.clientSecret = "ae60d37b6bdd4a93bce445b318e764d7";
+    this.clientID = "f7d60265e9164cc8bd68843559a6f7d9";
+    this.clientSecret = "8a181f41511e4e428dc23f52a0462f4c";
   }
 
   private String getAccessToken() throws IOException {
