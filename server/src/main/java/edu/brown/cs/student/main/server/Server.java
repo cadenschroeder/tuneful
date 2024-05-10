@@ -13,7 +13,8 @@ import java.util.concurrent.TimeUnit;
 import spark.Spark;
 
 /**
- * Main class for initializing a server. Includes 4 endpoints: /broadband, /loadcsv, /viewcsv,
+ * Main class for initializing a server. Includes 4 endpoints: /broadband,
+ * /loadcsv, /viewcsv,
  * /searchcsv Run Server main to start and initialize server.
  */
 public class Server {
@@ -27,10 +28,10 @@ public class Server {
           response.header("Access-Control-Allow-Methods", "*");
         });
 
-    // ParserState saves a given parser to use among loadcsv, viewcsv, searchcsv endpoints
+    // ParserState saves a given parser to use among loadcsv, viewcsv, searchcsv
+    // endpoints
     ParserState parser = new ParserState();
-    CacheBuilder<Object, Object> cacheBuilder =
-        CacheBuilder.newBuilder().expireAfterWrite(30, TimeUnit.SECONDS);
+    CacheBuilder<Object, Object> cacheBuilder = CacheBuilder.newBuilder().expireAfterWrite(30, TimeUnit.SECONDS);
 
     // Setting up the handler for the GET /loadcsv, /viewcsv, /searchcsv, /broadband
     SpotifySource spotifySource = new SpotifySource();

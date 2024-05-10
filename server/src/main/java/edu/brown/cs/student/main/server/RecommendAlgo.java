@@ -75,7 +75,7 @@ public class RecommendAlgo {
       likeAttributes.get("tempo").add((Double) features.get("tempo"));
     }
     Map<String, Object> likeStats = new HashMap<String, Object>(likeAttributes);
-    this.storageHandler.addDocument(uid, "attributes", "likes", likeStats);
+    this.storageHandler.addDocument(uid, "attributes", "likes", likeStats, false);
 
     // make a new map to hold the attributes for disliked songs
     Map<String, List<Double>> dislikeAttributes = new HashMap<>();
@@ -90,7 +90,7 @@ public class RecommendAlgo {
     dislikeAttributes.put("tempo", new ArrayList<Double>());
 
     Map<String, Object> dislikeStats = new HashMap<String, Object>(dislikeAttributes);
-    this.storageHandler.addDocument(uid, "attributes", "dislikes", dislikeStats);
+    this.storageHandler.addDocument(uid, "attributes", "dislikes", dislikeStats, false);
   }
 
   private static double calculateStandardDeviation(List<Double> array) {
@@ -160,7 +160,8 @@ public class RecommendAlgo {
       // If the number of elements is odd, return the middle element
       return list.get(n / 2);
     } else {
-      // If the number of elements is even, return the average of the two middle elements
+      // If the number of elements is even, return the average of the two middle
+      // elements
       return (list.get((n - 1) / 2) + list.get(n / 2)) / 2.0;
     }
   }
@@ -177,7 +178,7 @@ public class RecommendAlgo {
     } else {
       target = min + generalDistance;
     }
-    Double[] toReturn = {target, (target - generalDistance), (target + generalDistance)};
+    Double[] toReturn = { target, (target - generalDistance), (target + generalDistance) };
     return toReturn;
   }
 

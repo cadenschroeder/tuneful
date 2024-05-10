@@ -12,7 +12,8 @@ import java.net.*;
 import java.util.*;
 
 /**
- * SpotifySource Uses the ACS API to get information about broadband coverage in given county, state
+ * SpotifySource Uses the ACS API to get information about broadband coverage in
+ * given county, state
  * Takes in params: state, county
  */
 public class SpotifySource implements MusicSource {
@@ -28,10 +29,14 @@ public class SpotifySource implements MusicSource {
   private final JsonAdapter<List<List<String>>> listJsonAdapter = this.moshi.adapter(this.listType);
 
   public SpotifySource() {
-    this.clientID = "59435ce694fa4eb099fcf66d1a6ac313";
-    this.clientSecret = "ea8f091fd3b44b039c41d6d14a6f0f8c";
+    // this.clientID = "59435ce694fa4eb099fcf66d1a6ac313";
+    // this.clientSecret = "ea8f091fd3b44b039c41d6d14a6f0f8c";
     // this.clientID = "12f6f43b0e464dd0b0a5e1f6c4a18386";
     // this.clientSecret = "ac4ea3fd4d1146e19a9e13ec5a381037";
+    // this.clientID = "57e8a11a507245378588d106e1e1c308";
+    // this.clientSecret = "ae60d37b6bdd4a93bce445b318e764d7";
+    this.clientID = "f7d60265e9164cc8bd68843559a6f7d9";
+    this.clientSecret = "8a181f41511e4e428dc23f52a0462f4c";
   }
 
   private String getAccessToken() throws IOException {
@@ -52,10 +57,9 @@ public class SpotifySource implements MusicSource {
     writer.close();
     httpConn.getOutputStream().close();
 
-    InputStream responseStream =
-        httpConn.getResponseCode() / 100 == 2
-            ? httpConn.getInputStream()
-            : httpConn.getErrorStream();
+    InputStream responseStream = httpConn.getResponseCode() / 100 == 2
+        ? httpConn.getInputStream()
+        : httpConn.getErrorStream();
     Scanner s = new Scanner(responseStream).useDelimiter("\\A");
     String response = s.hasNext() ? s.next() : "";
     s.close();
@@ -64,7 +68,8 @@ public class SpotifySource implements MusicSource {
   }
 
   /**
-   * calls the get track and get audio features Spotify endpoints to build a SongData record
+   * calls the get track and get audio features Spotify endpoints to build a
+   * SongData record
    *
    * @throws IOException
    * @throws DatasourceException
@@ -79,10 +84,9 @@ public class SpotifySource implements MusicSource {
     HttpURLConnection httpConn = (HttpURLConnection) url.openConnection();
     httpConn.setRequestMethod("GET");
     httpConn.setRequestProperty("Authorization", "Bearer " + accessToken);
-    InputStream responseStream =
-        httpConn.getResponseCode() / 100 == 2
-            ? httpConn.getInputStream()
-            : httpConn.getErrorStream();
+    InputStream responseStream = httpConn.getResponseCode() / 100 == 2
+        ? httpConn.getInputStream()
+        : httpConn.getErrorStream();
     Scanner s = new Scanner(responseStream).useDelimiter("\\A");
     String response = s.hasNext() ? s.next() : "";
     s.close();
@@ -93,12 +97,10 @@ public class SpotifySource implements MusicSource {
     String explicit = track.get("explicit").toString();
     Map<String, Object> albumInfo = (Map<String, Object>) track.get("album");
     String albumName = albumInfo.get("name").toString();
-    ArrayList<Map<String, Object>> images =
-        (ArrayList<Map<String, Object>>) albumInfo.get("images");
+    ArrayList<Map<String, Object>> images = (ArrayList<Map<String, Object>>) albumInfo.get("images");
     String imageUrl = images.get(0).get("url").toString();
 
-    ArrayList<Map<String, Object>> artists =
-        (ArrayList<Map<String, Object>>) track.get("artists"); // check this cast
+    ArrayList<Map<String, Object>> artists = (ArrayList<Map<String, Object>>) track.get("artists"); // check this cast
     ArrayList<String> artistNames = new ArrayList<>();
     for (Map<String, Object> artist : artists) {
       artistNames.add(artist.get("name").toString());
@@ -118,10 +120,9 @@ public class SpotifySource implements MusicSource {
     HttpURLConnection featuresHttpConn = (HttpURLConnection) featuresURL.openConnection();
     featuresHttpConn.setRequestMethod("GET");
     featuresHttpConn.setRequestProperty("Authorization", "Bearer " + accessToken);
-    InputStream featuresResponseStream =
-        featuresHttpConn.getResponseCode() / 100 == 2
-            ? featuresHttpConn.getInputStream()
-            : featuresHttpConn.getErrorStream();
+    InputStream featuresResponseStream = featuresHttpConn.getResponseCode() / 100 == 2
+        ? featuresHttpConn.getInputStream()
+        : featuresHttpConn.getErrorStream();
     Scanner featuresS = new Scanner(featuresResponseStream).useDelimiter("\\A");
     String featuresResponse = featuresS.hasNext() ? featuresS.next() : "";
     featuresS.close();
@@ -162,10 +163,9 @@ public class SpotifySource implements MusicSource {
 
     httpConn.setRequestProperty("Authorization", "Bearer " + accessToken);
 
-    InputStream responseStream =
-        httpConn.getResponseCode() / 100 == 2
-            ? httpConn.getInputStream()
-            : httpConn.getErrorStream();
+    InputStream responseStream = httpConn.getResponseCode() / 100 == 2
+        ? httpConn.getInputStream()
+        : httpConn.getErrorStream();
     Scanner s = new Scanner(responseStream).useDelimiter("\\A");
     String response = s.hasNext() ? s.next() : "";
 
@@ -177,8 +177,7 @@ public class SpotifySource implements MusicSource {
     Map<String, Object> recommendations = deserializeRecommendations(response);
 
     // Extracting the song IDs
-    ArrayList<Map<String, Object>> tracks =
-        (ArrayList<Map<String, Object>>) recommendations.get("tracks");
+    ArrayList<Map<String, Object>> tracks = (ArrayList<Map<String, Object>>) recommendations.get("tracks");
     for (Map<String, Object> track : tracks) {
       try {
         songList.add(this.trackToSongData(track).toMap());
@@ -220,12 +219,10 @@ public class SpotifySource implements MusicSource {
       throw new DatasourceException("Missing name or images");
     }
     String albumName = albumInfo.get("name").toString();
-    ArrayList<Map<String, Object>> images =
-        (ArrayList<Map<String, Object>>) albumInfo.get("images");
+    ArrayList<Map<String, Object>> images = (ArrayList<Map<String, Object>>) albumInfo.get("images");
     String imageUrl = images.get(0).get("url").toString();
 
-    ArrayList<Map<String, Object>> artists =
-        (ArrayList<Map<String, Object>>) track.get("artists"); // check this cast
+    ArrayList<Map<String, Object>> artists = (ArrayList<Map<String, Object>>) track.get("artists"); // check this cast
 
     ArrayList<String> artistNames = new ArrayList<>();
     for (Map<String, Object> artist : artists) {
@@ -242,8 +239,8 @@ public class SpotifySource implements MusicSource {
     Moshi moshi = new Moshi.Builder().build();
 
     // Initializes an adapter to a Broadband class then uses it to parse the JSON.
-    JsonAdapter<Map<String, Object>> adapter =
-        moshi.adapter(Types.newParameterizedType(Map.class, String.class, Object.class));
+    JsonAdapter<Map<String, Object>> adapter = moshi
+        .adapter(Types.newParameterizedType(Map.class, String.class, Object.class));
 
     return adapter.fromJson(jsonSong);
   }
@@ -253,8 +250,8 @@ public class SpotifySource implements MusicSource {
     Moshi moshi = new Moshi.Builder().build();
 
     // Initializes an adapter to a Broadband class then uses it to parse the JSON.
-    JsonAdapter<Map<String, Object>> adapter =
-        moshi.adapter(Types.newParameterizedType(Map.class, String.class, Object.class));
+    JsonAdapter<Map<String, Object>> adapter = moshi
+        .adapter(Types.newParameterizedType(Map.class, String.class, Object.class));
 
     Map<String, Object> track = adapter.fromJson(jsonSong);
 
@@ -438,12 +435,14 @@ public class SpotifySource implements MusicSource {
   // }
 
   /**
-   * Private helper method for setting up an HttpURLConnection connection with the provided URL
+   * Private helper method for setting up an HttpURLConnection connection with the
+   * provided URL
    *
    * @return an HttpURLConnection with the provided URL
    * @param requestURL the URL which we want to set up a connection to
    * @throws DatasourceException if API connection doesn't result in success
-   * @throws IOException so different callers can handle differently if needed.
+   * @throws IOException         so different callers can handle differently if
+   *                             needed.
    */
   private static HttpURLConnection connect(URL requestURL) throws DatasourceException, IOException {
     URLConnection urlConnection = requestURL.openConnection();

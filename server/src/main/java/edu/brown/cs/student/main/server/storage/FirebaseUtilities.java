@@ -2,6 +2,7 @@ package edu.brown.cs.student.main.server.storage;
 
 import com.google.api.core.ApiFuture;
 import com.google.auth.oauth2.GoogleCredentials;
+import com.google.cloud.Timestamp;
 import com.google.cloud.firestore.*;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.FirebaseOptions;
@@ -25,8 +26,7 @@ public class FirebaseUtilities implements StorageInterface {
     // add your admin SDK from Firebase. see:
     // https://docs.google.com/document/d/10HuDtBWjkUoCaVj_A53IFm5torB_ws06fW3KYFZqKjc/edit?usp=sharing
     String workingDirectory = System.getProperty("user.dir");
-    Path firebaseConfigPath =
-        Paths.get(workingDirectory, "src", "main", "resources", "firebase_config.json");
+    Path firebaseConfigPath = Paths.get(workingDirectory, "src", "main", "resources", "firebase_config.json");
 
     // ^-- if your /resources/firebase_config.json exists but is not found,
     // try printing workingDirectory and messing around with this path.
@@ -34,10 +34,9 @@ public class FirebaseUtilities implements StorageInterface {
 
     FileInputStream serviceAccount = new FileInputStream(firebaseConfigPath.toString());
 
-    FirebaseOptions options =
-        new FirebaseOptions.Builder()
-            .setCredentials(GoogleCredentials.fromStream(serviceAccount))
-            .build();
+    FirebaseOptions options = new FirebaseOptions.Builder()
+        .setCredentials(GoogleCredentials.fromStream(serviceAccount))
+        .build();
 
     FirebaseApp.initializeApp(options);
   }
@@ -46,7 +45,7 @@ public class FirebaseUtilities implements StorageInterface {
   public List<Map<String, Object>> getCollection(
       String uid, String collection_id, Boolean chronological)
       throws InterruptedException, ExecutionException, IllegalArgumentException,
-          DataFormatException {
+      DataFormatException {
 
     if (uid == null || collection_id == null) {
       throw new IllegalArgumentException("getCollection: uid and/or collection_id cannot be null");
@@ -81,7 +80,8 @@ public class FirebaseUtilities implements StorageInterface {
   }
 
   @Override
-  public void addDocument(String uid, String collection_id, String doc_id, Map<String, Object> data)
+  public void addDocument(String uid, String collection_id, String doc_id, Map<String, Object> data,
+      boolean noOverwrites)
       throws IllegalArgumentException {
     if (uid == null || collection_id == null || doc_id == null || data == null) {
       throw new IllegalArgumentException(
@@ -96,11 +96,27 @@ public class FirebaseUtilities implements StorageInterface {
 
     Firestore db = FirestoreClient.getFirestore();
     // 1: Get a ref to the collection that you created
-    CollectionReference collectionRef =
-        db.collection("users").document(uid).collection(collection_id);
+    CollectionReference collectionRef = db.collection("users").document(uid).collection(collection_id);
+    DocumentReference docRef = collectionRef.document(doc_id);
 
     // 2: Write data to the collection ref
-    collectionRef.document(doc_id).set(data);
+    if (noOverwrites) {
+      ApiFuture<DocumentSnapshot> future = docRef.get();
+      try {
+        DocumentSnapshot document = future.get();
+        if (!document.exists()) {
+          // Document doesn't exist, add it
+          collectionRef.document(doc_id).set(data);
+        } //else do nothing and don't overwrite the existing data
+      } catch (InterruptedException | ExecutionException e) {
+        // Handle errors
+        e.printStackTrace();
+        throw new IllegalArgumentException(e.getMessage());
+      }
+    } else {
+      collectionRef.document(doc_id).set(data);
+    }
+
   }
 
   /**
@@ -109,8 +125,8 @@ public class FirebaseUtilities implements StorageInterface {
    * @param uid
    * @param collection_id
    * @param doc_id
-   * @param list_id --> indicates which list in a set to add to
-   * @param data --> data to be added to the list
+   * @param list_id       --> indicates which list in a set to add to
+   * @param data          --> data to be added to the list
    */
   @Override
   public void addToList(
@@ -122,8 +138,7 @@ public class FirebaseUtilities implements StorageInterface {
     }
     Firestore db = FirestoreClient.getFirestore();
     // 1: Get a ref to the collection that you created
-    CollectionReference collectionRef =
-        db.collection("users").document(uid).collection(collection_id);
+    CollectionReference collectionRef = db.collection("users").document(uid).collection(collection_id);
 
     // 2: Add the data element to the array by reference to the list id
 
@@ -202,7 +217,8 @@ public class FirebaseUtilities implements StorageInterface {
   }
 
   /**
-   * Delete a collection in batches to avoid out-of-memory errors. Batch size may be tuned based on
+   * Delete a collection in batches to avoid out-of-memory errors. Batch size may
+   * be tuned based on
    * document size (atmost 1MB) and application requirements.
    */
   private void deleteCollection(CollectionReference collection, int batchSize) {
@@ -234,8 +250,7 @@ public class FirebaseUtilities implements StorageInterface {
     }
     Firestore db = FirestoreClient.getFirestore();
     // 1: Get a ref to the collection that you created
-    CollectionReference collectionRef =
-        db.collection("users").document(uid).collection(collection_id);
+    CollectionReference collectionRef = db.collection("users").document(uid).collection(collection_id);
 
     // 2: Add the data element to the array by reference to the list id
 
@@ -285,8 +300,7 @@ public class FirebaseUtilities implements StorageInterface {
     }
 
     Firestore db = FirestoreClient.getFirestore();
-    CollectionReference collectionRef =
-        db.collection("users").document(uid).collection(collection_id);
+    CollectionReference collectionRef = db.collection("users").document(uid).collection(collection_id);
     collectionRef.document(doc_id).update(data);
   }
 }
