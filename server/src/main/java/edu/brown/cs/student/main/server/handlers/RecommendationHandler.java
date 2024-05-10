@@ -112,7 +112,7 @@ public class RecommendationHandler implements Route {
         if (songIDsList.size() > 5) {
           // deque called lastLikedTracks now should have the first five songs from
           // songIDsList
-          this.lastLikedTracks = songIDsList.subList(0, 5);
+          this.lastLikedTracks = new ArrayList<>(songIDsList.subList(0, 5));
         } else {
           for (String id : songIDsList) {
             // add the id to last likes

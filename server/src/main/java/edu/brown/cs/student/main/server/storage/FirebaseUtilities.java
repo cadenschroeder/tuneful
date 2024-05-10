@@ -173,24 +173,24 @@ public class FirebaseUtilities implements StorageInterface {
 
       CollectionReference collectionRefAttributes = userDoc.collection("attributes");
 
-      // delete the whole colection
-      deleteCollection(collectionRefAttributes, 5);
+      //Option 1: delete the whole colection
+//      deleteCollection(collectionRefAttributes, 5);
 
-      // TODO: If we don't want to fully delete but just set to empty
-      // Map<String, List<Double>> emptyttributes = new HashMap<>();
+      //Option 2: If we don't want to fully delete but just set to empty
+       Map<String, List<Double>> emptyttributes = new HashMap<>();
 
-      // emptyttributes.put("acousticness", new ArrayList<Double>());
-      // emptyttributes.put("danceability", new ArrayList<Double>());
-      // emptyttributes.put("energy", new ArrayList<Double>());
-      // emptyttributes.put("instrumentalness", new ArrayList<Double>());
-      // emptyttributes.put("liveness", new ArrayList<Double>());
-      // emptyttributes.put("loudness", new ArrayList<Double>());
-      // emptyttributes.put("speechiness", new ArrayList<Double>());
-      // emptyttributes.put("valence", new ArrayList<Double>());
-      // emptyttributes.put("tempo", new ArrayList<Double>());
+       emptyttributes.put("acousticness", new ArrayList<Double>());
+       emptyttributes.put("danceability", new ArrayList<Double>());
+       emptyttributes.put("energy", new ArrayList<Double>());
+       emptyttributes.put("instrumentalness", new ArrayList<Double>());
+       emptyttributes.put("liveness", new ArrayList<Double>());
+       emptyttributes.put("loudness", new ArrayList<Double>());
+       emptyttributes.put("speechiness", new ArrayList<Double>());
+       emptyttributes.put("valence", new ArrayList<Double>());
+       emptyttributes.put("tempo", new ArrayList<Double>());
 
-      // collectionRefAttributes.document("likes").set(emptyttributes);
-      // collectionRefAttributes.document("dislikes").set(emptyttributes);
+       collectionRefAttributes.document("likes").set(emptyttributes);
+       collectionRefAttributes.document("dislikes").set(emptyttributes);
 
       CollectionReference collectionRefSongs = userDoc.collection("songs");
 
