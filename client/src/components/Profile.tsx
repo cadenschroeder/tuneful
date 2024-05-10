@@ -47,6 +47,7 @@ const Profile = ({ props }: ProfileProps) => {
               </li>
             );
           })}
+        {!sessions && <li>No sessions :(</li>}
       </ul>
     </div>
   );
