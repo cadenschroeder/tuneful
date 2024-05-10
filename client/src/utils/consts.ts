@@ -124,3 +124,9 @@ export const emojis = [
   "🎧",
   "💩",
 ];
+
+export const puns = [
+  "Programmers write music in C#!",
+  "/** TODO: Finish this song */",
+  "How do I harmonize in binary?",
+];
