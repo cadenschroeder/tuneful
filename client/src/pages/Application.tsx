@@ -5,6 +5,7 @@ import Profile from "../components/Profile";
 import { AuthProps, Page, PageProps } from "../interfaces/interfaces";
 import { useEffect } from "react";
 import { fetchSongsQueue } from "../utils/storage";
+import { SpotifyAuthProvider } from '../contexts/SpotifyAuthContext';
 
 interface ApplicationProps {
   authProps: AuthProps;
@@ -21,20 +22,22 @@ const Application = ({ authProps, pageProps }: ApplicationProps) => {
   const CurrentPage = (): JSX.Element => {
     switch (page) {
       case Page.PROFILE:
-        return <Profile props={null} />;
+        return <SpotifyAuthProvider> <Profile props={null} /> </SpotifyAuthProvider>;
       case Page.FINISH:
-        return <Finish />;
+        return <SpotifyAuthProvider> <Finish /> </SpotifyAuthProvider>;
       default:
-        return <Music />;
+        return <SpotifyAuthProvider> <Music /> </SpotifyAuthProvider>;
     }
   };
 
   return (
-    <div id="application">
-      <div></div>
-      <CurrentPage />
-      <Menu authProps={authProps} pageProps={pageProps} />
-    </div>
+    <SpotifyAuthProvider>
+      <div id="application">
+        <div></div>
+        <CurrentPage />
+        <Menu authProps={authProps} pageProps={pageProps} />
+      </div>
+    </SpotifyAuthProvider>
   );
 };
 

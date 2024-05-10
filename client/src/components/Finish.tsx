@@ -1,10 +1,32 @@
 import { useEffect, useState } from "react";
 import { getFromLocalStorage } from "../utils/storage";
 import { Song } from "../utils/consts";
+import { useSpotifyAuth } from '../contexts/SpotifyAuthContext';
+import axios from "axios";
+
+
+const PLAYLIST_ENDPOINT = "https://api.spotify.com/v1/me/playlists";
 
 const Finish = () => {
+  const { token, setToken, signedInWithSpotify, setSignedInWithSpotify } = useSpotifyAuth();
   const [likes, setLikes] = useState<Song[]>([]);
   const [dislikes, setDislikes] = useState<Song[]>([]);
+
+
+  const handleExportNew = () => {
+    axios
+      .get(PLAYLIST_ENDPOINT, {
+        headers: {
+          Authorization: "Bearer " + token,
+        },
+      })
+      .then((response: any) => {
+        
+      })
+      .catch((error: any) => {
+        console.log(error);
+      });
+  };
 
   useEffect(() => {
     setLikes(getFromLocalStorage("likes"));

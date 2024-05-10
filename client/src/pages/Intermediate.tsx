@@ -5,6 +5,7 @@ import AccountLogin from "./AccountLogin";
 import axios from "axios";
 import { setThemeToLocalStorage } from "../utils/storage";
 import { clearUserSession, getRecommendations } from "../utils/api";
+import { useSpotifyAuth } from '../contexts/SpotifyAuthContext';
 
 const PLAYLIST_ENDPOINT = "https://api.spotify.com/v1/me/playlists";
 const GENRES = [
@@ -24,12 +25,13 @@ interface IntermediateProps {
 }
 
 const Intermediate = ({ pageProps, setIsAuthenticated }: IntermediateProps) => {
-  const [token, setToken] = useState("");
+  const { token, setToken, signedInWithSpotify, setSignedInWithSpotify } = useSpotifyAuth();
+  // const [token, setToken] = useState("");
   const [, setData] = useState<JSON>();
   const [playlists, setPlaylists] = useState([]);
   const [genreSelection, setGenreSelection] = useState("");
   const { setPage } = pageProps;
-  const [signedInWithSpotify, setSignedInWithSpotify] = useState(false);
+  // const [signedInWithSpotify, setSignedInWithSpotify] = useState(false);
   const [signedInWithoutSpotify, setSignedInWithoutSpotify] = useState(false);
   const [playlistChoice, setPlaylistChoice] = useState<{
     name: string;
@@ -49,7 +51,7 @@ const Intermediate = ({ pageProps, setIsAuthenticated }: IntermediateProps) => {
       .then((response: any) => {
         setData(response.data.items);
         setPlaylists(response.data.items);
-        console.log(response.data.items);
+        console.log(response.data);
       })
       .catch((error: any) => {
         console.log(error);
@@ -238,7 +240,8 @@ const Intermediate = ({ pageProps, setIsAuthenticated }: IntermediateProps) => {
                 id={genre}
                 name="genre"
                 value={genre}
-                onChange={(e) => handleSelection("genre", genre)}
+                onChange={(e) => {setGenreSelection(genre)
+                  handleSelection("genre", genre)}}
               ></input>
               <label htmlFor={genre}>{genre}</label>
             </div>
