@@ -2,7 +2,8 @@ import { AuthProps, Page, PageProps } from "../interfaces/interfaces";
 import { authLoginMock } from "../utils/auth";
 import { getAuth, GoogleAuthProvider, signInWithPopup } from "firebase/auth";
 import { addLoginCookie } from "../utils/cookie";
-import { emojis } from "../utils/consts";
+import { emojis, puns } from "../utils/consts";
+import { useState } from "react";
 
 interface LoginProps {
   authProps: AuthProps;
@@ -19,6 +20,16 @@ const Login = ({ authProps, pageProps }: LoginProps) => {
       setPage(Page.INTERMEDIATE);
       addLoginCookie("incognito");
     }
+  };
+
+  const [pun, setPun] = useState(puns[Math.floor(Math.random() * puns.length)]);
+
+  const handleClickPun = () => {
+    let newPun = pun;
+    while (pun === newPun) {
+      newPun = puns[Math.floor(Math.random() * puns.length)];
+    }
+    setPun(newPun);
   };
 
   const auth = getAuth();
@@ -62,6 +73,9 @@ const Login = ({ authProps, pageProps }: LoginProps) => {
         );
       })}
       <h1>tuneful</h1>
+      <h2 id="pun" onClick={handleClickPun}>
+        {pun}
+      </h2>
       <p>
         <button
           onClick={signInWithGoogle}

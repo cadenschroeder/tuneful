@@ -354,3 +354,34 @@ input[type="radio"]:checked + label {
 h1.intermediate {
   font-size: 35px;
 }
+
+#pun {
+  rotate: -10deg;
+  font-size: 0.7em;
+  color: #313131;
+  position: absolute;
+  left: 50vw;
+  top: 44%;
+  animation: punframes 1s linear infinite;
+  font-family: "Press Start 2P";
+  width: 400px;
+  transition: all 0.2s;
+  user-select: none;
+}
+
+#pun:hover {
+  cursor: pointer;
+  scale: 1.1;
+}
+
+@keyframes punframes {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
