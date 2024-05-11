@@ -72,14 +72,15 @@ const Login = ({ authProps, pageProps }: LoginProps) => {
           </span>
         );
       })}
-      <h1>tuneful</h1>
-      <h2 id="pun" onClick={handleClickPun}>
+      <h1 aria-label="page-title">tuneful</h1>
+      <h2 id="pun" aria-label="pun" onClick={handleClickPun}>
         {pun}
       </h2>
       <p>
         <button
           onClick={signInWithGoogle}
           style={{ zIndex: 5, background: "rgb(158 155 155)" }}
+          aria-label="google-sign-in"
         >
           Continue with Google
         </button>
@@ -88,6 +89,7 @@ const Login = ({ authProps, pageProps }: LoginProps) => {
         <button
           onClick={handleLoginIncognito}
           style={{ zIndex: 5, background: "rgb(158 155 155)" }}
+          aria-label="incognito-sign-in"
         >
           Incognito
         </button>

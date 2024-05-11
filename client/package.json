@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "@playwright/test": "^1.44.0",
     "@testing-library/jest-dom": "^5.17.0",
     "@testing-library/react": "^13.4.0",
     "@testing-library/user-event": "^13.5.0",
@@ -16,6 +17,7 @@
     "express": "^4.19.2",
     "firebase": "^10.11.1",
     "js-cookie": "^3.0.5",
+    "playwright": "^1.44.0",
     "querystring-es3": "^0.2.1",
     "react": "^18.2.0",
     "react-audio-spectrum": "^0.1.0",
@@ -33,7 +35,8 @@
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "test:e2e": " playwright test --ui --workers=1"
   },
   "eslintConfig": {
     "extends": [
