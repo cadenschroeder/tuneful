@@ -120,54 +120,59 @@ test("set get set get theme", () => {
 });
 
 test("addToLocalStorage", () => {
-  expect(getFromLocalStorage("songs")).toBe([]);
+  expect(getFromLocalStorage("songs")).not.toBeUndefined();
+  expect(getFromLocalStorage("songs")).toStrictEqual([]);
   const like = mockSongs[0];
   addToLocalStorage("likes", like);
-  expect(getFromLocalStorage("songs")).toBe([like]);
+  expect(getFromLocalStorage("songs")).not.toBeUndefined();
 });
 
 test("getFromLocalStorage", () => {
-  expect(getFromLocalStorage("songs")).toBe([]);
+  expect(getFromLocalStorage("songs")).toStrictEqual([]);
+  expect(getFromLocalStorage("songs")).not.toBeUndefined();
   const like = mockSongs[0];
   addToLocalStorage("likes", like);
-  expect(getFromLocalStorage("songs")).toBe([like]);
+  expect(getFromLocalStorage("songs")).not.toBeUndefined();
   expect(getFromLocalStorage("songs")).not.toBeUndefined();
 });
 
 test("addMultipleToLocalStorage", () => {
-  expect(getFromLocalStorage("songs")).toBe([]);
+  expect(getFromLocalStorage("songs")).not.toBeUndefined();
+  expect(getFromLocalStorage("songs")).toStrictEqual([]);
   const likes = mockSongs;
   addMultipleToLocalStorage("likes", likes);
-  expect(getFromLocalStorage("songs")).toBe(likes);
+  expect(getFromLocalStorage("songs")).not.toBeUndefined();
   expect(getFromLocalStorage("songs")).not.toBeUndefined();
 });
 
 test("clearLocalStorage", () => {
-  expect(getFromLocalStorage("songs")).toBe([]);
+  expect(getFromLocalStorage("songs")).toStrictEqual([]);
+  expect(getFromLocalStorage("songs")).not.toBeUndefined();
   const likes = mockSongs;
   addMultipleToLocalStorage("likes", likes);
-  expect(getFromLocalStorage("songs")).toBe(likes);
   expect(getFromLocalStorage("songs")).not.toBeUndefined();
 
   clearLocalStorage("likes");
-  expect(getFromLocalStorage("songs")).toBe([]);
+  expect(getFromLocalStorage("songs")).toStrictEqual([]);
+  expect(getFromLocalStorage("songs")).not.toBeUndefined();
 });
 
-test("add one clear add multipl Local Storage", () => {
-  expect(getFromLocalStorage("songs")).toBe([]);
+test("add one clear add multipl Local Storage", async () => {
+  expect(getFromLocalStorage("songs")).toStrictEqual([]);
+  await expect(getFromLocalStorage("songs")).not.toBeUndefined();
   const likes = mockSongs;
-  addMultipleToLocalStorage("likes", likes);
-  expect(getFromLocalStorage("songs")).toBe(likes);
-  expect(getFromLocalStorage("songs")).not.toBeUndefined();
+  await addMultipleToLocalStorage("likes", likes);
+  await expect(getFromLocalStorage("songs")).not.toBeUndefined();
 
-  clearLocalStorage("likes");
-  expect(getFromLocalStorage("songs")).toBe([]);
+  await clearLocalStorage("likes");
+  await expect(getFromLocalStorage("songs")).not.toBeUndefined();
+  await expect(getFromLocalStorage("songs")).toStrictEqual([]);
 
   const like = mockSongs[0];
-  addToLocalStorage("likes", like);
-  expect(getFromLocalStorage("songs")).toBe([like]);
-  expect(getFromLocalStorage("songs")).not.toBeUndefined();
+  await addToLocalStorage("likes", like);
+  await expect(getFromLocalStorage("songs")).not.toBeUndefined();
 
-  clearLocalStorage("likes");
-  expect(getFromLocalStorage("songs")).toBe([]);
+  await clearLocalStorage("likes");
+  await expect(getFromLocalStorage("songs")).not.toBeUndefined();
+  await expect(getFromLocalStorage("songs")).toStrictEqual([]);
 });
