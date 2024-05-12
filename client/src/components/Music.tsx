@@ -124,9 +124,15 @@ const Actions = ({
       <div className="buttons">
         {isDesktop && (
           <>
-            <button onClick={handleDislike}>👎</button>
-            <button onClick={handleToggle}>{isPlaying ? "⏸️" : "▶️"}</button>
-            <button onClick={handleLike}>👍</button>
+            <button onClick={handleDislike} aria-label="dislike">
+              👎
+            </button>
+            <button onClick={handleToggle} aria-label="pause-button">
+              {isPlaying ? "⏸️" : "▶️"}
+            </button>
+            <button onClick={handleLike} aria-label="like-button">
+              👍
+            </button>
           </>
         )}
       </div>
@@ -269,14 +275,17 @@ const Card = () => {
           position: "absolute",
         }}
       >
-        <button>{theme || "random"}</button>
-        <button>
+        <button aria-label="theme-display">{theme || "random"}</button>
+        <button aria-label="counter">
           👍: {likes.length} 👎: {dislikes.length}
         </button>
-        <button onClick={handleClearClick}>clear session</button>
+        <button onClick={handleClearClick} aria-label="clear-button">
+          clear session
+        </button>
       </div>
       <div
         id="card"
+        aria-label="card"
         className="card"
         draggable={true}
         onDrop={(e) => e.preventDefault()}

@@ -135,23 +135,31 @@ const Intermediate = ({ pageProps, setIsAuthenticated }: IntermediateProps) => {
 
         const trackIDsString = JSON.stringify(trackIDs);
         clearUserSession().then(() => {
-          getRecommendations(trackIDsString, "true", "true", "", "10").then(() => {
-            setThemeToLocalStorage(selectedItem.name);
-            setPage("music");
-          }); 
+          getRecommendations(trackIDsString, "true", "true", "", "10").then(
+            () => {
+              setThemeToLocalStorage(selectedItem.name);
+              setPage("music");
+            }
+          );
         });
         // call handler with the track ids array
 
         console.log(trackIDsString);
       });
-    } else if (genreSelection){
+    } else if (genreSelection) {
       clearUserSession().then(() => {
-       const recommendation = getRecommendations("[]", "true", "true", genreSelection, "10");
-       recommendation.then(() => {
-        console.log("Genre given recommendations " +  recommendation)
-        setThemeToLocalStorage(selectedItem.name);
-        setPage("music");
-       })
+        const recommendation = getRecommendations(
+          "[]",
+          "true",
+          "true",
+          genreSelection,
+          "10"
+        );
+        recommendation.then(() => {
+          console.log("Genre given recommendations " + recommendation);
+          setThemeToLocalStorage(selectedItem.name);
+          setPage("music");
+        });
       });
     }
 
@@ -161,53 +169,77 @@ const Intermediate = ({ pageProps, setIsAuthenticated }: IntermediateProps) => {
 
   if (signedInWithSpotify) {
     return (
-      <div style={{
-        height: "100vh",
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "center",
-        justifyContent: "center",
-      }}>
+      <div
+        style={{
+          height: "100vh",
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          justifyContent: "center",
+        }}
+      >
         <h1 className="intermediate">Select to Start</h1>
         <h2 id="select-header">
-          {selectedItem.name ? `Chosen: ${selectedItem.name}` : "Select a Playlist or a Genre"}
+          {selectedItem.name
+            ? `Chosen: ${selectedItem.name}`
+            : "Select a Playlist or a Genre"}
         </h2>
-        <div style={{ display: 'flex', flexDirection: 'column', width: '100%', alignItems: 'center' }}>
-        <div className="radio-group" style={{ maxHeight: '30vh' }}>
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            width: "100%",
+            alignItems: "center",
+          }}
+        >
+          <div className="radio-group" style={{ maxHeight: "30vh" }}>
             {/* Map over playlists to render actual radio buttons */}
-            {playlists.map((playlist: { name: string; tracks: { href: string } }) => (
-              <div className="radio-element" key={playlist.name}>
-                <input type="radio" id={playlist.name} name="playlist" value={playlist.name}
-                      onChange={() => { setPlaylistChoice(playlist); handleSelection("playlist", playlist.name); }} />
-                <label htmlFor={playlist.name}>{playlist.name}</label>
+            {playlists.map(
+              (playlist: { name: string; tracks: { href: string } }) => (
+                <div className="radio-element" key={playlist.name}>
+                  <input
+                    type="radio"
+                    id={playlist.name}
+                    name="playlist"
+                    value={playlist.name}
+                    onChange={() => {
+                      setPlaylistChoice(playlist);
+                      handleSelection("playlist", playlist.name);
+                    }}
+                  />
+                  <label htmlFor={playlist.name}>{playlist.name}</label>
+                </div>
+              )
+            )}
+          </div>
+
+          <div className="radio-group" style={{ maxHeight: "20vh" }}>
+            {GENRES.map((genre) => (
+              <div key={genre}>
+                <input
+                  type="radio"
+                  id={genre}
+                  name="selection"
+                  value={genre}
+                  onChange={() => {
+                    setGenreSelection(genre);
+                    handleSelection("genre", genre);
+                  }}
+                />
+                <label htmlFor={genre}>{genre}</label>
               </div>
-            )
-          )}
+            ))}
+          </div>
+          <div className="flex">
+            <button onClick={handleContinue}>Continue</button>
+            <button onClick={handleBackClick} style={{ marginTop: "20px" }}>
+              {"back"}
+            </button>
+            <button onClick={handleLogout} style={{ marginTop: "20px" }}>
+              Logout
+            </button>
+          </div>
         </div>
-
-        <div className="radio-group" style={{ maxHeight: '20vh' }}>
-          {GENRES.map((genre) => (
-            <div key={genre}>
-              <input
-                type="radio"
-                id={genre}
-                name="selection"
-                value={genre}
-                onChange={() => 
-                  {setGenreSelection(genre)
-                  handleSelection("genre", genre)}}
-              />
-              <label htmlFor={genre}>{genre}</label>
-            </div>
-          ))}
-
-        </div>
-        <div className="flex">
-          <button onClick={handleContinue}>Continue</button>
-          <button onClick={handleBackClick} style={{ marginTop: "20px" }}>{"back"}</button>
-          <button onClick={handleLogout} style={{ marginTop: "20px" }}>Logout</button>
-        </div>
-      </div>
       </div>
     );
   }
@@ -223,23 +255,29 @@ const Intermediate = ({ pageProps, setIsAuthenticated }: IntermediateProps) => {
           justifyContent: "center",
         }}
       >
-        <h1 className="intermediate">Select to Start</h1>
+        <h1 className="intermediate" aria-label="start-message">
+          Select to Start
+        </h1>
 
-        <h2 id="select-header">
+        <h2 id="select-header" aria-label="select-genre">
           {selectedItem.name
             ? `Chosen: ${selectedItem.name}`
-            : "Select a Playlist or a Genre"}
+            : "Select a Genre"}
         </h2>
 
-        <div className="radio-group">
+        <div className="radio-group" aria-label="genres-group">
           {GENRES.map((genre, key) => (
-            <div key={key}>
+            <div key={key} aria-label={key.toString()}>
               <input
                 type="radio"
+                // id={key.toString()}
                 id={genre}
                 name="genre"
                 value={genre}
-                onChange={(e) => handleSelection("genre", genre)}
+                onChange={(e) => {
+                  setGenreSelection(genre);
+                  handleSelection("genre", genre);
+                }}
               ></input>
               <label htmlFor={genre}>{genre}</label>
             </div>
@@ -247,11 +285,21 @@ const Intermediate = ({ pageProps, setIsAuthenticated }: IntermediateProps) => {
         </div>
 
         <div className="flex">
-          <button onClick={handleContinue}>Continue</button>
-          <button onClick={handleBackClick} style={{ marginTop: "20px" }}>
+          <button onClick={handleContinue} aria-label="continue-button">
+            Continue
+          </button>
+          <button
+            onClick={handleBackClick}
+            style={{ marginTop: "20px" }}
+            aria-label="back-button"
+          >
             {"back"}
           </button>
-          <button onClick={handleLogout} style={{ marginTop: "20px" }}>
+          <button
+            onClick={handleLogout}
+            style={{ marginTop: "20px" }}
+            aria-label="select-logout"
+          >
             Logout
           </button>
         </div>
@@ -271,10 +319,15 @@ const Intermediate = ({ pageProps, setIsAuthenticated }: IntermediateProps) => {
       }}
     >
       <AccountLogin onLoginSuccess={handleSpotifyLoginSuccess} />
-      <button onClick={() => setSignedInWithoutSpotify(true)}>
+      <button
+        onClick={() => setSignedInWithoutSpotify(true)}
+        aria-label="login-without-spotify"
+      >
         Continue without signing into Spotify
       </button>
-      <button onClick={handleLogout}>Logout</button>
+      <button onClick={handleLogout} aria-label="intermediate-logout">
+        Logout
+      </button>
     </div>
   );
 };

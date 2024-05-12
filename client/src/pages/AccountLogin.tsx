@@ -52,7 +52,9 @@ const AccountLogin: React.FC<AccountLoginProps> = ({ onLoginSuccess }) => {
 
   return (
     <div>
-      <button onClick={handleLogin}>Login with Spotify</button>
+      <button onClick={handleLogin} aria-label="login-with-spotify">
+        Login with Spotify
+      </button>
     </div>
   );
 };

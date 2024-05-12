@@ -54,14 +54,19 @@ const Menu = ({ authProps, pageProps }: MenuProps) => {
       <button
         className={page === Page.MUSIC ? "selected" : ""}
         onClick={handleMusicClick}
+        aria-label="music-button"
       >
         Music
       </button>
-      <button onClick={handleLogoutClick}>
+      <button onClick={handleLogoutClick} aria-label="swiping-logout">
         {isIncognito ? "Leave Incognito" : "Logout"}
       </button>
-      <button onClick={handleBackClick}>{"back"}</button>
-      <button onClick={handleFinishClick}>Finish</button>
+      <button onClick={handleBackClick} aria-label="swiping-back">
+        {"back"}
+      </button>
+      <button onClick={handleFinishClick} aria-label="finish-button">
+        Finish
+      </button>
     </div>
   );
 };
