@@ -13,6 +13,7 @@ import java.lang.reflect.Type;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
@@ -20,6 +21,7 @@ import java.util.logging.Logger;
 
 import edu.brown.cs.student.main.server.handlers.ViewSongHandler;
 import edu.brown.cs.student.main.server.storage.MockedUtilities;
+import edu.brown.cs.student.main.server.storage.StorageInterface;
 import okio.Buffer;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
@@ -31,6 +33,7 @@ import spark.Spark;
 public class TestViewSong {
     private JsonAdapter<Map<String, Object>> adapter;
     private final Type mapStringObject = Types.newParameterizedType(Map.class, new Type[]{String.class, Object.class});
+    private StorageInterface utilities;
 
     public TestViewSong() {
     }
@@ -43,7 +46,8 @@ public class TestViewSong {
 
     @BeforeEach
     public void setup() {
-        Spark.get("viewSongs", new ViewSongHandler(new MockedUtilities()));
+        this.utilities = new MockedUtilities();
+        Spark.get("viewSongs", new ViewSongHandler(this.utilities));
         Spark.awaitInitialization();
         Moshi moshi = (new Moshi.Builder()).build();
         this.adapter = moshi.adapter(this.mapStringObject);
@@ -65,7 +69,7 @@ public class TestViewSong {
     }
 
     @Test
-    public void testLoadHandlerBasic() throws IOException {
+    public void testViewHandlerBasic() throws IOException {
         //Test one normal call to the backend view songs with mocked data
         HttpURLConnection clientConnection = this.tryRequest("viewSongs?uid=mocked&isAllSongs=false");
         Assert.assertEquals(200, clientConnection.getResponseCode());
@@ -86,6 +90,121 @@ public class TestViewSong {
         Assert.assertEquals("No new songs found", response.get("error_message"));
         clientConnection.disconnect();
     }
+
+    @Test
+    public void testViewWithAdding() throws IOException {
+        //Test one normal call to the backend view songs with mocked data
+        HttpURLConnection clientConnection = this.tryRequest("viewSongs?uid=mocked&isAllSongs=false");
+        Assert.assertEquals(200, clientConnection.getResponseCode());
+        Map<String, Object> response = (Map)this.adapter.fromJson((new Buffer()).readFrom(clientConnection.getInputStream()));
+
+        Assert.assertEquals("success", response.get("response_type"));
+        Map<String,Object> responseMap = (Map) response.get("responseMap");
+        Assert.assertEquals("[song1Object, song2Object, song3Object, song4Object]", responseMap.get("songs").toString());
+        List<String> list = (List<String>) ((Map) response.get("responseMap")).get("songs");
+        Assert.assertEquals(4, list.size());
+
+        //test no new songs found after requesting twice in a row
+        clientConnection = this.tryRequest("viewSongs?uid=mocked&isAllSongs=false");
+        Assert.assertEquals(200, clientConnection.getResponseCode());
+        response = (Map)this.adapter.fromJson((new Buffer()).readFrom(clientConnection.getInputStream()));
+        Assert.assertEquals("error", response.get("response_type"));
+        Assert.assertEquals("No new songs found", response.get("error_message"));
+
+        Map<String, Object> newSong = new HashMap<>();
+        newSong.put("song", "newSong");
+        this.utilities.addDocument("test", "songs", "song", newSong, true);
+        clientConnection = this.tryRequest("viewSongs?uid=mocked&isAllSongs=false");
+        Assert.assertEquals(200, clientConnection.getResponseCode());
+        response = (Map)this.adapter.fromJson((new Buffer()).readFrom(clientConnection.getInputStream()));
+        Assert.assertEquals("success", response.get("response_type"));
+        responseMap = (Map) response.get("responseMap");
+        Assert.assertEquals("[newSong]", responseMap.get("songs").toString());
+        list = (List<String>) ((Map) response.get("responseMap")).get("songs");
+        Assert.assertEquals(1, list.size());
+
+        clientConnection.disconnect();
+    }
+
+    @Test
+    public void testUidEmpty() throws IOException {
+        //Test one normal call to the backend view songs with mocked data
+        HttpURLConnection clientConnection = this.tryRequest("viewSongs?uid=&isAllSongs=false");
+        Assert.assertEquals(200, clientConnection.getResponseCode());
+        Map<String, Object> response = (Map)this.adapter.fromJson((new Buffer()).readFrom(clientConnection.getInputStream()));
+
+        Assert.assertEquals("error", response.get("response_type"));
+        Assert.assertEquals("Empty parameter(s)", response.get("error_message"));
+
+        clientConnection.disconnect();
+    }
+
+    @Test
+    public void testUidNotSpecified() throws IOException {
+        //Test one normal call to the backend view songs with mocked data
+        HttpURLConnection clientConnection = this.tryRequest("viewSongs?isAllSongs=false");
+        Assert.assertEquals(200, clientConnection.getResponseCode());
+        Map<String, Object> response = (Map)this.adapter.fromJson((new Buffer()).readFrom(clientConnection.getInputStream()));
+
+        Assert.assertEquals("error", response.get("response_type"));
+        Assert.assertEquals("Missing one or more parameters", response.get("error_message"));
+
+        clientConnection.disconnect();
+    }
+    @Test
+    public void testisAllSongsEmpty() throws IOException {
+        //Test one normal call to the backend view songs with mocked data
+        HttpURLConnection clientConnection = this.tryRequest("viewSongs?uid=test&isAllSongs=");
+        Assert.assertEquals(200, clientConnection.getResponseCode());
+        Map<String, Object> response = (Map)this.adapter.fromJson((new Buffer()).readFrom(clientConnection.getInputStream()));
+
+        Assert.assertEquals("error", response.get("response_type"));
+        Assert.assertEquals("Empty parameter(s)", response.get("error_message"));
+
+        clientConnection.disconnect();
+    }
+
+    @Test
+    public void testisAllSongsNotSpecified() throws IOException {
+        //Test one normal call to the backend view songs with mocked data
+        HttpURLConnection clientConnection = this.tryRequest("viewSongs?uid=test");
+        Assert.assertEquals(200, clientConnection.getResponseCode());
+        Map<String, Object> response = (Map)this.adapter.fromJson((new Buffer()).readFrom(clientConnection.getInputStream()));
+
+        Assert.assertEquals("error", response.get("response_type"));
+        Assert.assertEquals("Missing one or more parameters", response.get("error_message"));
+
+        clientConnection.disconnect();
+    }
+
+
+    @Test
+    public void testBothEmpty() throws IOException {
+        //Test one normal call to the backend view songs with mocked data
+        HttpURLConnection clientConnection = this.tryRequest("viewSongs?uid=&isAllSongs=");
+        Assert.assertEquals(200, clientConnection.getResponseCode());
+        Map<String, Object> response = (Map)this.adapter.fromJson((new Buffer()).readFrom(clientConnection.getInputStream()));
+
+        Assert.assertEquals("error", response.get("response_type"));
+        Assert.assertEquals("Empty parameter(s)", response.get("error_message"));
+
+        clientConnection.disconnect();
+    }
+
+    @Test
+    public void testBothSpecified() throws IOException {
+        //Test one normal call to the backend view songs with mocked data
+        HttpURLConnection clientConnection = this.tryRequest("viewSongs?");
+        Assert.assertEquals(200, clientConnection.getResponseCode());
+        Map<String, Object> response = (Map)this.adapter.fromJson((new Buffer()).readFrom(clientConnection.getInputStream()));
+
+        Assert.assertEquals("error", response.get("response_type"));
+        Assert.assertEquals("Missing one or more parameters", response.get("error_message"));
+
+        clientConnection.disconnect();
+    }
+
+
 
 }
 
